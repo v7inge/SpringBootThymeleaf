@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple chat</title>
+	<link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/css/style.css" rel="stylesheet">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="/webjars/sockjs-client/sockjs.min.js"></script>
+	<script src="/webjars/stomp-websocket/stomp.min.js"></script>
+	<script src="/js/script.js"></script>	
+	
+	<link type="text/css" rel="stylesheet" data-th-href="@{css/style.css}" />
+	
+</head>
+
+<body onload="onLoad()">
+	
+	<h2 th:utext="${loginedUser}">..!..</h2>
+	
+	<div class="invisible" id="userName" th:utext="${loginedUser}"></div>
+	<div class="invisible" id="contactName">no contact</div>
+	
+	<div class="chat_window">
+	
+		<div class="top_menu">
+			<div class="title">Chat by Victor Umanskiy</div>
+		</div>
+		
+		<div class = "sidebar">
+		<ul class = "contacts" id = "contacts" th:each ="contactName : ${contactList}">
+		<li class = "contact" th:utext="${contactName}"></li>
+		</ul>   
+		</div>
+		
+		<div class="chat_inner_window">
+		
+		<table class = "tdcenter">
+			<tr>
+				<td>
+					<p>Select a contact to start messaging...</p>
+				</td>
+			</tr>
+		</table>
+		
+		<ul class = "messages" id = "messages">
+		</ul>
+		</div>
+	
+		<div class="bottom_wrapper clearfix">
+				<div class="message_input_wrapper">
+					<input id="message_input_value" class="message_input" placeholder="Type your message here..." />
+				</div>
+				
+				<div class="send_message" id="send_button">
+					<div class="icon"></div>
+					<div class="text">Send</div>
+				</div>
+	  			
+			</div>
+	
+		</div>
+	
+</body>
+</html>

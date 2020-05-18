@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple chat</title>
+	<link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/css/style.css" rel="stylesheet">
+	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script src="/webjars/sockjs-client/sockjs.min.js"></script>
+	<script src="/webjars/stomp-websocket/stomp.min.js"></script>
+	<script src="/js/script.js"></script>	
+	<link type="text/css" rel="stylesheet" data-th-href="@{css/style.css}" />
+	
+</head>
+
+<body>
+
+	<h2 th:utext="${message}">..!..</h2>
+	<h2 th:utext="${testMessage}">..!..</h2>
+	<h2>test h2</h2>
+
+  <div class="login_window">
+
+    <div class="top_menu">
+		<div class="title">Chat by Victor Umanskiy</div>
+	</div>
+
+    <h2 class="h2-login active">Log in</h2>
+    <h2 class="h2-login inactive">Sign up</h2>
+    
+    <p style="color: red;" th:utext="${errorString}"></p>
+
+    <form th:action="@{/auth}" th:object="${authForm}" method="POST">
+      <input type="text" id="login" name="userName" placeholder="login" th:field="*{login}" />
+      <input type="text" id="password" name="password" placeholder="password" th:field="*{password}" />
+      <input type="submit" id="login_button" value="Log In" />
+      <div class="checkbox">
+      <input class="custom-checkbox" type="checkbox" id="rememberMe" name="rememberMe" th:field="*{remember}" checked />
+      <label for="rememberMe">Remember me</label>
+      </div>
+    </form>
+
+    <div id="formFooter">
+      <div class="dark-gray">If you forgot you password please contact the developer</div>
+    </div>
+
+  </div>
+
+</body>
+</html>
