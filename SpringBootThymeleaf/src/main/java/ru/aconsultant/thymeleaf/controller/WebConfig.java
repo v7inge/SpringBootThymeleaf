@@ -28,7 +28,7 @@ import ru.aconsultant.thymeleaf.interceptor.EncodingInterceptor;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 	
-	//@Override
+	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(new AuthInterceptor()).addPathPatterns("/");
 		registry.addInterceptor(new EncodingInterceptor());
@@ -39,7 +39,7 @@ public class WebConfig implements WebMvcConfigurer {
 		return new DataSourceTransactionManager(dataSource);
 	}
 	
-	@Bean
+	/*@Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
@@ -48,6 +48,6 @@ public class WebConfig implements WebMvcConfigurer {
         dataSource.setPassword("hgy78fdXVb0");
 
         return dataSource;
-    }
+    }*/
    
 }
