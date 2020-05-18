@@ -28,8 +28,8 @@
 		</div>
 		
 		<div class = "sidebar">
-		<ul class = "contacts" id = "contacts" th:each ="contactName : ${contactList}">
-		<li class = "contact" th:utext="${contactName}"></li>
+		<ul class = "contacts" id = "contacts">
+		<li class = "contact" th:each ="contactName : ${contactList}" th:utext="${contactName}"></li>
 		</ul>   
 		</div>
 		
