@@ -25,6 +25,9 @@ import ru.aconsultant.thymeleaf.mapper.UserAccountMapper;
 @Transactional
 public class DatabaseAccess extends JdbcDaoSupport {
  
+	// query for group chats:
+	// SELECT * FROM GROUP_CHATS WHERE Members LIKE CONCAT("%", "victor", "$%")
+	
 	@Autowired 
 	private DataSource dataSource;
 	
@@ -62,7 +65,7 @@ public class DatabaseAccess extends JdbcDaoSupport {
     }
     
     
-    public ArrayList<String> contactList(String excludeName) throws SQLException {
+    public ArrayList<String> contactNameList(String excludeName) throws SQLException {
         
 		String sql = "Select a.USER_NAME from USER_ACCOUNT a WHERE a.USER_NAME <> ?";
 		Object[] args = new Object[] { excludeName };
@@ -74,6 +77,31 @@ public class DatabaseAccess extends JdbcDaoSupport {
 			ArrayList<String> list = new ArrayList<String>();
 		    while (rs.next()) {
 		        list.add(rs.getString("USER_NAME"));
+		    }
+		    return list;
+			
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    public ArrayList<Contact> contactList(String userName) throws SQLException {
+        
+		String sql = 
+				"SELECT UserChats.Contact, SUM(m.New) AS UnreadCount FROM \n" +
+				"(SELECT chats.User, chats.Contact FROM PERSONAL_CHATS chats WHERE chats.User = ?) AS UserChats \n" +
+				"LEFT JOIN MESSAGES m ON UserChats.Contact = m.Sender AND m.New = 1 \n" +
+				"GROUP BY UserChats.Contact";
+				
+		Object[] args = new Object[] { userName };
+		int[] argTypes = new int[] { Types.VARCHAR };
+		
+		try {
+			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
+			
+			ArrayList<Contact> list = new ArrayList<Contact>();
+		    while (rs.next()) {
+		        list.add(new Contact(rs.getString("Contact"), rs.getInt("UnreadCount")));
 		    }
 		    return list;
 			

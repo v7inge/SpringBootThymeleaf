@@ -13,7 +13,16 @@ function connect() {
 		stompClient.subscribe("/queue/" + sender, function (data) {
 			
 			var data = JSON.parse(data.body);
-			drawMessage(data.text, new Date(data.date), "left");
+			
+			let messageFrom = data.sender;
+			let activeContact = $("#contactName").text();
+			
+			if (messageFrom == activeContact) {
+				drawMessage(data.text, new Date(data.date), "left");
+			} else {
+				increaseCounter(messageFrom);
+			}
+			
 		});
 	});
 }
@@ -59,6 +68,68 @@ function formatDate(date) {
 	  if (minute < 10) minute = "0" + minute;
 	  
 	  return day + "." + month + "." + year + " " + hour + ":" + minute;
+}
+
+function resetCounter(str) {
+
+	let el = findContact(str);
+	if (el != null) {
+	
+		let counterElement = $(el).children(".counter");
+
+		if(counterElement.hasClass("invisible") == false) {
+			counterElement.toggleClass("invisible");
+		}
+
+		counterElement.text("");
+
+	};
+
+}
+
+function findContact(str) {
+
+	let contact = null;
+
+	$(".contact").each(function (index, el) {
+
+		if (getContactName(el) == str) {
+			contact = el;	
+			return false;
+		}
+
+	});
+
+	return contact;
+
+}
+
+function getContactName(el) {
+	return $(el).children(".name").text();	
+}
+
+function getContactCounter(el) {
+	let counterElement = $(el).children(".counter");
+	let counterNumber = Number(counterElement.text());
+	return counterNumber;
+}
+
+function increaseCounter(str, num = 1) {
+
+	let el = findContact(str);
+	if (el != null) {
+	
+		let counterElement = $(el).children(".counter");
+
+		if(counterElement.hasClass("invisible")) {
+			counterElement.toggleClass("invisible");
+		}
+
+		let counterNumber = Number(counterElement.text());
+		counterElement.text(counterNumber + num);
+
+	};
+
 }
 
 function sendMessage() {
@@ -111,26 +182,31 @@ $(document).ready(function() {
 
 	// Click on contact name
 	$(".contact").click(function() {
-					
+				
+		// Counter
+		let contactCounter = getContactCounter($(this));
+		let needToResetCounter = (contactCounter != 0);
+		
+		let contactName = getContactName($(this));
+		$("#contactName").text(contactName);
+
 		// Changing styles and content
+		resetCounter(contactName);
 		contacts = $(".contact-active");
 		contacts.removeClass();
 		contacts.toggleClass("contact");
 		$(this).removeClass();
 		$(this).toggleClass("contact-active");
 		$("#messages").html("");
-		
+
 		// Hide tip table
 		tipTable = $(".tdcenter");
 		tipTable.removeClass();
 		tipTable.html("");
-		
-		let contactName = $(this).text();
-		$("#contactName").text(contactName);
 
 		// Filling data
-		let userData = {"queryType": "contact_clicked", "contact": contactName};
-        let url = "/";
+		let userData = {"queryType": "contact_clicked", "contact": contactName}; //, "needToResetCounter": needToResetCounter};
+        let url = "/contact-clicked";
         let userJson = JSON.stringify(userData);
 		
 		$.ajax

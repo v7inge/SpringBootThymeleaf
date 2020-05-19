@@ -29,8 +29,11 @@
 		
 		<div class = "sidebar">
 		<ul class = "contacts" id = "contacts">
-		<li class = "contact" th:each ="contactName : ${contactList}" th:utext="${contactName}"></li>
-		</ul>   
+		<li class = "contact" th:each ="contact : ${contactList}">
+		<div class = "name" th:utext="${contact.login}"></div>
+		<div class = "counter" th:classappend = "${contact.unreadCount}==0 ? invisible : userclass" th:utext="${contact.unreadCount}"></div>
+		</li>
+		</ul>
 		</div>
 		
 		<div class="chat_inner_window">

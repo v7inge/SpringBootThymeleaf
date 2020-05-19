@@ -40,8 +40,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.aconsultant.thymeleaf.form.AuthForm;
 import ru.aconsultant.thymeleaf.service.Serializer;
 import ru.aconsultant.thymeleaf.beans.UserAccount;
-import ru.aconsultant.thymeleaf.utils.DBUtils;
-import ru.aconsultant.thymeleaf.utils.MyUtils;
+import ru.aconsultant.thymeleaf.beans.Contact;
 import ru.aconsultant.thymeleaf.beans.Message;
 import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
 
@@ -72,12 +71,42 @@ public class MainController {
 	public String chatGet(Model model, HttpServletRequest request) throws SQLException {
 		
 		// Fill contact list
-        ArrayList<String> contactList = this.databaseAccess.contactList(model.getAttribute("loginedUser").toString());
+        ArrayList<Contact> contactList = this.databaseAccess.contactList(model.getAttribute("loginedUser").toString());
 		model.addAttribute("contactList", contactList);
 
 		return "chat";
 	}
 	
+	@RequestMapping(value = { "/contact-clicked" }, method = RequestMethod.POST)
+	public String contactClick(Model model, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws SQLException, IOException {
+		
+		String contact = "";
+        StringBuffer sb = new StringBuffer();
+        String line = null;
+
+        BufferedReader reader = request.getReader();
+        while ((line = reader.readLine()) != null)
+            sb.append(line);
+        
+        try {
+            
+        	String jsonString = sb.toString();
+        	JSONObject jsonObject =  new JSONObject(jsonString);		
+        	JSONObject jsonEnt = new JSONObject();
+        	
+        	contact = jsonObject.getString("contact");
+        	request.setAttribute("contact", contact);
+        	List<Message> history = this.databaseAccess.getHistory(model.getAttribute("loginedUser").toString(), contact);
+            jsonEnt.put("contactHistory", history);
+            PrintWriter out = response.getWriter();
+            out.write(jsonEnt.toString());
+        
+        } catch (JSONException e) { }
+        
+        return null;
+	}
+	
+	// NOT USED
 	@RequestMapping(value = { "/" }, method = RequestMethod.POST)
 	public String chatPost(Model model, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws SQLException, IOException {
 		
@@ -156,7 +185,7 @@ public class MainController {
                 errorString = "Invalid pair login-passwod";
         	} else {
         		
-        		model.addAttribute("loginedUser", user.getUserName());
+        		model.addAttribute("loginedUser", user.getLogin());
         		/*session.setAttribute("testUser", Serializer.serializeObject(new UserAccount("test login", "test password")));
         		UserAccount testUser = Serializer.deSerializeUserAccount(session.getAttribute("testUser").toString());*/
         		return "redirect:/";
