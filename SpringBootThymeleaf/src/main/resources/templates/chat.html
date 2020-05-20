@@ -29,6 +29,10 @@
 		
 		<div class = "sidebar">
 		<ul class = "contacts" id = "contacts">
+		<li class = "contact">
+			<img src="http://aconsultant.ru/wp-content/uploads/2020/05/gear.png" width="13" height="13" alt="gear">
+			<div class = "name">Settings</div>
+		</li>
 		<li class = "contact" th:each ="contact : ${contactList}">
 		<div class = "name" th:utext="${contact.login}"></div>
 		<div class = "counter" th:classappend = "${contact.unreadCount}==0 ? invisible : userclass" th:utext="${contact.unreadCount}"></div>

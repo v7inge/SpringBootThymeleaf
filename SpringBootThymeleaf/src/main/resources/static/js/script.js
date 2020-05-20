@@ -163,7 +163,7 @@ function sendMessage() {
     });
 }
 
-function sendContactClick(contactElement) {
+function contactClick(contactElement) {
 
 	// Counter
 	let contactCounter = getContactCounter(contactElement);
@@ -177,8 +177,8 @@ function sendContactClick(contactElement) {
 	contacts = $(".contact-active");
 	contacts.removeClass();
 	contacts.toggleClass("contact");
-	$(this).removeClass();
-	$(this).toggleClass("contact-active");
+	contactElement.removeClass();
+	contactElement.toggleClass("contact-active");
 	$("#messages").html("");
 
 	// Hide tip table
@@ -242,7 +242,7 @@ $(document).ready(function() {
 
 	// Click on contact name
 	$(".contact").click(function() {
-		sendContactClick($(this));	
+		contactClick($(this));	
 	});
 	
 	// Changing login type

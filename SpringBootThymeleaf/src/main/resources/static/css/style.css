@@ -8,6 +8,9 @@
   --dark-green: rgba(0, 167, 22, 0.822);
   --light-gray: rgba(216, 216, 216, 0.507);
   --dark-gray: #444444a6;
+  --dark-text: #222222;
+  --deep-blue: #63ADD0;
+  --light-blue: #e0ecfe;
 }
 
 .light-gray {
@@ -87,19 +90,24 @@ body {
 .contact {
   clear: both;
 	display: block;
-	color:#222222;
+	color: var(--dark-text);
 	padding:6px;
 }
 
 .contact-active {
   clear: both;
 	display: block;
-  background:#63ADD0;
-  padding:6px;
+  background: var(--deep-blue);
+  padding: 6px;
+}
+
+.contact-active .name {
+  position: relative;
+  display: inline-block;
 }
 
 .contact:hover {
-	background:#e0ecfe;
+	background: var(--light-blue);
 }
 
 .contact .counter {
@@ -114,6 +122,22 @@ body {
 .contact .name {
   position: relative;
   display: inline-block;
+}
+
+.contact img {
+  vertical-align: middle;
+  height: 15px;
+  width: 15px;
+  margin-right: 4px;
+  margin-left: 2px;
+}
+
+.contact-active img {
+  vertical-align: middle;
+  height: 15px;
+  width: 15px;
+  margin-right: 4px;
+  margin-left: 2px;
 }
 
 /* --------------------------------------- */
