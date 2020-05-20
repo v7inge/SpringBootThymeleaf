@@ -139,8 +139,8 @@ function sendMessage() {
 	let date = new Date();
 	let sender = $("#userName").text();
 	let reciever = $("#contactName").text();
-	let message = {"queryType": "message_sent", "text": text, "sender": sender, "date": date, "reciever": reciever};
-	let url = "/";
+	let message = {"text": text, "sender": sender, "date": date, "reciever": reciever};
+	let url = "/message-sent";
     let userJson = JSON.stringify(message);
 	
     if ((reciever == "") || (text == "")) {
@@ -163,6 +163,66 @@ function sendMessage() {
     });
 }
 
+function sendContactClick(contactElement) {
+
+	// Counter
+	let contactCounter = getContactCounter(contactElement);
+	let needToResetCounter = (contactCounter != 0);
+	
+	let contactName = getContactName(contactElement);
+	$("#contactName").text(contactName);
+
+	// Changing styles and content
+	resetCounter(contactName);
+	contacts = $(".contact-active");
+	contacts.removeClass();
+	contacts.toggleClass("contact");
+	$(this).removeClass();
+	$(this).toggleClass("contact-active");
+	$("#messages").html("");
+
+	// Hide tip table
+	tipTable = $(".tdcenter");
+	tipTable.removeClass();
+	tipTable.html("");
+
+	// Filling data
+	let userData = {"contact": contactName, "needToResetCounter": needToResetCounter};
+    let url = "/contact-clicked";
+    let userJson = JSON.stringify(userData);
+	
+	$.ajax
+    ({
+        type: "POST",
+        data: userJson,
+        url: url,
+        contentType: "application/json; charset=utf-8",
+        error: function(e)
+        {
+        	console.log("Запрос не удался!");
+        },
+        success: function(data)
+    	{
+
+        	let side = "";
+        	let mas = data.contactHistory;
+        	for (let i = 0; i !== mas.length; i += 1) {
+        		
+        		if (mas[i].sender == $("#userName").text()) {
+        			side = "right";
+        		} else {
+        			side = "left";
+        		}
+        		
+        		drawMessage(mas[i].text, new Date(mas[i].date), side);
+        	
+        	}
+    	}
+    });
+	
+	scrollDown();
+}
+
 function scrollDown() {
 	$("#messages").scrollTop($("#messages")[0].scrollHeight);
 }
@@ -182,63 +242,7 @@ $(document).ready(function() {
 
 	// Click on contact name
 	$(".contact").click(function() {
-				
-		// Counter
-		let contactCounter = getContactCounter($(this));
-		let needToResetCounter = (contactCounter != 0);
-		
-		let contactName = getContactName($(this));
-		$("#contactName").text(contactName);
-
-		// Changing styles and content
-		resetCounter(contactName);
-		contacts = $(".contact-active");
-		contacts.removeClass();
-		contacts.toggleClass("contact");
-		$(this).removeClass();
-		$(this).toggleClass("contact-active");
-		$("#messages").html("");
-
-		// Hide tip table
-		tipTable = $(".tdcenter");
-		tipTable.removeClass();
-		tipTable.html("");
-
-		// Filling data
-		let userData = {"queryType": "contact_clicked", "contact": contactName}; //, "needToResetCounter": needToResetCounter};
-        let url = "/contact-clicked";
-        let userJson = JSON.stringify(userData);
-		
-		$.ajax
-        ({
-            type: "POST",
-            data: userJson,
-            url: url,
-            contentType: "application/json; charset=utf-8",
-            error: function(e)
-            {
-            	console.log("Запрос не удался!");
-            },
-            success: function(data)
-        	{
-
-            	console.log("data: " + data);
-            	let side = "";
-            	let mas = data.contactHistory;
-            	for (let i = 0; i !== mas.length; i += 1) {
-            		
-            		if (mas[i].sender == $("#userName").text()) {
-            			side = "right";
-            		} else {
-            			side = "left";
-            		}
-            		
-            		drawMessage(mas[i].text, new Date(mas[i].date), side);
-            	
-            	}
-        	}
-        });
-		scrollDown();
+		sendContactClick($(this));	
 	});
 	
 	// Changing login type

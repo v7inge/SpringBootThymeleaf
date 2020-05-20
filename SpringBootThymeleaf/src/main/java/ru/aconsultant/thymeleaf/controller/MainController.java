@@ -43,6 +43,7 @@ import ru.aconsultant.thymeleaf.beans.UserAccount;
 import ru.aconsultant.thymeleaf.beans.Contact;
 import ru.aconsultant.thymeleaf.beans.Message;
 import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
+import ru.aconsultant.thymeleaf.service.CounterResetThread;
 
 @Controller
 @SessionAttributes("loginedUser")
@@ -77,6 +78,36 @@ public class MainController {
 		return "chat";
 	}
 	
+	@RequestMapping(value = { "/message-sent" }, method = RequestMethod.POST)
+	public String messageSent(Model model, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws SQLException, IOException {
+		
+		String contact = "";
+        StringBuffer sb = new StringBuffer();
+        String line = null;
+
+        BufferedReader reader = request.getReader();
+        while ((line = reader.readLine()) != null)
+            sb.append(line);
+
+        try {
+            
+        	String jsonString = sb.toString();
+        	
+        	StringReader stringReader = new StringReader(jsonString);
+        	ObjectMapper mapper = new ObjectMapper();
+        	Message message = mapper.readValue(stringReader, Message.class);
+        			
+        	try {
+        		this.databaseAccess.saveMessage(message);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        } catch (JSONException e) { }
+        
+        return null;
+	}
+	
 	@RequestMapping(value = { "/contact-clicked" }, method = RequestMethod.POST)
 	public String contactClick(Model model, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws SQLException, IOException {
 		
@@ -96,11 +127,19 @@ public class MainController {
         	
         	contact = jsonObject.getString("contact");
         	request.setAttribute("contact", contact);
-        	List<Message> history = this.databaseAccess.getHistory(model.getAttribute("loginedUser").toString(), contact);
+        	String userName = model.getAttribute("loginedUser").toString();
+        	List<Message> history = this.databaseAccess.getHistory(userName, contact);
             jsonEnt.put("contactHistory", history);
             PrintWriter out = response.getWriter();
             out.write(jsonEnt.toString());
         
+            // Reset message counter with minor thread priority
+            if (jsonObject.getBoolean("needToResetCounter")) {
+            	CounterResetThread counterResetThread = new CounterResetThread(userName, contact, this.databaseAccess);
+            	counterResetThread.setPriority(3);
+            	counterResetThread.start();
+            }
+            
         } catch (JSONException e) { }
         
         return null;

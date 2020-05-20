@@ -130,4 +130,9 @@ public class DatabaseAccess extends JdbcDaoSupport {
         this.getJdbcTemplate().update(sql, message.getSender(), message.getReciever(), new java.sql.Date(message.getDate().getTime()), message.getText());
     }
     
+    public void resetCounter(String userName, String contactName) throws SQLException {
+        String sql = "UPDATE MESSAGES SET New=0 WHERE Sender=? AND Reciever=?";
+        this.getJdbcTemplate().update(sql, contactName, userName);
+    }
+    
 }
