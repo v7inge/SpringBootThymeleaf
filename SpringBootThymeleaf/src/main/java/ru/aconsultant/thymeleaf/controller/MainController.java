@@ -50,6 +50,7 @@ import ru.aconsultant.thymeleaf.service.CounterResetThread;
 public class MainController {
 
 	private String loginedUser;
+	//private UserAccount loginedUser;
 	
 	@Autowired
     private DatabaseAccess databaseAccess;
@@ -145,55 +146,6 @@ public class MainController {
         return null;
 	}
 	
-	// NOT USED
-	@RequestMapping(value = { "/" }, method = RequestMethod.POST)
-	public String chatPost(Model model, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws SQLException, IOException {
-		
-		String contact = "";
-        StringBuffer sb = new StringBuffer();
-        String line = null;
-
-        BufferedReader reader = request.getReader();
-        while ((line = reader.readLine()) != null)
-            sb.append(line);
-
-        try {
-            
-        	String jsonString = sb.toString();
-        	JSONObject jsonObject =  new JSONObject(jsonString);
-        	
-        	switch (jsonObject.getString("queryType")) {
-        		case "contact_clicked":
-        			
-        			JSONObject jsonEnt = new JSONObject();
-        			contact = jsonObject.getString("contact");
-        			request.setAttribute("contact", contact);
-        			List<Message> history = this.databaseAccess.getHistory(model.getAttribute("loginedUser").toString(), contact);
-                    jsonEnt.put("contactHistory", history);
-                    PrintWriter out = response.getWriter();
-                	out.write(jsonEnt.toString());
-        	        break;
-        		case "message_sent":
-        			String messageString = jsonString.replace("\"queryType\":\"message_sent\",", "");
-        			jsonObject.remove("queryType");
-        			StringReader stringReader = new StringReader(messageString);
-        			ObjectMapper mapper = new ObjectMapper();
-        			Message message = mapper.readValue(stringReader, Message.class);
-        			try {
-        				this.databaseAccess.saveMessage(message);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-        			break;
-        	    default:
-        	    	return "chat";
-        	}
-        } catch (JSONException e) {
-        }
-        
-        return null;
-	}
-	
 	@RequestMapping(value = { "/auth" }, method = RequestMethod.GET)
 	public String authGet(Model model) { //, @ModelAttribute("loginedUser") UserAccount loginedUser) {
 		
@@ -225,8 +177,8 @@ public class MainController {
         	} else {
         		
         		model.addAttribute("loginedUser", user.getLogin());
-        		/*session.setAttribute("testUser", Serializer.serializeObject(new UserAccount("test login", "test password")));
-        		UserAccount testUser = Serializer.deSerializeUserAccount(session.getAttribute("testUser").toString());*/
+        		//model.addAttribute("loginedUser", new UserAccount("test login", "test password"));
+        		//session.setAttribute("testUser", new UserAccount("test login", "test password"));
         		return "redirect:/";
         	}
         }
