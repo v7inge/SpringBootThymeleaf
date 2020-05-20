@@ -1,6 +1,7 @@
 package ru.aconsultant.thymeleaf.beans;
+import java.io.Serializable;
 
-public class UserAccount {
+public class UserAccount implements Serializable {
 
 	private String login;
 	private String password;

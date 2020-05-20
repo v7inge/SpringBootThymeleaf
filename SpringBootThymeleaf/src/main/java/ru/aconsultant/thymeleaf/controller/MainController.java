@@ -46,11 +46,11 @@ import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
 import ru.aconsultant.thymeleaf.service.CounterResetThread;
 
 @Controller
-@SessionAttributes("loginedUser")
+@SessionAttributes({"loginedUser","testUser"})
 public class MainController {
 
 	private String loginedUser;
-	//private UserAccount loginedUser;
+	private UserAccount testUser;
 	
 	@Autowired
     private DatabaseAccess databaseAccess;
@@ -71,6 +71,8 @@ public class MainController {
 	
 	@RequestMapping(value = { "/" }, method = RequestMethod.GET)
 	public String chatGet(Model model, HttpServletRequest request) throws SQLException {
+		
+		UserAccount yy = (UserAccount) model.getAttribute("testUser");
 		
 		// Fill contact list
         ArrayList<Contact> contactList = this.databaseAccess.contactList(model.getAttribute("loginedUser").toString());
@@ -177,6 +179,7 @@ public class MainController {
         	} else {
         		
         		model.addAttribute("loginedUser", user.getLogin());
+        		model.addAttribute("testUser", new UserAccount("test login", "test password"));
         		//model.addAttribute("loginedUser", new UserAccount("test login", "test password"));
         		//session.setAttribute("testUser", new UserAccount("test login", "test password"));
         		return "redirect:/";
