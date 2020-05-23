@@ -40,9 +40,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		
+		http.csrf().disable();
+		
 		http
 			.authorizeRequests()
-				//.antMatchers("/").access("hasRole('ROLE_USER')")
 				.antMatchers("/").authenticated()
 				.anyRequest().permitAll()
 				.and()
@@ -53,10 +55,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.and()
 			.logout()
 				.permitAll()
-				.logoutUrl("/logout").logoutSuccessUrl("/logoutSuccessful");
-				//.logoutUrl("/auth"); //.logoutSuccessUrl("/auth");
-				//.logoutUrl("/logout")
-				//.logoutSuccessUrl("/logout");
+				.logoutUrl("/logout")
+				.logoutSuccessUrl("/auth");
 	}
 
 	/*@Bean
