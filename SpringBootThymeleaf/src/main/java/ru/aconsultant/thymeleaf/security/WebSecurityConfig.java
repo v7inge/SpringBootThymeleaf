@@ -33,8 +33,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception { 
 		
-		// Setting Service to find User in the database.
-		// And Setting PassswordEncoder
 		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 	}
 	
@@ -58,18 +56,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.logoutUrl("/logout")
 				.logoutSuccessUrl("/auth");
 	}
-
-	/*@Bean
-	@Override
-	public UserDetailsService userDetailsService() {
-		UserDetails user =
-			 User.withDefaultPasswordEncoder()
-				.username("user")
-				.password("password")
-				.roles("USER")
-				.build();
-
-		return new InMemoryUserDetailsManager(user);
-	}*/
 	
 }
