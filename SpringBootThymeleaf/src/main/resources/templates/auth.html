@@ -28,31 +28,38 @@
     <h2 class="h2-login inactive">Sign up</h2>
     
    	
-    <div th:if="${param.error}">
-    	Invalid username and password.
+    <div style="color: red;" th:if="${param.error}">
+    	Invalid username and password
     </div>
     
     <div th:if="${param.logout}">
-    	You have been logged out.
+    	You have been successfully logged out
     </div>
     
-    
-    <!-- <p style="color: red;" th:utext="${errorString}"></p> -->
-
-    <!-- <form th:action="@{/auth}" th:object="${authForm}" method="POST"> -->
-    <form th:action="@{/auth}" method="POST">
+    <form id="form_login" th:action="@{/auth}" method="POST">
       <input type="text" id="login" name="username" placeholder="username" />
-      <input type="text" id="password" name="password" placeholder="password" />
+      <input type="password" id="password" name="password" placeholder="password" />
       <input type="submit" id="login_button" value="Log In" />
       <!-- <div class="checkbox">
       <input class="custom-checkbox" type="checkbox" id="rememberMe" name="rememberMe" th:field="*{remember}" checked />
       <label for="rememberMe">Remember me</label>
       </div> -->
     </form>
-
-    <div id="formFooter">
-      <div class="dark-gray">If you forgot you password please contact the developer</div>
-    </div>
+    
+    <form id="form_signup" class="invisible" th:action="@{/register}" method="POST">
+      <input type="text" id="reg_username" name="username" onchange="usernameInputChange()" placeholder="username" th:field="*{username}" />
+      <div id = "reg_username_tip"></div>
+      <input id = "reg_password" type="password" placeholder="password" onchange ="passwordInputChange()" />
+      <input id = "reg_password_repeat" type="password" placeholder="please, repeat password" onchange ="passwordInputChange()" />
+      <div id = "reg_password_tip"></div>
+      <input type="submit" class="inactive-input" id="reg_button" value="Sign up" />
+      <!--
+      <div class="checkbox">
+      <input class="custom-checkbox" type="checkbox" id="rememberMe" name="rememberMe" th:field="*{remember}" checked />
+      <label for="rememberMe">Remember me</label>
+      </div>
+      -->
+    </form>
 
   </div>
 

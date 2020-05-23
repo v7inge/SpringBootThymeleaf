@@ -29,7 +29,9 @@
 }
 
 .invisible {
-  opacity: 0;
+  display: none;
+  /*opacity: 0;*/
+  /*visibility: hidden;*/
 }
 
 .sidebar {
@@ -76,6 +78,27 @@ body {
   overflow: hidden;
 }
 
+.contact_input {
+  display: inline-block;
+  border-radius: 10px;
+  border: 1px solid #bcbdc0;
+  width: calc(100% - 20px);
+  position: relative;
+  margin-top: 7px;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 7px 7px 7px 7px;
+}
+
+.searching-tip {
+  clear: both;
+	display: block;
+	color: var(--dark-gray);
+  margin-left: 14px;
+  margin-top: 6px;
+	/*padding: 5px 5px 5px 5px;*/
+}
+
 /* --------------------------------------- */
 /* CONTACTS */
 
@@ -101,11 +124,6 @@ body {
   padding: 6px;
 }
 
-.contact-active .name {
-  position: relative;
-  display: inline-block;
-}
-
 .contact:hover {
 	background: var(--light-blue);
 }
@@ -128,16 +146,14 @@ body {
   vertical-align: middle;
   height: 15px;
   width: 15px;
-  margin-right: 4px;
-  margin-left: 2px;
+  margin-right: 5px;
 }
 
 .contact-active img {
   vertical-align: middle;
   height: 15px;
   width: 15px;
-  margin-right: 4px;
-  margin-left: 2px;
+  margin-right: 5px;
 }
 
 /* --------------------------------------- */
@@ -323,7 +339,7 @@ body {
 .bottom_wrapper .message_input_wrapper {
   display: inline-block;
   height: 50px;
-  border-radius: 25px;
+  border-radius: 10px;
   border: 1px solid #bcbdc0;
   width: calc(100% - 160px);
   position: relative;
@@ -368,6 +384,11 @@ body {
 
 /* --------------------------------------- */
 /* LOGIN PAGE */
+
+.inactive-input {
+  pointer-events: none;
+  background-color: var(--dark-gray) !important;
+}
 
 .login_window {
   position: absolute;
@@ -479,7 +500,7 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover  {
   background-color: var(--dark-green);
 }
 
-input[type=text] {
+input[type=text], input[type=password] {
   background-color: var(--light-gray);
   border: none;
   color: #0d0d0d;

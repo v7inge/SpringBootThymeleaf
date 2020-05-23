@@ -188,18 +188,6 @@ public class MainController {
 		return "about";
 	}
 	
-	/*@RequestMapping(value = { "/logout" }, method = RequestMethod.GET)
-	public String logoutGet(Model model, Principal principal) throws SQLException {
-		
-		return "auth";
-	}*/
-	
-	@RequestMapping(value = "/logoutSuccessful", method = RequestMethod.GET)
-    public String logoutSuccessfulPage(Model model) {
-        model.addAttribute("title", "Logout");
-        return "logoutSuccessfulPage";
-    }
-	
 	/*@RequestMapping(value = { "/auth" }, method = RequestMethod.POST)
 	public String authPost(Model model, @ModelAttribute("authForm") AuthForm authForm, HttpServletRequest request, HttpSession session) throws JsonGenerationException, JsonMappingException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
  

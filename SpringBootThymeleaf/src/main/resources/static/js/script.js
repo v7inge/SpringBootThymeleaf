@@ -1,4 +1,8 @@
 
+let regCorrect = false;
+let usernameCorrect = false;
+let passwordCorrect = false;
+
 function onLoad() {
 	connect();
 }
@@ -225,6 +229,56 @@ function contactClick(contactElement) {
 
 function scrollDown() {
 	$("#messages").scrollTop($("#messages")[0].scrollHeight);
+}
+
+function usernameInputChange() {
+
+	let inputValue = $("#reg_username").val();
+	
+	if (inputValue.length == null || inputValue.length < 3) {
+		$("#reg_username_tip").text("Username should contain at least 3 symbols");
+		usernameCorrect = false;
+	} else {
+		$("#reg_username_tip").text("");
+		usernameCorrect = true;
+	}
+
+	checkRegInfo();
+}
+
+function passwordInputChange() {
+
+	let pass = $("#reg_password").val();
+	let passR = $("#reg_password_repeat").val();
+
+	if (pass.length == 0 || passR.length == 0) {
+		passwordCorrect = false;
+		$("#reg_password_tip").text("");
+	} else {
+	
+		if (pass == passR) {
+					passwordCorrect = true;
+					$("#reg_password_tip").text("");
+				} else {
+					passwordCorrect = false;
+					$("#reg_password_tip").text("Please check passwords, they don't match now");
+				}
+
+	}
+
+	checkRegInfo();
+}
+
+function checkRegInfo() {
+
+	regCorrect = (usernameCorrect && passwordCorrect);
+
+	if (regCorrect) {
+		$("#reg_button").removeClass("inactive-input");	
+	} else {
+		$("#reg_button").addClass("inactive-input");	
+	}
+
 }
 
 $(document).ready(function() {
