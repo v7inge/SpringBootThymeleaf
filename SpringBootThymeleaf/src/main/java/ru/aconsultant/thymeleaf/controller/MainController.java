@@ -75,11 +75,16 @@ public class MainController {
 	@RequestMapping(value = { "/" }, method = RequestMethod.GET)
 	public String chatGet(Model model, Principal principal) throws SQLException {
 		
-		String userName = principal.getName();
+		String userName = "no user";
+		if (principal != null) {
+			userName = principal.getName();
+		}
+		
+		/*String userName = principal.getName();
 		 
         System.out.println("User Name: " + userName);
  
-        User loginedUser = (User) ((Authentication) principal).getPrincipal();
+        User loginedUser = (User) ((Authentication) principal).getPrincipal();*/
  
         //model.addAttribute("userInfo", userInfo);
         model.addAttribute("loginedUser", userName);
@@ -161,10 +166,18 @@ public class MainController {
 	}
 	
 	@RequestMapping(value = { "/auth" }, method = RequestMethod.GET)
-	public String authGet(Model model) { //, @ModelAttribute("loginedUser") UserAccount loginedUser) {
+	public String authGet(Model model, Principal principal) {
 		
+		String userName = "no user";
+		if (principal != null) {
+			userName = principal.getName();
+		}
+ 
+        //User loginedUser = (User) ((Authentication) principal).getPrincipal();
+        model.addAttribute("message", userName);
+ 
+
 		model.addAttribute("authForm", new AuthForm());
-		model.addAttribute("message", "message from controller");
 
 		return "auth";
 	}
@@ -174,6 +187,18 @@ public class MainController {
 
 		return "about";
 	}
+	
+	/*@RequestMapping(value = { "/logout" }, method = RequestMethod.GET)
+	public String logoutGet(Model model, Principal principal) throws SQLException {
+		
+		return "auth";
+	}*/
+	
+	@RequestMapping(value = "/logoutSuccessful", method = RequestMethod.GET)
+    public String logoutSuccessfulPage(Model model) {
+        model.addAttribute("title", "Logout");
+        return "logoutSuccessfulPage";
+    }
 	
 	/*@RequestMapping(value = { "/auth" }, method = RequestMethod.POST)
 	public String authPost(Model model, @ModelAttribute("authForm") AuthForm authForm, HttpServletRequest request, HttpSession session) throws JsonGenerationException, JsonMappingException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {

@@ -15,9 +15,8 @@
 
 <body>
 
-	<h2 th:utext="${message}">..!..</h2>
-	<h2 th:utext="${testMessage}">..!..</h2>
-	<h2>test h2</h2>
+	
+	<h2 th:utext="${message}"></h2>
 
   <div class="login_window">
 
@@ -28,16 +27,27 @@
     <h2 class="h2-login active">Log in</h2>
     <h2 class="h2-login inactive">Sign up</h2>
     
-    <p style="color: red;" th:utext="${errorString}"></p>
+   	
+    <div th:if="${param.error}">
+    	Invalid username and password.
+    </div>
+    
+    <div th:if="${param.logout}">
+    	You have been logged out.
+    </div>
+    
+    
+    <!-- <p style="color: red;" th:utext="${errorString}"></p> -->
 
-    <form th:action="@{/auth}" th:object="${authForm}" method="POST">
-      <input type="text" id="login" name="userName" placeholder="login" th:field="*{login}" />
-      <input type="text" id="password" name="password" placeholder="password" th:field="*{password}" />
+    <!-- <form th:action="@{/auth}" th:object="${authForm}" method="POST"> -->
+    <form th:action="@{/auth}" method="POST">
+      <input type="text" id="login" name="username" placeholder="username" />
+      <input type="text" id="password" name="password" placeholder="password" />
       <input type="submit" id="login_button" value="Log In" />
-      <div class="checkbox">
+      <!-- <div class="checkbox">
       <input class="custom-checkbox" type="checkbox" id="rememberMe" name="rememberMe" th:field="*{remember}" checked />
       <label for="rememberMe">Remember me</label>
-      </div>
+      </div> -->
     </form>
 
     <div id="formFooter">

@@ -12,11 +12,12 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		
-	    HttpSession session = request.getSession(); //(true);
+		//#refactor
+	    /*HttpSession session = request.getSession(); //(true);
 	    if (session.getAttribute("loginedUser") == null) {
 	    	response.sendRedirect(request.getContextPath() + "/auth");
 	    	return false;
-	    }
+	    }*/
 
 		return true;
 	}
