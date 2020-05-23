@@ -39,7 +39,7 @@ public class DatabaseAccess extends JdbcDaoSupport {
     
     public UserAccount findUser(String login, String password) {
     	
-    	String sql = "Select a.USER_NAME, a.PASSWORD, a.GENDER from USER_ACCOUNT a where a.USER_NAME = ? and a.PASSWORD = ?";
+    	String sql = "Select a.USER_NAME, a.PASSWORD from USER_ACCOUNT a where a.USER_NAME = ? and a.PASSWORD = ?";
         Object[] args = new Object[] { login, password };
         UserAccountMapper mapper = new UserAccountMapper();
         try {
@@ -53,7 +53,7 @@ public class DatabaseAccess extends JdbcDaoSupport {
     
     public UserAccount findUser(String login) {
     	
-    	String sql = "Select a.USER_NAME, a.PASSWORD, a.GENDER from USER_ACCOUNT a where a.USER_NAME = ?";
+    	String sql = "Select a.USER_NAME, a.PASSWORD from USER_ACCOUNT a where a.USER_NAME = ?";
         Object[] args = new Object[] { login };
         UserAccountMapper mapper = new UserAccountMapper();
         try {
