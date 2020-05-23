@@ -169,6 +169,12 @@ public class MainController {
 		return "auth";
 	}
 	
+	@RequestMapping(value = { "/about" }, method = RequestMethod.GET)
+	public String aboutGet(Model model) throws SQLException {
+
+		return "about";
+	}
+	
 	/*@RequestMapping(value = { "/auth" }, method = RequestMethod.POST)
 	public String authPost(Model model, @ModelAttribute("authForm") AuthForm authForm, HttpServletRequest request, HttpSession session) throws JsonGenerationException, JsonMappingException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
  
