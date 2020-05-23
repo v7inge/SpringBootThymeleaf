@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.security.Principal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -49,8 +52,8 @@ import ru.aconsultant.thymeleaf.service.CounterResetThread;
 @SessionAttributes({"loginedUser","testUser"})
 public class MainController {
 
-	private String loginedUser;
-	private UserAccount testUser;
+	//private String loginedUser;
+	//private UserAccount testUser;
 	
 	@Autowired
     private DatabaseAccess databaseAccess;
@@ -70,12 +73,21 @@ public class MainController {
 	}
 	
 	@RequestMapping(value = { "/" }, method = RequestMethod.GET)
-	public String chatGet(Model model, HttpServletRequest request) throws SQLException {
+	public String chatGet(Model model, Principal principal) throws SQLException {
 		
-		UserAccount yy = (UserAccount) model.getAttribute("testUser");
+		String userName = principal.getName();
+		 
+        System.out.println("User Name: " + userName);
+ 
+        User loginedUser = (User) ((Authentication) principal).getPrincipal();
+ 
+        //model.addAttribute("userInfo", userInfo);
+        model.addAttribute("loginedUser", userName);
+		
+		//UserAccount yy = (UserAccount) model.getAttribute("testUser");
 		
 		// Fill contact list
-        ArrayList<Contact> contactList = this.databaseAccess.contactList(model.getAttribute("loginedUser").toString());
+        ArrayList<Contact> contactList = this.databaseAccess.contactList(userName);
 		model.addAttribute("contactList", contactList);
 
 		return "chat";
@@ -157,7 +169,7 @@ public class MainController {
 		return "auth";
 	}
 	
-	@RequestMapping(value = { "/auth" }, method = RequestMethod.POST)
+	/*@RequestMapping(value = { "/auth" }, method = RequestMethod.POST)
 	public String authPost(Model model, @ModelAttribute("authForm") AuthForm authForm, HttpServletRequest request, HttpSession session) throws JsonGenerationException, JsonMappingException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
  
         String login = authForm.getLogin();
@@ -178,8 +190,8 @@ public class MainController {
                 errorString = "Invalid pair login-passwod";
         	} else {
         		
-        		model.addAttribute("loginedUser", user.getLogin());
-        		model.addAttribute("testUser", new UserAccount("test login", "test password"));
+        		//model.addAttribute("loginedUser", user.getUserName());
+        		//model.addAttribute("testUser", new UserAccount("test login", "test password"));
         		//model.addAttribute("loginedUser", new UserAccount("test login", "test password"));
         		//session.setAttribute("testUser", new UserAccount("test login", "test password"));
         		return "redirect:/";
@@ -188,6 +200,6 @@ public class MainController {
  
         model.addAttribute("errorString", errorString);
         return "auth";
-    }
+    }*/
 	
 }

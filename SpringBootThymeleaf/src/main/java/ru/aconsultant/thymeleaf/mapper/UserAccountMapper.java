@@ -8,11 +8,14 @@ import org.springframework.jdbc.core.RowMapper;
 
 public class UserAccountMapper implements RowMapper<UserAccount> {
 
+	public static final String BASE_SQL = "SELECT u.USER_ID, u.USER_NAME, u.ENCRYPTED_PASSWORD From APP_USER u ";
+	
 	@Override
 	public UserAccount mapRow(ResultSet rs, int rowNum) throws SQLException {
 
 		String login = rs.getString("USER_NAME");
-		String password = rs.getString("PASSWORD");
-		return new UserAccount(login, password);
+		//String password = rs.getString("PASSWORD"); //#refactor
+		String encryptedPassword = rs.getString("ENCRYPTED_PASSWORD");
+		return new UserAccount(login, encryptedPassword);
 	}
 }
