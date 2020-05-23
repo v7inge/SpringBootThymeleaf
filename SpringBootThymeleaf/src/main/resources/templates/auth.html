@@ -46,7 +46,7 @@
       </div> -->
     </form>
     
-    <form id="form_signup" class="invisible" th:action="@{/register}" method="POST">
+    <form id="form_signup" class="invisible" th:object="${authForm}" th:action="@{/register}" method="POST">
       <input type="text" id="reg_username" name="username" onchange="usernameInputChange()" placeholder="username" th:field="*{username}" />
       <div id = "reg_username_tip"></div>
       <input id = "reg_password" type="password" placeholder="password" onchange ="passwordInputChange()" />

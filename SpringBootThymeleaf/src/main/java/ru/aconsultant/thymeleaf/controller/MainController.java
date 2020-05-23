@@ -188,12 +188,12 @@ public class MainController {
 		return "about";
 	}
 	
-	/*@RequestMapping(value = { "/auth" }, method = RequestMethod.POST)
-	public String authPost(Model model, @ModelAttribute("authForm") AuthForm authForm, HttpServletRequest request, HttpSession session) throws JsonGenerationException, JsonMappingException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+	@RequestMapping(value = { "/register" }, method = RequestMethod.POST)
+	public String registerPost(Model model, @ModelAttribute("authForm") AuthForm authForm, HttpServletRequest request, HttpSession session) throws JsonGenerationException, JsonMappingException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
  
-        String login = authForm.getLogin();
+        String login = authForm.getUsername();
         String password = authForm.getPassword();
-        boolean remember = authForm.getRemember();
+        //boolean remember = authForm.getRemember();
  
         UserAccount user = null;
         boolean hasError = false;
@@ -219,6 +219,6 @@ public class MainController {
  
         model.addAttribute("errorString", errorString);
         return "auth";
-    }*/
+    }
 	
 }

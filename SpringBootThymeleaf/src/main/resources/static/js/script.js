@@ -261,7 +261,7 @@ function passwordInputChange() {
 					$("#reg_password_tip").text("");
 				} else {
 					passwordCorrect = false;
-					$("#reg_password_tip").text("Please check passwords, they don't match now");
+					$("#reg_password_tip").text("Please check passwords, they don't match");
 				}
 
 	}
@@ -302,14 +302,21 @@ $(document).ready(function() {
 	// Changing login type
 	$(".h2-login").click(function() {
 		
-		let h2login = $(".h2-login");
-		h2login.removeClass("active");
-		h2login.addClass("inactive");
-
-		$(this).removeClass("inactive");
-		$(this).addClass("active");
-
-		$("#login_button").val($(this).text());
+		if ($(this).text() == "Log in") {
+			$("#h2_login").addClass("active");
+			$("#h2_login").removeClass("inactive");
+			$("#h2_signup").addClass("inactive");
+			$("#h2_signup").removeClass("active");
+			$("#form_login").removeClass("invisible");
+			$("#form_signup").addClass("invisible");
+		} else {
+			$("#h2_login").addClass("inactive");
+			$("#h2_login").removeClass("active");
+			$("#h2_signup").addClass("active");
+			$("#h2_signup").removeClass("inactive");
+			$("#form_login").addClass("invisible");
+			$("#form_signup").removeClass("invisible");
+		}
 		
 	});
 	
