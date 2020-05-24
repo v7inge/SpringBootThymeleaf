@@ -62,6 +62,7 @@ public class MainController {
 	@Autowired
     private UserDetailsServiceImpl userService;
 	
+	
 	@MessageMapping("/message")
 	@SendTo("/chat/messages")
 	public Message getMessages(Message message, SimpMessageHeaderAccessor headerAccessor) {
@@ -69,12 +70,14 @@ public class MainController {
 		return message;
 	}
 	
+	
 	@MessageMapping("/direct/{sender}/to/{reciever}")
 	@SendTo("/queue/{reciever}")
 	public Message direct(@Payload Message message, @DestinationVariable String sender, @DestinationVariable String reciever) {
 		
 		return message;
 	}
+	
 	
 	@RequestMapping(value = { "/" }, method = RequestMethod.GET)
 	public String chatGet(Model model, Principal principal) throws SQLException {
@@ -95,6 +98,7 @@ public class MainController {
 
 		return "chat";
 	}
+	
 	
 	@RequestMapping(value = { "/message-sent" }, method = RequestMethod.POST)
 	public String messageSent(Model model, HttpServletRequest request) throws SQLException, IOException {
@@ -125,6 +129,7 @@ public class MainController {
         
         return null;
 	}
+	
 	
 	@RequestMapping(value = { "/contact-clicked" }, method = RequestMethod.POST)
 	public String contactClick(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
@@ -163,6 +168,7 @@ public class MainController {
         return null;
 	}
 	
+	
 	@RequestMapping(value = { "/auth" }, method = RequestMethod.GET)
 	public String authGet(Model model, Principal principal) {
 		
@@ -180,11 +186,13 @@ public class MainController {
 		return "auth";
 	}
 	
+	
 	@RequestMapping(value = { "/about" }, method = RequestMethod.GET)
 	public String aboutGet(Model model) throws SQLException {
 
 		return "about";
 	}
+	
 	
 	@RequestMapping(value = { "/register" }, method = RequestMethod.POST)
 	public String registerPost(Model model, @ModelAttribute("authForm") AuthForm authForm, Principal principal) throws SQLException {
@@ -228,6 +236,37 @@ public class MainController {
         	JSONObject jsonEnt = new JSONObject();
         	username = jsonObject.getString("username");
             jsonEnt.put("free", this.databaseAccess.findUserAccount(username) == null);
+            PrintWriter out = response.getWriter();
+            out.write(jsonEnt.toString());
+            
+        } catch (JSONException e) { }
+        
+        return null;
+	}
+	
+	
+	@RequestMapping(value = { "/contact-search" }, method = RequestMethod.POST)
+	public String contactSearch(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
+		
+        StringBuffer sb = new StringBuffer();
+        BufferedReader reader = request.getReader();
+        String line = null;
+    
+        while ((line = reader.readLine()) != null)
+            sb.append(line);
+        
+        try {
+            
+        	String jsonString = sb.toString();
+        	JSONObject jsonObject =  new JSONObject(jsonString);		
+        	JSONObject jsonEnt = new JSONObject();
+        	
+        	String input = jsonObject.getString("input");
+        	String userName = principal.getName();
+        	
+        	List<String> users = this.databaseAccess.searchForUsers(input, userName);
+        	
+            jsonEnt.put("users", users);
             PrintWriter out = response.getWriter();
             out.write(jsonEnt.toString());
             

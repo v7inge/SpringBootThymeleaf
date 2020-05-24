@@ -238,6 +238,64 @@ function scrollDown() {
 }
 
 
+function contactInputChange() {
+
+	let inputValue = $("#contact_input").val();
+	if (inputValue == "") {
+		$("#contacts").removeClass("invisible");
+		$("#searching-tip").addClass("invisible");
+	} else {
+		$("#contacts").addClass("invisible");
+		$("#searching-tip").removeClass("invisible");
+		$("#searching-tip").text("Searching...");
+	}
+	
+	// Filling data
+	let userData = {"input": inputValue};
+    let url = "/contact-search";
+    let userJson = JSON.stringify(userData);
+	
+	$.ajax
+    ({
+        type: "POST",
+        data: userJson,
+        url: url,
+        contentType: "application/json; charset=utf-8",
+        success: function(data)
+    	{
+
+        	console.log("we got some data");
+        	let mas = data.users;
+        	for (let i = 0; i !== mas.length; i += 1) {
+        		
+        		console.log(mas[i]);
+        	}
+    	}
+    });
+	
+}
+
+
+function dropDown() {
+  document.getElementById("myDropdown").classList.toggle("show");
+}
+
+
+window.onclick = function(event) {
+  if (!event.target.matches(".dropbtn")) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains("show")) {
+        openDropdown.classList.remove("show");
+      }
+    }
+  }
+}
+
+
+
 $(document).ready(function() {
 	
 	$(document).keypress(function (e) {

@@ -166,4 +166,30 @@ public class DatabaseAccess extends JdbcDaoSupport {
     	return "";
     }
     
+    
+    public ArrayList<String> searchForUsers(String input, String username) throws SQLException {
+        
+    	String sql = 
+				"SELECT u.USER_NAME FROM APP_USER u \n" +
+				"WHERE u.USER_NAME LIKE CONCAT(?, \"%\") \n" +
+				"AND u.USER_NAME NOT IN \n" +
+				"(SELECT chats.Contact FROM PERSONAL_CHATS chats \n" +
+				"WHERE chats.User = ?)";
+    	
+		Object[] args = new Object[] { input, username };
+		int[] argTypes = new int[] { Types.VARCHAR, Types.VARCHAR };
+		
+		try {
+			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
+			ArrayList<String> list = new ArrayList<String>();
+		    while (rs.next()) {
+		        list.add(rs.getString("USER_NAME"));
+		    }
+		    return list;
+			
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
 }

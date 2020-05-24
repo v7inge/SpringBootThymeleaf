@@ -29,45 +29,55 @@
 		</div>
 		
 		<div class = "sidebar">
-		<ul class = "contacts" id = "contacts">
-		<li class = "contact">
-			<img src="http://aconsultant.ru/wp-content/uploads/2020/05/gear.png" width="13" height="13" alt="gear">
-			<div class = "name">Settings</div>
-		</li>
-		<li class = "contact" th:each ="contact : ${contactList}">
-		<div class = "name" th:utext="${contact.login}"></div>
-		<div class = "counter" th:classappend = "${contact.unreadCount}==0 ? invisible : userclass" th:utext="${contact.unreadCount}"></div>
-		</li>
-		</ul>
-		</div>
+		
+			<div class="dropdown">
+				<div onclick="dropDown()" class="dropbtn">
+					&equiv; Menu
+				</div>
+				<div id="myDropdown" class="dropdown-content">
+					<a href="#">Profile</a>
+					<a href="#">About the chat</a>
+					<a href="#">Contact the developer</a>
+				</div>
+			</div>
+	
+			<input id="contact_input" class="contact_input" onchange="contactInputChange()" placeholder="New contact..." />
+			<div id="searching-tip" class="searching-tip invisible"></div>
+			
+			<ul class = "contacts" id = "contacts">
+			<!-- <li class = "contact">
+				<img src="http://aconsultant.ru/wp-content/uploads/2020/05/gear.png" width="13" height="13" alt="gear">
+				<div class = "name">Settings</div>
+			</li> -->
+			<li class = "contact" th:each ="contact : ${contactList}">
+			<div class = "name" th:utext="${contact.login}"></div>
+			<div class = "counter" th:classappend = "${contact.unreadCount}==0 ? invisible : userclass" th:utext="${contact.unreadCount}"></div>
+			</li>
+			</ul>
+			</div>
 		
 		<div class="chat_inner_window">
 		
-		<table class = "tdcenter">
-			<tr>
-				<td>
-					<p>Select a contact to start messaging...</p>
-				</td>
-			</tr>
-		</table>
-		
-		<ul class = "messages" id = "messages">
-		</ul>
-		</div>
-	
-		<div class="bottom_wrapper clearfix">
+			<table class = "tdcenter">
+				<tr>
+					<td>
+						<p>Select a contact to start messaging...</p>
+					</td>
+				</tr>
+			</table>
+			
+			<ul class="messages" id="messages">
+			</ul>
+			
+			<div class="bottom_wrapper clearfix">
 				<div class="message_input_wrapper">
 					<input id="message_input_value" class="message_input" placeholder="Type your message here..." />
-				</div>
-				
-				<div class="send_message" id="send_button">
-					<div class="icon"></div>
-					<div class="text">Send</div>
-				</div>
-	  			
+				</div>			
 			</div>
-	
+			
 		</div>
+	
+	</div>
 	
 </body>
 </html>
