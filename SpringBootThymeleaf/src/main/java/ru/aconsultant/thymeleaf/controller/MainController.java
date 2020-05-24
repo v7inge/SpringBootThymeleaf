@@ -85,15 +85,9 @@ public class MainController {
 		}
 		
 		/*String userName = principal.getName();
-		 
-        System.out.println("User Name: " + userName);
- 
         User loginedUser = (User) ((Authentication) principal).getPrincipal();*/
  
-        //model.addAttribute("userInfo", userInfo);
         model.addAttribute("loginedUser", userName);
-		
-		//UserAccount yy = (UserAccount) model.getAttribute("testUser");
 		
 		// Fill contact list
         ArrayList<Contact> contactList = this.databaseAccess.contactList(userName);
@@ -103,7 +97,7 @@ public class MainController {
 	}
 	
 	@RequestMapping(value = { "/message-sent" }, method = RequestMethod.POST)
-	public String messageSent(Model model, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws SQLException, IOException {
+	public String messageSent(Model model, HttpServletRequest request) throws SQLException, IOException {
 		
 		String contact = "";
         StringBuffer sb = new StringBuffer();
@@ -133,7 +127,7 @@ public class MainController {
 	}
 	
 	@RequestMapping(value = { "/contact-clicked" }, method = RequestMethod.POST)
-	public String contactClick(Model model, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws SQLException, IOException {
+	public String contactClick(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
 		
 		String contact = "";
         StringBuffer sb = new StringBuffer();
@@ -151,8 +145,8 @@ public class MainController {
         	
         	contact = jsonObject.getString("contact");
         	request.setAttribute("contact", contact);
-        	String userName = model.getAttribute("loginedUser").toString(); /// ВАЖНО заменить на principal
-        	List<Message> history = this.databaseAccess.getHistory(userName, contact);
+        	String userName = principal.getName();
+        	List<Message> history = this.databaseAccess.getHistory(principal.getName(), contact);
             jsonEnt.put("contactHistory", history);
             PrintWriter out = response.getWriter();
             out.write(jsonEnt.toString());
@@ -217,7 +211,7 @@ public class MainController {
 	
 	
 	@RequestMapping(value = { "/username-check" }, method = RequestMethod.POST)
-	public String usernameInput(Model model, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws SQLException, IOException {
+	public String usernameInput(Model model, HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
 		
 		String username = "";
         StringBuffer sb = new StringBuffer();
