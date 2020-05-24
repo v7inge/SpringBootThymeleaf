@@ -49,7 +49,7 @@
     <form id="form_signup" class="invisible" th:object="${authForm}" th:action="@{/register}" method="POST">
       <input type="text" id="reg_username" name="username" onchange="usernameInputChange()" placeholder="username" th:field="*{username}" />
       <div id = "reg_username_tip"></div>
-      <input id = "reg_password" type="password" placeholder="password" onchange ="passwordInputChange()" />
+      <input id = "reg_password" type="password" placeholder="password" onchange ="passwordInputChange()" th:field="*{password}" />
       <input id = "reg_password_repeat" type="password" placeholder="please, repeat password" onchange ="passwordInputChange()" />
       <div id = "reg_password_tip"></div>
       <input type="submit" class="inactive-input" id="reg_button" value="Sign up" />

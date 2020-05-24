@@ -26,7 +26,9 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,6 +50,7 @@ import ru.aconsultant.thymeleaf.beans.Message;
 import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
 import ru.aconsultant.thymeleaf.service.CounterResetThread;
 import ru.aconsultant.thymeleaf.security.PasswordEncoder;
+import ru.aconsultant.thymeleaf.security.UserDetailsServiceImpl;
 
 @Controller
 @SessionAttributes({"loginedUser","testUser"})
@@ -56,8 +59,8 @@ public class MainController {
 	@Autowired
     private DatabaseAccess databaseAccess;
 	
-	//@Autowired
-    //private PasswordEncoder passwordEncoder;
+	@Autowired
+    private UserDetailsServiceImpl userService;
 	
 	@MessageMapping("/message")
 	@SendTo("/chat/messages")
@@ -201,13 +204,15 @@ public class MainController {
         String errorString = this.databaseAccess.addUserAccount(user);
         if (errorString == "") {
         	
-        } else {
+        	Authentication authentication = new UsernamePasswordAuthenticationToken(userService.loadUserByUsername(username), null, userService.createAuthorityList("ROLE_USER"));
+        	SecurityContextHolder.getContext().setAuthentication(authentication);
+        	return "chat";
         	
+        } else {
+        	System.out.println(errorString);
         }
  
         
- 
-        model.addAttribute("errorString", errorString);
         return "auth";
     }
 	
