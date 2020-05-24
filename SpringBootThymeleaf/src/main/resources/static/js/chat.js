@@ -266,10 +266,16 @@ function contactInputChange() {
 
         	console.log("we got some data");
         	let mas = data.users;
-        	for (let i = 0; i !== mas.length; i += 1) {
-        		
-        		console.log(mas[i]);
+        	
+        	if (mas.length == 0) {
+        		$("#searching-tip").text("Nothing found");
+        	} else {
+        		for (let i = 0; i !== mas.length; i += 1) {	
+            		console.log(mas[i]);
+            	}
+        		$("#searching-tip").addClass("invisible");
         	}
+        	
     	}
     });
 	
