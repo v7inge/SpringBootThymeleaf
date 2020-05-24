@@ -1,11 +1,9 @@
 
-let regCorrect = false;
-let usernameCorrect = false;
-let passwordCorrect = false;
 
 function onLoad() {
 	connect();
 }
+
 
 function connect() {
 	
@@ -31,6 +29,7 @@ function connect() {
 	});
 }
 
+
 function drawMessage(text, date, side) {
 
 	let messages = document.getElementById("messages");
@@ -52,9 +51,11 @@ function drawMessage(text, date, side) {
 	scrollDown();
 }
 
+
 function disconnect(){
 	stompClient.disconnect();
 }
+
 
 function formatDate(date) {
 
@@ -74,6 +75,7 @@ function formatDate(date) {
 	  return day + "." + month + "." + year + " " + hour + ":" + minute;
 }
 
+
 function resetCounter(str) {
 
 	let el = findContact(str);
@@ -88,8 +90,8 @@ function resetCounter(str) {
 		counterElement.text("");
 
 	};
-
 }
+
 
 function findContact(str) {
 
@@ -105,18 +107,20 @@ function findContact(str) {
 	});
 
 	return contact;
-
 }
+
 
 function getContactName(el) {
 	return $(el).children(".name").text();	
 }
+
 
 function getContactCounter(el) {
 	let counterElement = $(el).children(".counter");
 	let counterNumber = Number(counterElement.text());
 	return counterNumber;
 }
+
 
 function increaseCounter(str, num = 1) {
 
@@ -133,8 +137,8 @@ function increaseCounter(str, num = 1) {
 		counterElement.text(counterNumber + num);
 
 	};
-
 }
+
 
 function sendMessage() {
 	
@@ -166,6 +170,7 @@ function sendMessage() {
         scriptCharset: "utf-8"
     });
 }
+
 
 function contactClick(contactElement) {
 
@@ -227,59 +232,11 @@ function contactClick(contactElement) {
 	scrollDown();
 }
 
+
 function scrollDown() {
 	$("#messages").scrollTop($("#messages")[0].scrollHeight);
 }
 
-function usernameInputChange() {
-
-	let inputValue = $("#reg_username").val();
-	
-	if (inputValue.length == null || inputValue.length < 3) {
-		$("#reg_username_tip").text("Username should contain at least 3 symbols");
-		usernameCorrect = false;
-	} else {
-		$("#reg_username_tip").text("");
-		usernameCorrect = true;
-	}
-
-	checkRegInfo();
-}
-
-function passwordInputChange() {
-
-	let pass = $("#reg_password").val();
-	let passR = $("#reg_password_repeat").val();
-
-	if (pass.length == 0 || passR.length == 0) {
-		passwordCorrect = false;
-		$("#reg_password_tip").text("");
-	} else {
-	
-		if (pass == passR) {
-					passwordCorrect = true;
-					$("#reg_password_tip").text("");
-				} else {
-					passwordCorrect = false;
-					$("#reg_password_tip").text("Please check passwords, they don't match");
-				}
-
-	}
-
-	checkRegInfo();
-}
-
-function checkRegInfo() {
-
-	regCorrect = (usernameCorrect && passwordCorrect);
-
-	if (regCorrect) {
-		$("#reg_button").removeClass("inactive-input");	
-	} else {
-		$("#reg_button").addClass("inactive-input");	
-	}
-
-}
 
 $(document).ready(function() {
 	
@@ -297,27 +254,6 @@ $(document).ready(function() {
 	// Click on contact name
 	$(".contact").click(function() {
 		contactClick($(this));	
-	});
-	
-	// Changing login type
-	$(".h2-login").click(function() {
-		
-		if ($(this).text() == "Log in") {
-			$("#h2_login").addClass("active");
-			$("#h2_login").removeClass("inactive");
-			$("#h2_signup").addClass("inactive");
-			$("#h2_signup").removeClass("active");
-			$("#form_login").removeClass("invisible");
-			$("#form_signup").addClass("invisible");
-		} else {
-			$("#h2_login").addClass("inactive");
-			$("#h2_login").removeClass("active");
-			$("#h2_signup").addClass("active");
-			$("#h2_signup").removeClass("inactive");
-			$("#form_login").addClass("invisible");
-			$("#form_signup").removeClass("invisible");
-		}
-		
 	});
 	
 });

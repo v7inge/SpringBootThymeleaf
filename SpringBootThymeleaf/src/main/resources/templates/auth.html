@@ -6,14 +6,12 @@
 	<link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<link href="/css/style.css" rel="stylesheet">
 	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
-	<script src="/webjars/sockjs-client/sockjs.min.js"></script>
-	<script src="/webjars/stomp-websocket/stomp.min.js"></script>
-	<script src="/js/script.js"></script>	
+	<script src="/js/auth.js"></script>	
 	<link type="text/css" rel="stylesheet" data-th-href="@{css/style.css}" />
 	
 </head>
 
-<body>
+<body onload="onLoad()">
 
 	
 	<h2 th:utext="${message}"></h2>
