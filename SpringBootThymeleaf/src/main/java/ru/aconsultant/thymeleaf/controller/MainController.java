@@ -206,7 +206,7 @@ public class MainController {
         	
         	Authentication authentication = new UsernamePasswordAuthenticationToken(userService.loadUserByUsername(username), null, userService.createAuthorityList("ROLE_USER"));
         	SecurityContextHolder.getContext().setAuthentication(authentication);
-        	return "chat";
+        	return "redirect:/";
         	
         } else {
         	System.out.println(errorString);
