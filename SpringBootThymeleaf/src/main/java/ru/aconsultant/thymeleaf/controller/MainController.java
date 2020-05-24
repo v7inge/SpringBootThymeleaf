@@ -47,16 +47,17 @@ import ru.aconsultant.thymeleaf.beans.Contact;
 import ru.aconsultant.thymeleaf.beans.Message;
 import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
 import ru.aconsultant.thymeleaf.service.CounterResetThread;
+import ru.aconsultant.thymeleaf.security.PasswordEncoder;
 
 @Controller
 @SessionAttributes({"loginedUser","testUser"})
 public class MainController {
-
-	//private String loginedUser;
-	//private UserAccount testUser;
 	
 	@Autowired
     private DatabaseAccess databaseAccess;
+	
+	//@Autowired
+    //private PasswordEncoder passwordEncoder;
 	
 	@MessageMapping("/message")
 	@SendTo("/chat/messages")
@@ -189,33 +190,22 @@ public class MainController {
 	}
 	
 	@RequestMapping(value = { "/register" }, method = RequestMethod.POST)
-	public String registerPost(Model model, @ModelAttribute("authForm") AuthForm authForm, HttpServletRequest request, HttpSession session) throws JsonGenerationException, JsonMappingException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+	public String registerPost(Model model, @ModelAttribute("authForm") AuthForm authForm, Principal principal) throws SQLException {
  
-        String login = authForm.getUsername();
+        String username = authForm.getUsername();
         String password = authForm.getPassword();
-        //boolean remember = authForm.getRemember();
- 
-        UserAccount user = null;
-        boolean hasError = false;
-        String errorString = null;
- 
-        if (login == null || password == null || login.length() == 0 || password.length() == 0) {
-            hasError = true;
-            errorString = "Please enter login and password";
+        PasswordEncoder passwordEncoder = new PasswordEncoder();
+        String encryptedPassword = PasswordEncoder.encryptPassword(password);
+        UserAccount user = new UserAccount(username, encryptedPassword);
+        
+        String errorString = this.databaseAccess.addUserAccount(user);
+        if (errorString == "") {
+        	
         } else {
-        	user = this.databaseAccess.findUser(login, password);
-        	if (user == null) {
-        		hasError = true;
-                errorString = "Invalid pair login-passwod";
-        	} else {
-        		
-        		//model.addAttribute("loginedUser", user.getUserName());
-        		//model.addAttribute("testUser", new UserAccount("test login", "test password"));
-        		//model.addAttribute("loginedUser", new UserAccount("test login", "test password"));
-        		//session.setAttribute("testUser", new UserAccount("test login", "test password"));
-        		return "redirect:/";
-        	}
+        	
         }
+ 
+        
  
         model.addAttribute("errorString", errorString);
         return "auth";

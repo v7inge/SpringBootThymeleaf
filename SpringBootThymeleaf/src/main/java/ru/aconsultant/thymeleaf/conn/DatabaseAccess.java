@@ -85,6 +85,7 @@ public class DatabaseAccess extends JdbcDaoSupport {
         }
     }
     
+    
     public ArrayList<Contact> contactList(String userName) throws SQLException {
         
 		String sql = 
@@ -125,14 +126,53 @@ public class DatabaseAccess extends JdbcDaoSupport {
         }
     }
     
+    
     public void saveMessage(Message message) throws SQLException {
         String sql = "INSERT INTO MESSAGES (Sender, Reciever, DateTime, Text) VALUES (?, ?, ?, ?)";
         this.getJdbcTemplate().update(sql, message.getSender(), message.getReciever(), new java.sql.Date(message.getDate().getTime()), message.getText());
     }
     
+    
     public void resetCounter(String userName, String contactName) throws SQLException {
         String sql = "UPDATE MESSAGES SET New=0 WHERE Sender=? AND Reciever=?";
         this.getJdbcTemplate().update(sql, contactName, userName);
+    }
+    
+    
+    public UserAccount findUserAccount(String userName) {
+
+        String sql = "SELECT u.USER_NAME, u.ENCRYPTED_PASSWORD From APP_USER u WHERE u.USER_NAME = ? ";
+ 
+        Object[] params = new Object[] { userName };
+        UserAccountMapper mapper = new UserAccountMapper();
+        try {
+        	UserAccount userInfo = this.getJdbcTemplate().queryForObject(sql, params, mapper);
+            return userInfo;
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    
+    public String addUserAccount(UserAccount user) throws SQLException {
+    	
+    	String sql = "SELECT USER_NAME FROM APP_USER WHERE USER_NAME = ?";
+    	Object[] args = new Object[] { user.getUserName() };
+    	int[] argTypes = new int[] { Types.VARCHAR };
+		
+		try {
+			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
+		    if (rs.next()) {
+		        return "Sorry, such username already exists";
+		    }
+        } catch (EmptyResultDataAccessException e) {
+            return "Technical problem, please contact a developer";
+        }
+    	
+		sql = "INSERT INTO APP_USER (USER_NAME, ENCRYPTED_PASSWORD, ENABLED) VALUES (?, ?, 1)";
+        this.getJdbcTemplate().update(sql, user.getUserName(), user.getEncryptedPassword());
+    	
+    	return "";
     }
     
 }
