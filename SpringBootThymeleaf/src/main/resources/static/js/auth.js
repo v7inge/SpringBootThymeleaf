@@ -25,8 +25,37 @@ function usernameInputChange() {
 		$("#reg_username_tip").text("");
 		usernameCorrect = true;
 	}
-
-	checkRegInfo();
+	
+	if (usernameCorrect) {
+		
+		// Check if username is free
+		let userData = {"username": inputValue};
+	    let url = "/username-check";
+	    let userJson = JSON.stringify(userData);
+		
+		$.ajax
+	    ({
+	        type: "POST",
+	        data: userJson,
+	        url: url,
+	        contentType: "application/json; charset=utf-8",
+	        success: function(data)
+	    	{
+	
+	        	if (data.free == true) {
+	        		usernameCorrect = true;
+	        		$("#reg_username_tip").text("Good, such username is free");
+	        	} else {
+	        		usernameCorrect = false;
+	        		$("#reg_username_tip").text("Sorry, such username is already in use");
+	        	}
+	        	
+	        	checkRegInfo();
+	
+	    	}
+	    });
+	}
+	
 }
 
 

@@ -156,20 +156,11 @@ public class DatabaseAccess extends JdbcDaoSupport {
     
     public String addUserAccount(UserAccount user) throws SQLException {
     	
-    	String sql = "SELECT USER_NAME FROM APP_USER WHERE USER_NAME = ?";
-    	Object[] args = new Object[] { user.getUserName() };
-    	int[] argTypes = new int[] { Types.VARCHAR };
-		
-		try {
-			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
-		    if (rs.next()) {
-		        return "Sorry, such username already exists";
-		    }
-        } catch (EmptyResultDataAccessException e) {
-            return "Technical problem, please contact a developer";
-        }
+    	if (findUserAccount(user.getUserName()) != null) {
+    		return "Sorry, such username already exists";
+    	}
     	
-		sql = "INSERT INTO APP_USER (USER_NAME, ENCRYPTED_PASSWORD, ENABLED) VALUES (?, ?, 1)";
+		String sql = "INSERT INTO APP_USER (USER_NAME, ENCRYPTED_PASSWORD, ENABLED) VALUES (?, ?, 1)";
         this.getJdbcTemplate().update(sql, user.getUserName(), user.getEncryptedPassword());
     	
     	return "";

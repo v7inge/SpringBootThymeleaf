@@ -151,7 +151,7 @@ public class MainController {
         	
         	contact = jsonObject.getString("contact");
         	request.setAttribute("contact", contact);
-        	String userName = model.getAttribute("loginedUser").toString();
+        	String userName = model.getAttribute("loginedUser").toString(); /// ВАЖНО заменить на principal
         	List<Message> history = this.databaseAccess.getHistory(userName, contact);
             jsonEnt.put("contactHistory", history);
             PrintWriter out = response.getWriter();
@@ -209,11 +209,38 @@ public class MainController {
         	return "redirect:/";
         	
         } else {
-        	System.out.println(errorString);
+        	
+        	//model.addAttribute("regErrorString", errorString); // #refactor // Сейчас этот параметр не читается, т.к. идет редирект. Если нужны разные виды ошибок, то надо переделать. 
+        	return "redirect:/auth?regerror";
         }
- 
-        
-        return "auth";
     }
+	
+	
+	@RequestMapping(value = { "/username-check" }, method = RequestMethod.POST)
+	public String usernameInput(Model model, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws SQLException, IOException {
+		
+		String username = "";
+        StringBuffer sb = new StringBuffer();
+        String line = null;
+
+        BufferedReader reader = request.getReader();
+        while ((line = reader.readLine()) != null)
+            sb.append(line);
+        
+        try {
+            
+        	String jsonString = sb.toString();
+        	JSONObject jsonObject =  new JSONObject(jsonString);		
+        	JSONObject jsonEnt = new JSONObject();
+        	username = jsonObject.getString("username");
+            jsonEnt.put("free", this.databaseAccess.findUserAccount(username) == null);
+            PrintWriter out = response.getWriter();
+            out.write(jsonEnt.toString());
+            
+        } catch (JSONException e) { }
+        
+        return null;
+	}
+	
 	
 }

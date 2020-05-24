@@ -25,6 +25,11 @@
     <h2 class="h2-login active" id="h2_login">Log in</h2>
     <h2 class="h2-login inactive" id="h2_signup">Sign up</h2>
     
+   	<!-- <p style="color: red;" th:utext="${regErrorString}"></p> // #refactor // Сейчас этот параметр не приходит, т.к. идет редирект. Если нужны разные виды ошибок, то надо переделать. -->
+   	
+   	<div style="color: red;" th:if="${param.regerror}">
+    	Such username already exists
+    </div>
    	
     <div style="color: red;" th:if="${param.error}">
     	Invalid username and password
