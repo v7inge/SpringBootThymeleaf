@@ -240,44 +240,47 @@ function scrollDown() {
 
 function contactInputChange() {
 
+	$("#found_contacts").empty();
+	
 	let inputValue = $("#contact_input").val();
 	if (inputValue == "") {
 		$("#contacts").removeClass("invisible");
 		$("#searching-tip").addClass("invisible");
+		$("#found_contacts").addClass("invisible");
 	} else {
+		
 		$("#contacts").addClass("invisible");
 		$("#searching-tip").removeClass("invisible");
 		$("#searching-tip").text("Searching...");
+		
+		// Filling data
+		let userData = {"input": inputValue};
+	    let url = "/contact-search";
+	    let userJson = JSON.stringify(userData);
+		
+		$.ajax
+	    ({
+	        type: "POST",
+	        data: userJson,
+	        url: url,
+	        contentType: "application/json; charset=utf-8",
+	        success: function(data)
+	    	{
+	        	let mas = data.users;
+	        	
+	        	if (mas.length == 0) {
+	        		$("#searching-tip").text("Nothing found");
+	        	} else {
+	        		$("#found_contacts").removeClass("invisible");
+	        		for (let i = 0; i !== mas.length; i += 1) {	
+	        			addContact(mas[i], "found_contacts");	
+	            	}
+	        		$("#searching-tip").addClass("invisible");
+	        	}
+	        	
+	    	}
+	    });
 	}
-	
-	// Filling data
-	let userData = {"input": inputValue};
-    let url = "/contact-search";
-    let userJson = JSON.stringify(userData);
-	
-	$.ajax
-    ({
-        type: "POST",
-        data: userJson,
-        url: url,
-        contentType: "application/json; charset=utf-8",
-        success: function(data)
-    	{
-
-        	console.log("we got some data");
-        	let mas = data.users;
-        	
-        	if (mas.length == 0) {
-        		$("#searching-tip").text("Nothing found");
-        	} else {
-        		for (let i = 0; i !== mas.length; i += 1) {	
-            		console.log(mas[i]);
-            	}
-        		$("#searching-tip").addClass("invisible");
-        	}
-        	
-    	}
-    });
 	
 }
 
@@ -300,6 +303,28 @@ window.onclick = function(event) {
   }
 }
 
+
+function addContact(text, zone) {
+
+	let ul = document.getElementById(zone);
+
+	let li = document.createElement("li");
+	li.classList.add("contact");
+
+	let divName = document.createElement("div");
+	divName.classList.add("name");
+	divName.appendChild(document.createTextNode(text));
+	li.appendChild(divName);
+
+	if (zone == "contacts") {
+		let divCounter = document.createElement("div");
+		divName.classList.add("counter");
+		divName.classList.add("invisible");
+		li.appendChild(divName);
+	}
+
+	ul.appendChild(li);
+}
 
 
 $(document).ready(function() {
