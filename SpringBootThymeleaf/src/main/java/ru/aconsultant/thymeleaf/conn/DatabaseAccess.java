@@ -192,4 +192,24 @@ public class DatabaseAccess extends JdbcDaoSupport {
         }
     }
     
+    
+    public void addContact(String username, String contact) throws SQLException {
+    	
+    	String sql = "SELECT ch.User, ch.Contact FROM PERSONAL_CHATS ch \n" + 
+    			"WHERE ch.User = ? AND ch.Contact = ?";
+    	
+    	Object[] args = new Object[] { username, contact };
+		int[] argTypes = new int[] { Types.VARCHAR, Types.VARCHAR };
+    	
+		try {
+			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
+		    if (rs.next()) { } else {
+		    	sql = "INSERT INTO PERSONAL_CHATS (User, Contact, New) VALUES (?, ?, NULL)";
+		    	this.getJdbcTemplate().update(sql, username, contact);
+		    }
+			
+        } catch (EmptyResultDataAccessException e) { }    
+    }
+
+    
 }

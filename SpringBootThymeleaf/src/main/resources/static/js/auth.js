@@ -98,16 +98,16 @@ function checkRegInfo() {
 
 function setActiveTab(tabName) {
 	
-	if (tabName == "Log in") {
-		$("#h2_login").addClass("active");
-		$("#h2_login").removeClass("inactive");
+	if (tabName == "Sign in") {
+		$("#h2_signin").addClass("active");
+		$("#h2_signin").removeClass("inactive");
 		$("#h2_signup").addClass("inactive");
 		$("#h2_signup").removeClass("active");
 		$("#form_login").removeClass("invisible");
 		$("#form_signup").addClass("invisible");
 	} else {
-		$("#h2_login").addClass("inactive");
-		$("#h2_login").removeClass("active");
+		$("#h2_signin").addClass("inactive");
+		$("#h2_signin").removeClass("active");
 		$("#h2_signup").addClass("active");
 		$("#h2_signup").removeClass("inactive");
 		$("#form_login").addClass("invisible");

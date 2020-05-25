@@ -22,7 +22,7 @@
 		<div class="title">Chat by Victor Umanskiy</div>
 	</div>
 
-    <h2 class="h2-login active" id="h2_login">Log in</h2>
+    <h2 class="h2-login active" id="h2_signin">Sign in</h2>
     <h2 class="h2-login inactive" id="h2_signup">Sign up</h2>
     
    	<!-- <p style="color: red;" th:utext="${regErrorString}"></p> // #refactor // Сейчас этот параметр не приходит, т.к. идет редирект. Если нужны разные виды ошибок, то надо переделать. -->
@@ -42,7 +42,7 @@
     <form id="form_login" th:action="@{/auth}" method="POST">
       <input type="text" id="login" name="username" placeholder="username" />
       <input type="password" id="password" name="password" placeholder="password" />
-      <input type="submit" id="login_button" value="Log In" />
+      <input type="submit" id="login_button" value="Sign In" />
       <!-- <div class="checkbox">
       <input class="custom-checkbox" type="checkbox" id="rememberMe" name="rememberMe" th:field="*{remember}" checked />
       <label for="rememberMe">Remember me</label>

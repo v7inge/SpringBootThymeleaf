@@ -273,7 +273,7 @@ function contactInputChange() {
 	        	} else {
 	        		$("#found_contacts").removeClass("invisible");
 	        		for (let i = 0; i !== mas.length; i += 1) {	
-	        			addContact(mas[i], "found_contacts");	
+	        			addFoundContact(mas[i]);	
 	            	}
 	        		$("#searching-tip").addClass("invisible");
 	        	}
@@ -304,26 +304,52 @@ window.onclick = function(event) {
 }
 
 
-function addContact(text, zone) {
+function addFoundContact(text) {
 
-	let ul = document.getElementById(zone);
+	let contactHtml = 
+	'<li class = "contact found">' +
+	'<div class = "name">' + text + '</div>' +
+	'</li>';
 
-	let li = document.createElement("li");
-	li.classList.add("contact");
+	$("#found_contacts").append(contactHtml);
+}
 
-	let divName = document.createElement("div");
-	divName.classList.add("name");
-	divName.appendChild(document.createTextNode(text));
-	li.appendChild(divName);
 
-	if (zone == "contacts") {
-		let divCounter = document.createElement("div");
-		divName.classList.add("counter");
-		divName.classList.add("invisible");
-		li.appendChild(divName);
-	}
+function addContact(text) {
 
-	ul.appendChild(li);
+	let contactHtml = 
+	'<li class = "contact">' +
+	'<div class = "name">' + text + '</div> \n' +
+	'<div class = "counter invisible"></div>' +
+	'</li>';
+
+	$("#contacts").append(contactHtml);
+}
+
+
+function moveContactToTheList(text) {
+	
+	$("#found_contacts").empty();
+	addContact(text);
+	$("#contacts").removeClass("invisible");
+	$("#searching-tip").addClass("invisible");
+	$("#found_contacts").addClass("invisible");
+	$("#contact_input").val("");
+	
+	// Filling data
+	let userData = {"input": text};
+    let url = "/contact-add";
+    let userJson = JSON.stringify(userData);
+	
+	$.ajax
+    ({
+        type: "POST",
+        data: userJson,
+        url: url,
+        contentType: "application/json; charset=utf-8",
+        success: function(data) { }
+    });
+	
 }
 
 
@@ -340,9 +366,14 @@ $(document).ready(function() {
 		sendMessage();
     });
 
-	// Click on contact name
-	$(".contact").click(function() {
-		contactClick($(this));	
+	// Click on contact
+	$("body").on("click", ".contact", function () {
+		contactClick($(this));
+	});
+
+	// Click on found contact
+	$("body").on("click", ".found", function () {
+		moveContactToTheList($(this).text());
 	});
 	
 });

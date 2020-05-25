@@ -276,4 +276,32 @@ public class MainController {
 	}
 	
 	
+	@RequestMapping(value = { "/contact-add" }, method = RequestMethod.POST)
+	public String contactAdd(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
+		
+        StringBuffer sb = new StringBuffer();
+        BufferedReader reader = request.getReader();
+        String line = null;
+    
+        while ((line = reader.readLine()) != null)
+            sb.append(line);
+        
+        try {
+            
+        	String jsonString = sb.toString();
+        	JSONObject jsonObject =  new JSONObject(jsonString);		
+        	JSONObject jsonEnt = new JSONObject();
+        	
+        	String input = jsonObject.getString("input");
+        	String userName = principal.getName();
+        	
+        	this.databaseAccess.addContact(userName, input);
+        	this.databaseAccess.addContact(input, userName);
+            
+        } catch (JSONException e) { }
+        
+        return null;
+	}
+	
+	
 }

@@ -200,7 +200,7 @@ body {
   list-style: none;
   padding: 20px 10px 0 10px;
   margin: 0;
-  height: 100%;
+  height: calc(100% - 70px);
   overflow: auto;
 }
 
