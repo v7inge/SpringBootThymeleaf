@@ -20,13 +20,11 @@ public class CounterResetThread extends Thread {
 	@Override
     public void run() {
 		
-		System.out.println("Start time: " + System.currentTimeMillis());
 		try {
 			this.databaseAccess.resetCounter(this.userName, this.contactName);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		System.out.println("End time: " + System.currentTimeMillis());
     }
 
 }

@@ -22,7 +22,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import ru.aconsultant.thymeleaf.beans.UserAccount;
-import ru.aconsultant.thymeleaf.interceptor.AuthInterceptor;
 import ru.aconsultant.thymeleaf.interceptor.EncodingInterceptor;
 
 @Configuration
@@ -30,7 +29,6 @@ public class WebConfig implements WebMvcConfigurer {
 	
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		//registry.addInterceptor(new AuthInterceptor()).addPathPatterns("/"); //#refactor
 		registry.addInterceptor(new EncodingInterceptor());
 	}
 	
@@ -38,16 +36,5 @@ public class WebConfig implements WebMvcConfigurer {
 	public PlatformTransactionManager transactionManager(DataSource dataSource) {
 		return new DataSourceTransactionManager(dataSource);
 	}
-	
-	/*@Bean
-    public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://freshnoon.beget.tech/freshnoon_chat?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC");
-        dataSource.setUsername("freshnoon_chat");
-        dataSource.setPassword("hgy78fdXVb0");
-
-        return dataSource;
-    }*/
    
 }

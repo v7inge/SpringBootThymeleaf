@@ -26,6 +26,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -62,13 +64,15 @@ public class MainController {
 	@Autowired
     private UserDetailsServiceImpl userService;
 	
+	@Autowired
+    private SimpMessagingTemplate messagingTemplate;
 	
-	@MessageMapping("/message")
+	/*@MessageMapping("/message")
 	@SendTo("/chat/messages")
 	public Message getMessages(Message message, SimpMessageHeaderAccessor headerAccessor) {
 		
 		return message;
-	}
+	}*/
 	
 	
 	@MessageMapping("/direct/{sender}/to/{reciever}")
@@ -77,6 +81,20 @@ public class MainController {
 		
 		return message;
 	}
+	
+	/*@MessageMapping("/direct/{reciever}")
+    @SendToUser("/queue/message-flow")
+    public Message goM(@Payload Message message, Principal principal, @DestinationVariable String reciever) {
+
+
+		return message;
+    }*/
+	
+	@MessageMapping("/message-flow")
+    public void broadcast(@Payload Message message, Principal principal) {
+
+        messagingTemplate.convertAndSendToUser(message.getReciever(), "/queue/reply", message);
+    }
 	
 	
 	@RequestMapping(value = { "/" }, method = RequestMethod.GET)
@@ -299,6 +317,16 @@ public class MainController {
         	this.databaseAccess.addContact(input, userName);
             
         } catch (JSONException e) { }
+        
+        return null;
+	}
+	
+	
+	// Service method to check security parameters
+	@RequestMapping(value = { "/security-check" }, method = RequestMethod.POST)
+	public String securityCheck(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
+		
+        System.out.println(principal.getName());
         
         return null;
 	}

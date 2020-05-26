@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -15,12 +16,36 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+
+
+
+/*@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
+
+	@Override
+	public void registerStompEndpoints(StompEndpointRegistry registry) {
+		registry.addEndpoint("/portfolio").withSockJS();
+	}
+
+	@Override
+       public void configureMessageBroker(MessageBrokerRegistry config) {
+           config.setApplicationDestinationPrefixes("/app");
+           config.enableSimpleBroker("/topic", "/queue");
+       }
+
+}*/
+
+
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer  {
 	
 	public void configureMessageBroker(MessageBrokerRegistry confi) {
-		confi.enableSimpleBroker("/chat", "/queue/");
+		confi.enableSimpleBroker("/chat", "/topic", "/queue", "/user");
 		confi.setApplicationDestinationPrefixes("/app");
 		confi.setUserDestinationPrefix("/user"); 
 	}

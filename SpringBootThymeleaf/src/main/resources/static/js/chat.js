@@ -1,4 +1,22 @@
 
+function test() {
+	
+	// Filling data
+	let userData = {"input": "hi"};
+    let url = "/security-check";
+    let userJson = JSON.stringify(userData);
+	
+	$.ajax
+    ({
+        type: "POST",
+        data: userJson,
+        url: url,
+        contentType: "application/json; charset=utf-8"
+    });
+	
+}
+
+
 
 function onLoad() {
 	connect();
@@ -12,7 +30,9 @@ function connect() {
 	stompClient = Stomp.over(socket);
 	stompClient.connect({}, function (frame) {
 		
-		stompClient.subscribe("/queue/" + sender, function (data) {
+		stompClient.subscribe("/user/queue/reply", function (data) {
+			
+			console.log("we got some message: " + data);
 			
 			var data = JSON.parse(data.body);
 			
@@ -157,18 +177,19 @@ function sendMessage() {
     
 	// Sending message
 	drawMessage(text, date, "right");
-	stompClient.send("/app/direct/" + sender + "/to/" + reciever, {}, userJson);
+	//stompClient.send("/app/direct/" + sender + "/to/" + reciever, {}, userJson);
+	stompClient.send("/app/message-flow", {}, userJson);
 	$("#message_input_value").val("");
 	
 	// Sending for DB saving
-    $.ajax
+    /*$.ajax
     ({
     	type: "POST",
         data: userJson,
         url: url,
         contentType: "application/json; charset=utf-8",
         scriptCharset: "utf-8"
-    });
+    });*/
 }
 
 
