@@ -71,6 +71,10 @@ public class MainController {
 	@Autowired
 	private HttpParamProcessor httpParamProcessor;
 	
+	// How to get principal as a user:
+	//User loginedUser = (User) ((Authentication) principal).getPrincipal();
+	
+	
 	@MessageMapping("/message-flow")
     public void broadcast(@Payload Message message, Principal principal) {
 
@@ -85,9 +89,6 @@ public class MainController {
 		if (principal != null) {
 			userName = principal.getName();
 		}
-		
-		/*String userName = principal.getName();
-        User loginedUser = (User) ((Authentication) principal).getPrincipal();*/
  
         model.addAttribute("loginedUser", userName);
 		
@@ -99,8 +100,8 @@ public class MainController {
 	}
 	
 	
-	@RequestMapping(value = { "/message-sent" }, method = RequestMethod.POST)
-	public String messageSent(Model model, HttpServletRequest request) throws SQLException, IOException {
+	@RequestMapping(value = { "/message-sent" }, method = RequestMethod.POST) // #refactor - change to thread from websocket handler
+	public void messageSent(Model model, HttpServletRequest request) throws SQLException, IOException {
 		
 		String contact = "";
         StringBuffer sb = new StringBuffer();
@@ -125,46 +126,28 @@ public class MainController {
             }
 
         } catch (JSONException e) { }
-        
-        return null;
 	}
 	
 	
 	@RequestMapping(value = { "/contact-clicked" }, method = RequestMethod.POST)
-	public String contactClick(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
+	public void contactClick(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
 		
-		String contact = "";
-        StringBuffer sb = new StringBuffer();
-        String line = null;
-
-        BufferedReader reader = request.getReader();
-        while ((line = reader.readLine()) != null)
-            sb.append(line);
-        
-        try {
-            
-        	String jsonString = sb.toString();
-        	JSONObject jsonObject =  new JSONObject(jsonString);		
-        	JSONObject jsonEnt = new JSONObject();
-        	
-        	contact = jsonObject.getString("contact");
-        	request.setAttribute("contact", contact);
-        	String userName = principal.getName();
-        	List<Message> history = this.databaseAccess.getHistory(principal.getName(), contact);
-            jsonEnt.put("contactHistory", history);
-            PrintWriter out = response.getWriter();
-            out.write(jsonEnt.toString());
-        
-            // Reset message counter with minor thread priority
-            if (jsonObject.getBoolean("needToResetCounter")) {
-            	CounterResetThread counterResetThread = new CounterResetThread(userName, contact, this.databaseAccess);
-            	counterResetThread.setPriority(3);
-            	counterResetThread.start();
-            }
-            
-        } catch (JSONException e) { }
-        
-        return null;
+		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
+		String contact = (String) requestParameters.get("contact");
+		String userName = principal.getName();
+		
+		List<Message> history = databaseAccess.getHistory(userName, contact);
+		
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("contactHistory", history);
+		httpParamProcessor.translateResponseParameters(response, map);
+		
+		// Reset message counter with minor thread priority
+        if ((boolean) requestParameters.get("needToResetCounter")) {
+        	CounterResetThread counterResetThread = new CounterResetThread(userName, contact, this.databaseAccess);
+        	counterResetThread.setPriority(3);
+        	counterResetThread.start();
+        }
 	}
 	
 	
@@ -176,10 +159,7 @@ public class MainController {
 			userName = principal.getName();
 		}
  
-        //User loginedUser = (User) ((Authentication) principal).getPrincipal();
         model.addAttribute("message", userName);
- 
-
 		model.addAttribute("authForm", new AuthForm());
 
 		return "auth";
@@ -198,11 +178,10 @@ public class MainController {
  
         String username = authForm.getUsername();
         String password = authForm.getPassword();
-        PasswordEncoder passwordEncoder = new PasswordEncoder();
         String encryptedPassword = PasswordEncoder.encryptPassword(password);
         UserAccount user = new UserAccount(username, encryptedPassword);
         
-        String errorString = this.databaseAccess.addUserAccount(user);
+        String errorString = databaseAccess.addUserAccount(user);
         if (errorString == "") {
         	
         	Authentication authentication = new UsernamePasswordAuthenticationToken(userService.loadUserByUsername(username), null, userService.createAuthorityList("ROLE_USER"));
@@ -210,125 +189,53 @@ public class MainController {
         	return "redirect:/";
         	
         } else {
-        	
-        	//model.addAttribute("regErrorString", errorString); // #refactor // Сейчас этот параметр не читается, т.к. идет редирект. Если нужны разные виды ошибок, то надо переделать. 
         	return "redirect:/auth?regerror";
         }
     }
 	
 	
 	@RequestMapping(value = { "/username-check" }, method = RequestMethod.POST)
-	public String usernameInput(Model model, HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+	public void usernameInput(Model model, HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
 		
-		String username = "";
-        StringBuffer sb = new StringBuffer();
-        String line = null;
-
-        BufferedReader reader = request.getReader();
-        while ((line = reader.readLine()) != null)
-            sb.append(line);
-        
-        try {
-            
-        	String jsonString = sb.toString();
-        	JSONObject jsonObject =  new JSONObject(jsonString);		
-        	JSONObject jsonEnt = new JSONObject();
-        	username = jsonObject.getString("username");
-            jsonEnt.put("free", this.databaseAccess.findUserAccount(username) == null);
-            PrintWriter out = response.getWriter();
-            out.write(jsonEnt.toString());
-            
-        } catch (JSONException e) { }
-        
-        return null;
+		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
+		String username = (String) requestParameters.get("username");
+		
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("free", databaseAccess.findUserAccount(username) == null);
+		httpParamProcessor.translateResponseParameters(response, map);
 	}
 	
 	
 	@RequestMapping(value = { "/contact-search" }, method = RequestMethod.POST)
-	public String contactSearch(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
+	public void contactSearch(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
 		
-        StringBuffer sb = new StringBuffer();
-        BufferedReader reader = request.getReader();
-        String line = null;
-    
-        while ((line = reader.readLine()) != null)
-            sb.append(line);
-        
-        try {
-            
-        	String jsonString = sb.toString();
-        	JSONObject jsonObject =  new JSONObject(jsonString);		
-        	JSONObject jsonEnt = new JSONObject();
-        	
-        	String input = jsonObject.getString("input");
-        	String userName = principal.getName();
-        	
-        	List<String> users = this.databaseAccess.searchForUsers(input, userName);
-        	
-            jsonEnt.put("users", users);
-            PrintWriter out = response.getWriter();
-            out.write(jsonEnt.toString());
-            
-        } catch (JSONException e) { }
-        
-        return null;
+		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
+		String input = (String) requestParameters.get("input");
+		String userName = principal.getName();
+		List<String> users = databaseAccess.searchForUsers(input, userName);
+		
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("users", users);
+		httpParamProcessor.translateResponseParameters(response, map);
 	}
 	
 	
 	@RequestMapping(value = { "/contact-add" }, method = RequestMethod.POST)
-	public String contactAdd(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
+	public void contactAdd(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
 		
-        StringBuffer sb = new StringBuffer();
-        BufferedReader reader = request.getReader();
-        String line = null;
-    
-        while ((line = reader.readLine()) != null)
-            sb.append(line);
-        
-        try {
-            
-        	String jsonString = sb.toString();
-        	JSONObject jsonObject =  new JSONObject(jsonString);		
-        	JSONObject jsonEnt = new JSONObject();
+		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
+		String input = (String) requestParameters.get("input");
+        String userName = principal.getName();
         	
-        	String input = jsonObject.getString("input");
-        	String userName = principal.getName();
-        	
-        	this.databaseAccess.addContact(userName, input);
-        	this.databaseAccess.addContact(input, userName);
-            
-        } catch (JSONException e) { }
-        
-        return null;
+        databaseAccess.addContact(userName, input);
+        databaseAccess.addContact(input, userName);    
 	}
 	
 	
 	// Service method to check security parameters
 	@RequestMapping(value = { "/security-check" }, method = RequestMethod.POST)
-	public String securityCheck(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
-		
-		HashMap<String, String> requestParameters = httpParamProcessor.getRequestParameters(request);
-		String paramFromClient = requestParameters.get("paramFromClient");
-		System.out.println("paramFromClient: " + paramFromClient);
-		
-		List<Message> history = this.databaseAccess.getHistory("victor", "jerry");
-        //jsonEnt.put("contactHistory", history);
-		
-		
-		
-		
-		
-		
-		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("history", history);
-		
-		String paramFromServer = paramFromClient + " - hello from the server";
-		map.put("paramFromServer", paramFromServer);
-		
-		
-		httpParamProcessor.translateResponseParameters(response, map);
+	public void securityCheck(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
         
-        return null;
 	}
 	
 	

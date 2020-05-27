@@ -25,10 +25,11 @@ import ru.aconsultant.thymeleaf.beans.Message;
 
 @Component
 public class HttpParamProcessor {
-
-	public HashMap<String, String> getRequestParameters(HttpServletRequest request) throws IOException {
+	
+	
+	public HashMap<String, Object> getRequestParameters(HttpServletRequest request) throws IOException {
 		
-		HashMap<String, String> params = new HashMap<>();
+		HashMap<String, Object> params = new HashMap<>();
 		
 		StringBuffer sb = new StringBuffer();
         BufferedReader reader = request.getReader();
@@ -45,13 +46,14 @@ public class HttpParamProcessor {
         	String[] keys = JSONObject.getNames(jsonObject);
         	
         	for (String key : keys) {
-        		params.put(key, jsonObject.getString(key));
+        		params.put(key, jsonObject.get(key));
             }
             
         } catch (JSONException e) { }
         
         return params;
 	}
+	
 	
 	public void translateResponseParameters(HttpServletResponse response, HashMap<String, Object> map) throws IOException {
 		
