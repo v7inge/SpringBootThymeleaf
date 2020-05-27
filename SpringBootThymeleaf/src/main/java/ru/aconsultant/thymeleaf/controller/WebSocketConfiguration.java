@@ -21,31 +21,12 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 
-
-/*@Configuration
-@EnableWebSocketMessageBroker
-public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
-
-	@Override
-	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/portfolio").withSockJS();
-	}
-
-	@Override
-       public void configureMessageBroker(MessageBrokerRegistry config) {
-           config.setApplicationDestinationPrefixes("/app");
-           config.enableSimpleBroker("/topic", "/queue");
-       }
-
-}*/
-
-
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer  {
 	
 	public void configureMessageBroker(MessageBrokerRegistry confi) {
-		confi.enableSimpleBroker("/chat", "/topic", "/queue", "/user");
+		confi.enableSimpleBroker("/queue", "/user");
 		confi.setApplicationDestinationPrefixes("/app");
 		confi.setUserDestinationPrefix("/user"); 
 	}

@@ -2,7 +2,7 @@
 function test() {
 	
 	// Filling data
-	let userData = {"input": "hi"};
+	let userData = {"paramFromClient": "hi"};
     let url = "/security-check";
     let userJson = JSON.stringify(userData);
 	
@@ -11,7 +11,28 @@ function test() {
         type: "POST",
         data: userJson,
         url: url,
-        contentType: "application/json; charset=utf-8"
+        contentType: "application/json; charset=utf-8",
+        success: function(data)
+    	{
+
+        	let paramFromServer = data.paramFromServer;
+        	console.log(paramFromServer);
+        	
+        	let side = "";
+        	let mas = data.history;
+        	for (let i = 0; i !== mas.length; i += 1) {
+        		
+        		if (mas[i].sender == $("#userName").text()) {
+        			side = "right";
+        		} else {
+        			side = "left";
+        		}
+        		
+        		drawMessage(mas[i].text, new Date(mas[i].date), side);
+        	}
+        	
+        	
+    	}
     });
 	
 }
@@ -31,8 +52,6 @@ function connect() {
 	stompClient.connect({}, function (frame) {
 		
 		stompClient.subscribe("/user/queue/reply", function (data) {
-			
-			console.log("we got some message: " + data);
 			
 			var data = JSON.parse(data.body);
 			
@@ -182,14 +201,14 @@ function sendMessage() {
 	$("#message_input_value").val("");
 	
 	// Sending for DB saving
-    /*$.ajax
+    $.ajax
     ({
     	type: "POST",
         data: userJson,
         url: url,
         contentType: "application/json; charset=utf-8",
         scriptCharset: "utf-8"
-    });*/
+    });
 }
 
 

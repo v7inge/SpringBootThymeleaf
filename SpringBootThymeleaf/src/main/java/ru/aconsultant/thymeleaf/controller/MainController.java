@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -45,12 +46,12 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ru.aconsultant.thymeleaf.form.AuthForm;
-import ru.aconsultant.thymeleaf.service.Serializer;
 import ru.aconsultant.thymeleaf.beans.UserAccount;
 import ru.aconsultant.thymeleaf.beans.Contact;
 import ru.aconsultant.thymeleaf.beans.Message;
 import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
 import ru.aconsultant.thymeleaf.service.CounterResetThread;
+import ru.aconsultant.thymeleaf.service.HttpParamProcessor;
 import ru.aconsultant.thymeleaf.security.PasswordEncoder;
 import ru.aconsultant.thymeleaf.security.UserDetailsServiceImpl;
 
@@ -67,28 +68,8 @@ public class MainController {
 	@Autowired
     private SimpMessagingTemplate messagingTemplate;
 	
-	/*@MessageMapping("/message")
-	@SendTo("/chat/messages")
-	public Message getMessages(Message message, SimpMessageHeaderAccessor headerAccessor) {
-		
-		return message;
-	}*/
-	
-	
-	@MessageMapping("/direct/{sender}/to/{reciever}")
-	@SendTo("/queue/{reciever}")
-	public Message direct(@Payload Message message, @DestinationVariable String sender, @DestinationVariable String reciever) {
-		
-		return message;
-	}
-	
-	/*@MessageMapping("/direct/{reciever}")
-    @SendToUser("/queue/message-flow")
-    public Message goM(@Payload Message message, Principal principal, @DestinationVariable String reciever) {
-
-
-		return message;
-    }*/
+	@Autowired
+	private HttpParamProcessor httpParamProcessor;
 	
 	@MessageMapping("/message-flow")
     public void broadcast(@Payload Message message, Principal principal) {
@@ -326,7 +307,26 @@ public class MainController {
 	@RequestMapping(value = { "/security-check" }, method = RequestMethod.POST)
 	public String securityCheck(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
 		
-        System.out.println(principal.getName());
+		HashMap<String, String> requestParameters = httpParamProcessor.getRequestParameters(request);
+		String paramFromClient = requestParameters.get("paramFromClient");
+		System.out.println("paramFromClient: " + paramFromClient);
+		
+		List<Message> history = this.databaseAccess.getHistory("victor", "jerry");
+        //jsonEnt.put("contactHistory", history);
+		
+		
+		
+		
+		
+		
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("history", history);
+		
+		String paramFromServer = paramFromClient + " - hello from the server";
+		map.put("paramFromServer", paramFromServer);
+		
+		
+		httpParamProcessor.translateResponseParameters(response, map);
         
         return null;
 	}
