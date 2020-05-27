@@ -2,6 +2,9 @@ package ru.aconsultant.thymeleaf.beans;
 
 import java.util.Date;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class Message {
 
 	private String sender;

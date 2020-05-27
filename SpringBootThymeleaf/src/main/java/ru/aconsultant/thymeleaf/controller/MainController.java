@@ -52,6 +52,7 @@ import ru.aconsultant.thymeleaf.beans.Message;
 import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
 import ru.aconsultant.thymeleaf.service.CounterResetThread;
 import ru.aconsultant.thymeleaf.service.HttpParamProcessor;
+import ru.aconsultant.thymeleaf.service.MessageSaveThread;
 import ru.aconsultant.thymeleaf.security.PasswordEncoder;
 import ru.aconsultant.thymeleaf.security.UserDetailsServiceImpl;
 
@@ -79,6 +80,11 @@ public class MainController {
     public void broadcast(@Payload Message message, Principal principal) {
 
         messagingTemplate.convertAndSendToUser(message.getReciever(), "/queue/reply", message);
+        
+        // Save massage to database with minor thread priority
+        MessageSaveThread messageSaveThread = new MessageSaveThread(message, this.databaseAccess);
+        messageSaveThread.setPriority(3);
+        messageSaveThread.start(); 
     }
 	
 	
@@ -97,35 +103,6 @@ public class MainController {
 		model.addAttribute("contactList", contactList);
 
 		return "chat";
-	}
-	
-	
-	@RequestMapping(value = { "/message-sent" }, method = RequestMethod.POST) // #refactor - change to thread from websocket handler
-	public void messageSent(Model model, HttpServletRequest request) throws SQLException, IOException {
-		
-		String contact = "";
-        StringBuffer sb = new StringBuffer();
-        String line = null;
-
-        BufferedReader reader = request.getReader();
-        while ((line = reader.readLine()) != null)
-            sb.append(line);
-
-        try {
-            
-        	String jsonString = sb.toString();
-        	
-        	StringReader stringReader = new StringReader(jsonString);
-        	ObjectMapper mapper = new ObjectMapper();
-        	Message message = mapper.readValue(stringReader, Message.class);
-        			
-        	try {
-        		this.databaseAccess.saveMessage(message);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-        } catch (JSONException e) { }
 	}
 	
 	

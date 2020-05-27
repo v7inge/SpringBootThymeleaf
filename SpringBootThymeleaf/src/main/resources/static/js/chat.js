@@ -187,7 +187,6 @@ function sendMessage() {
 	let sender = $("#userName").text();
 	let reciever = $("#contactName").text();
 	let message = {"text": text, "sender": sender, "date": date, "reciever": reciever};
-	let url = "/message-sent";
     let userJson = JSON.stringify(message);
 	
     if ((reciever == "") || (text == "")) {
@@ -196,19 +195,8 @@ function sendMessage() {
     
 	// Sending message
 	drawMessage(text, date, "right");
-	//stompClient.send("/app/direct/" + sender + "/to/" + reciever, {}, userJson);
 	stompClient.send("/app/message-flow", {}, userJson);
 	$("#message_input_value").val("");
-	
-	// Sending for DB saving
-    $.ajax
-    ({
-    	type: "POST",
-        data: userJson,
-        url: url,
-        contentType: "application/json; charset=utf-8",
-        scriptCharset: "utf-8"
-    });
 }
 
 
