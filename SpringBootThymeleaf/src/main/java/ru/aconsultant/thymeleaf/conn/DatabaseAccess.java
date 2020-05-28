@@ -210,6 +210,12 @@ public class DatabaseAccess extends JdbcDaoSupport {
 			
         } catch (EmptyResultDataAccessException e) { }    
     }
+    
+    
+    public void setUserAvatar(String username, String avatar) throws SQLException {
+        String sql = "UPDATE APP_USER SET AVATAR=? WHERE USER_NAME=?";
+        this.getJdbcTemplate().update(sql, avatar, username);
+    }
 
     
 }

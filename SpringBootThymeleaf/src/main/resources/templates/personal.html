@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple chat</title>
+	<link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/css/style.css" rel="stylesheet">
+	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script src="/js/personal.js"></script>	
+	<link type="text/css" rel="stylesheet" data-th-href="@{css/style.css}" />
+	
+</head>
+
+<body>
+
+	<h2 th:utext="${username}"></h2>
+	
+	<button onclick="test()">Test</button>
+	
+	Some personal content
+	
+	<form method="POST" enctype="multipart/form-data" id="fileUploadForm">           
+	    Profile picture: <input type="file" name="files"/><br /> 
+	    <input type="submit" value="Submit" id="submitButton"/>
+	</form>
+	
+</body>
+</html>

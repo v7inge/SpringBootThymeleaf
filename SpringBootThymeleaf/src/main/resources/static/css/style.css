@@ -115,6 +115,7 @@ body {
 	display: block;
 	color: var(--dark-text);
 	padding:6px;
+  cursor: pointer;
 }
 
 .contact-active {
@@ -425,11 +426,13 @@ body {
 
 h2.inactive {
   color: #cccccc;
+  cursor: pointer;
 }
 
 h2.active {
   color: #0d0d0d;
   border-bottom: 2px solid var(--dark-green);
+  cursor: pointer;
 }
 
 input[type=button], input[type=submit], input[type=reset]  {

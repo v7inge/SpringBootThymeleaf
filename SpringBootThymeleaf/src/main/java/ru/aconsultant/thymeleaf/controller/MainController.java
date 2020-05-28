@@ -36,6 +36,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttribute;
@@ -55,6 +56,8 @@ import ru.aconsultant.thymeleaf.service.HttpParamProcessor;
 import ru.aconsultant.thymeleaf.service.MessageSaveThread;
 import ru.aconsultant.thymeleaf.security.PasswordEncoder;
 import ru.aconsultant.thymeleaf.security.UserDetailsServiceImpl;
+import ru.aconsultant.thymeleaf.service.FileProcessor;
+import ru.aconsultant.thymeleaf.form.UploadForm;
 
 @Controller
 @SessionAttributes({"loginedUser","testUser"})
@@ -71,6 +74,9 @@ public class MainController {
 	
 	@Autowired
 	private HttpParamProcessor httpParamProcessor;
+	
+	@Autowired
+	private FileProcessor fileProcessor;
 	
 	// How to get principal as a user:
 	//User loginedUser = (User) ((Authentication) principal).getPrincipal();
@@ -209,10 +215,26 @@ public class MainController {
 	}
 	
 	
-	// Service method to check security parameters
-	@RequestMapping(value = { "/security-check" }, method = RequestMethod.POST)
-	public void securityCheck(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
+	@RequestMapping(value = { "/personal" }, method = RequestMethod.GET)
+	public String personalGet(Model model, Principal principal) {
         
+		model.addAttribute("username", principal.getName());
+		return "personal";
+	}
+	
+	
+	@PostMapping("/avatar-upload")
+	public void avatarUpload(@ModelAttribute UploadForm form, HttpServletResponse response, Principal principal) throws SQLException, IOException {
+		
+		fileProcessor.saveUserAvatar(principal.getName(), form.getFiles());
+	}
+	
+	
+	// Service method for debugging
+	@RequestMapping(value = { "/test" }, method = RequestMethod.POST)
+	public void securityCheck(Model model, HttpServletResponse response, Principal principal) throws SQLException, IOException {
+        
+		System.out.println("testing");
 	}
 	
 	
