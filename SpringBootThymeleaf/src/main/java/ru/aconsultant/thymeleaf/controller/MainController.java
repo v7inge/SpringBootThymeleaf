@@ -2,7 +2,9 @@ package ru.aconsultant.thymeleaf.controller;
 
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.security.Principal;
@@ -14,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -22,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -35,12 +39,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.context.support.ServletContextResource;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -58,6 +66,8 @@ import ru.aconsultant.thymeleaf.security.PasswordEncoder;
 import ru.aconsultant.thymeleaf.security.UserDetailsServiceImpl;
 import ru.aconsultant.thymeleaf.service.FileProcessor;
 import ru.aconsultant.thymeleaf.form.UploadForm;
+
+import org.apache.commons.io.IOUtils;
 
 @Controller
 @SessionAttributes({"loginedUser","testUser"})
@@ -77,6 +87,11 @@ public class MainController {
 	
 	@Autowired
 	private FileProcessor fileProcessor;
+	
+	
+	@Autowired
+    private ServletContext servletContext;
+	
 	
 	// How to get principal as a user:
 	//User loginedUser = (User) ((Authentication) principal).getPrincipal();
@@ -215,11 +230,39 @@ public class MainController {
 	}
 	
 	
+	@ResponseBody
+	@RequestMapping(value = "/image-resource", method = RequestMethod.GET)
+	public Resource getImageAsResource() {
+	   return new ServletContextResource(servletContext, "https://aconsultant.ru/wp-content/uploads/2017/10/synchronization_icon_sharing_data_exchange_sync_transfer_network-512.png");
+	}
+	
+	
 	@RequestMapping(value = { "/personal" }, method = RequestMethod.GET)
 	public String personalGet(Model model, Principal principal) {
         
+		
+		
+		model.addAttribute("imageSource", "https://aconsultant.ru/wp-content/uploads/2017/10/development.desktop-512.png");
+		
+		
 		model.addAttribute("username", principal.getName());
 		return "personal";
+	}
+	
+	
+	@GetMapping("/image")
+	public void showProductImage(HttpServletResponse response) throws IOException {
+	
+		response.setContentType("image/jpeg"); // Or whatever format you wanna use
+
+		//InputStream is = new ByteArrayInputStream(fileProcessor.getBytesFromFTP());
+		//IOUtils(is, response.getOutputStream());
+	}
+	
+	@RequestMapping(value = "/user-avatar", method = RequestMethod.GET)
+	public @ResponseBody byte[] getUserAvatar(Principal principal) throws IOException, SQLException {
+		
+		return fileProcessor.getUserAvatar(principal.getName());
 	}
 	
 	

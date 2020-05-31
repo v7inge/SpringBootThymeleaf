@@ -216,6 +216,24 @@ public class DatabaseAccess extends JdbcDaoSupport {
         String sql = "UPDATE APP_USER SET AVATAR=? WHERE USER_NAME=?";
         this.getJdbcTemplate().update(sql, avatar, username);
     }
+    
+    
+    public String getUserAvatar(String username) throws SQLException {
+        
+		String sql = "SELECT AVATAR FROM APP_USER WHERE USER_NAME = ?";
+				
+		Object[] args = new Object[] { username };
+		int[] argTypes = new int[] { Types.VARCHAR };
+		
+		try {
+			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
+		    if (rs.next()) {
+		        return rs.getString("AVATAR");
+		    }
+			
+        } catch (EmptyResultDataAccessException e) { }
+		return null;
+    }
 
     
 }
