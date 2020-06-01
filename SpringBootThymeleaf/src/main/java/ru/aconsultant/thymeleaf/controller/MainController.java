@@ -266,6 +266,13 @@ public class MainController {
 	}
 	
 	
+	@GetMapping("/avatar/{username}")
+	public @ResponseBody byte[] getAvatar(@PathVariable String username) throws IOException, SQLException {
+		
+		return fileProcessor.getUserAvatar(username);
+	}
+	
+	
 	@PostMapping("/avatar-upload")
 	public void avatarUpload(@ModelAttribute UploadForm form, HttpServletResponse response, Principal principal) throws SQLException, IOException {
 		

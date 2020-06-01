@@ -33,14 +33,14 @@
 		
 			<!-- PROFILE -->
 			<div id="profile" class="profile">
-				<img id="profile-img" class="contact-img" src="http://aconsultant.ru/wp-content/uploads/2020/05/1590919474726-8_3.jpg" alt="">
+				<img id="profile-img" class="contact-img" th:src="@{'/user-avatar'}" alt="no pic" />
 				<div id="profile-name" class="contact-name">Виктор</div>
 			</div>
 
 			<!-- MENU -->
 			<div class="menu">
 				<div class ="shadowRound"> 
-					<img src="http://aconsultant.ru/wp-content/uploads/2020/05/1590919474726-8_3.jpg" />
+					<img th:src="@{'/user-avatar'}" />
 				</div>	
 				<div class="username">victor</div>
 				<div class="text">Sign out</div>
@@ -60,7 +60,7 @@
 					<div class = "name">Settings</div>
 				</li> -->
 				<li class = "contact" th:each ="contact : ${contactList}">
-					<img class="contact-img" src="http://aconsultant.ru/wp-content/uploads/2020/05/1590919474726-8_3.jpg" alt="">
+					<img class="contact-img" th:src="@{/avatar/{username}(username=${contact.login})}" alt="" />
 					<div class = "contact-name" th:utext="${contact.login}"></div>
 					<div class = "counter" th:classappend = "${contact.unreadCount}==0 ? invisible : userclass" th:utext="${contact.unreadCount}"></div>
 				</li>

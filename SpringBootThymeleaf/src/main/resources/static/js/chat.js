@@ -412,7 +412,7 @@ $(document).ready(function() {
 		var form_data = new FormData();
 		var ext = name.split('.').pop().toLowerCase();
 		
-		if(jQuery.inArray(ext, ['png','jpg','jpeg']) == -1) {
+		if(jQuery.inArray(ext, ["png","jpg","jpeg"]) == -1) {
 			console.log("Invalid Image File");
 		} else {
 			console.log("Good Image File");
