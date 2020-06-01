@@ -392,16 +392,34 @@ $(document).ready(function() {
 
 	// Click on avatar in menu
 	$(".shadowRound").click(function() {
-		console.log("change avatar");
+		$("#file_input").click();
 	});
 
 	// Click on any space
 	$(document).click(function(event) {
     if ($(event.target).closest(".menu").length
-		|| $(event.target).closest(".profile").length) {
+		|| $(event.target).closest(".profile").length
+		|| $(event.target).closest("#file_input").length) {
 			return;
 		}
 		$(".menu").removeClass("active");
 	});
+	
+	// Avatar file chosen
+	$(document).on("change", "#file_input", function() {
+		
+		var name = document.getElementById("file_input").files[0].name;
+		var form_data = new FormData();
+		var ext = name.split('.').pop().toLowerCase();
+		
+		if(jQuery.inArray(ext, ['png','jpg','jpeg']) == -1) {
+			console.log("Invalid Image File");
+		} else {
+			console.log("Good Image File");
+		}
+	});
+	
+	
+	
 	
 });
