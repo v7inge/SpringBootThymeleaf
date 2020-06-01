@@ -5,6 +5,7 @@
     <title>Simple chat</title>
 	<link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<link href="/css/style.css" rel="stylesheet">
+	<link href="/css/avatar.css" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="/webjars/sockjs-client/sockjs.min.js"></script>
 	<script src="/webjars/stomp-websocket/stomp.min.js"></script>
@@ -16,46 +17,49 @@
 
 <body onload="onLoad()">
 	
-	<h2 th:utext="${loginedUser}">..!..</h2>
-	<a th:if="${#request.userPrincipal != null}" th:href="@{/logout}">Log out</a>
-	
 	<div class="invisible" id="userName" th:utext="${loginedUser}"></div>
 	<div class="invisible" id="contactName">no contact</div>
 	
-	<button onclick="test()">Test</button>
-	
 	<div class="chat_window">
 	
+		<!-- TOP BAR -->
 		<div class="top_menu">
 			<div class="title">Chat by Victor Umanskiy</div>
 		</div>
 		
 		<div class = "sidebar">
 		
-			<div class="dropdown">
-				<div onclick="dropDown()" class="dropbtn">
-					&equiv; Menu
-				</div>
-				<div id="myDropdown" class="dropdown-content">
-					<a href="#">Profile</a>
-					<a href="#">About the chat</a>
-					<a href="#">Contact the developer</a>
-				</div>
+			<!-- PROFILE -->
+			<div id="profile" class="profile">
+				<img id="profile-img" class="contact-img" src="http://aconsultant.ru/wp-content/uploads/2020/05/1590919474726-8_3.jpg" alt="">
+				<div id="profile-name" class="contact-name">Виктор</div>
+			</div>
+
+			<!-- MENU -->
+			<div class="menu">
+				<div class ="shadowRound"> 
+					<img src="http://aconsultant.ru/wp-content/uploads/2020/05/1590919474726-8_3.jpg" />
+				</div>	
+				<div class="username">victor</div>
+				<div class="text">Sign out</div>
 			</div>
 	
+			<!-- CONTACT SEARCH -->
 			<input id="contact_input" class="contact_input" onchange="contactInputChange()" placeholder="Add contact..." />
 			<div id="searching-tip" class="searching-tip invisible"></div>
 			
 			<ul class = "contacts invisible" id = "found_contacts">
 			</ul>
 			
+			<!-- CONTACTS -->
 			<ul class = "contacts" id = "contacts">
 				<!-- <li class = "contact">
 					<img src="http://aconsultant.ru/wp-content/uploads/2020/05/gear.png" width="13" height="13" alt="gear">
 					<div class = "name">Settings</div>
 				</li> -->
 				<li class = "contact" th:each ="contact : ${contactList}">
-					<div class = "name" th:utext="${contact.login}"></div>
+					<img class="contact-img" src="http://aconsultant.ru/wp-content/uploads/2020/05/1590919474726-8_3.jpg" alt="">
+					<div class = "contact-name" th:utext="${contact.login}"></div>
 					<div class = "counter" th:classappend = "${contact.unreadCount}==0 ? invisible : userclass" th:utext="${contact.unreadCount}"></div>
 				</li>
 				</ul>
@@ -63,6 +67,7 @@
 		
 		<div class="chat_inner_window">
 		
+			<!-- STARTING TIP -->
 			<table class = "tdcenter">
 				<tr>
 					<td>
@@ -71,12 +76,18 @@
 				</tr>
 			</table>
 			
+			<!-- MESSAGES -->
 			<ul class="messages" id="messages">
 			</ul>
 			
+			<!-- BOTTOM BAR -->
 			<div class="bottom_wrapper clearfix">
 				<div class="message_input_wrapper">
 					<input id="message_input_value" class="message_input" placeholder="Type your message here..." />
+				</div>
+				<div class="send_message" id="send_button">
+					<div class="icon"></div>
+					<div class="text">Send</div>
 				</div>			
 			</div>
 			

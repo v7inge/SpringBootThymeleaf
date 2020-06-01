@@ -150,7 +150,7 @@ function findContact(str) {
 
 
 function getContactName(el) {
-	return $(el).children(".name").text();	
+	return $(el).children(".contact-name").text();	
 }
 
 
@@ -313,25 +313,6 @@ function contactInputChange() {
 }
 
 
-function dropDown() {
-  document.getElementById("myDropdown").classList.toggle("show");
-}
-
-
-window.onclick = function(event) {
-  if (!event.target.matches(".dropbtn")) {
-    var dropdowns = document.getElementsByClassName("dropdown-content");
-    var i;
-    for (i = 0; i < dropdowns.length; i++) {
-      var openDropdown = dropdowns[i];
-      if (openDropdown.classList.contains("show")) {
-        openDropdown.classList.remove("show");
-      }
-    }
-  }
-}
-
-
 function addFoundContact(text) {
 
 	let contactHtml = 
@@ -402,6 +383,25 @@ $(document).ready(function() {
 	// Click on found contact
 	$("body").on("click", ".found", function () {
 		moveContactToTheList($(this).text());
+	});
+	
+	// Click on profile
+	$("#profile").click(function() {
+		$(".menu").addClass("active");
+	});
+
+	// Click on avatar in menu
+	$(".shadowRound").click(function() {
+		console.log("change avatar");
+	});
+
+	// Click on any space
+	$(document).click(function(event) {
+    if ($(event.target).closest(".menu").length
+		|| $(event.target).closest(".profile").length) {
+			return;
+		}
+		$(".menu").removeClass("active");
 	});
 	
 });

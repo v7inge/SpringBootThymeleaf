@@ -158,11 +158,9 @@ public class FileProcessor {
         	width = originalHeight;
         	height = originalHeight;
         }
-        
-        System.out.println("Original Image Dimension: " + originalImage.getWidth() + "x" + originalImage.getHeight());            
+                  
         BufferedImage croppedImage = originalImage.getSubimage(x, y, width, height);
         croppedImage = resizeImage(croppedImage);
-        System.out.println("Cropped Image Dimension: "+croppedImage.getWidth()+"x"+croppedImage.getHeight());
 
         // Convert from buffered image to byte array
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

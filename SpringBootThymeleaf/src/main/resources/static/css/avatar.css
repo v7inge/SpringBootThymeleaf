@@ -1,0 +1,40 @@
+.shadowRound { 
+  margin: 0 auto;
+  margin-top: 20px;
+  position: relative;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  background-color: white;
+}
+
+.shadowRound img {
+  position: absolute;
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+}
+
+.shadowRound:after { 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0; 
+  background: rgba(0,0,0,.5);  
+  border-radius: 50%;
+  opacity: 0;  
+  width: 100px;
+  height: 100px;
+  padding-top: 15px;
+  content: '+';
+  font-size: 50px;
+  font-weight: bold;
+  text-align: center;
+  color: #FFE200;
+}
+
+.shadowRound:hover:before,
+.shadowRound:hover:after { 
+  opacity: 1;         
+}
