@@ -1,5 +1,6 @@
 package ru.aconsultant.thymeleaf.conn;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +13,7 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.InvalidResultSetAccessException;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
@@ -86,13 +88,14 @@ public class DatabaseAccess extends JdbcDaoSupport {
     }
     
     
-    public ArrayList<Contact> contactList(String userName) throws SQLException {
+    public ArrayList<Contact> contactList(String userName) throws SQLException, InvalidResultSetAccessException, IOException {
         
 		String sql = 
-				"SELECT UserChats.Contact, SUM(m.New) AS UnreadCount FROM \n" +
+				"SELECT UserChats.Contact, SUM(m.New) AS UnreadCount, AppUser.AVATAR AS Avatar FROM \n" +
 				"(SELECT chats.User, chats.Contact FROM PERSONAL_CHATS chats WHERE chats.User = ?) AS UserChats \n" +
 				"LEFT JOIN MESSAGES m ON UserChats.Contact = m.Sender AND m.New = 1 \n" +
-				"GROUP BY UserChats.Contact";
+				"LEFT JOIN APP_USER AppUser ON UserChats.Contact = AppUser.USER_NAME \n" +
+				"GROUP BY UserChats.Contact, AppUser.AVATAR";
 				
 		Object[] args = new Object[] { userName };
 		int[] argTypes = new int[] { Types.VARCHAR };
@@ -102,7 +105,7 @@ public class DatabaseAccess extends JdbcDaoSupport {
 			
 			ArrayList<Contact> list = new ArrayList<Contact>();
 		    while (rs.next()) {
-		        list.add(new Contact(rs.getString("Contact"), rs.getInt("UnreadCount")));
+		        list.add(new Contact(rs.getString("Contact"), rs.getInt("UnreadCount"), rs.getString("Avatar")));
 		    }
 		    return list;
 			

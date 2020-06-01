@@ -84,7 +84,11 @@ public class FileProcessor {
 	public byte[] getUserAvatar(String username) throws SQLException, IOException {
 		
 		String filename = databaseAccess.getUserAvatar(username);
-		return getBytesFromFTP(filename);
+		if (filename == "" || filename == null) {
+			return null;
+		} else {
+			return getBytesFromFTP(filename);
+		}
 	}
 	
 	
@@ -101,6 +105,8 @@ public class FileProcessor {
 	
 	
 	public byte[] getBytesFromFTP(String filename) throws IOException {
+		
+		if (filename == null || filename == "") { return null; }
 		
 		connectToFTP();
 		InputStream inputStream = ftpClient.retrieveFileStream(filename);

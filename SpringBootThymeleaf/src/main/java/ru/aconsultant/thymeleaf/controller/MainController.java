@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.InvalidResultSetAccessException;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -110,7 +111,7 @@ public class MainController {
 	
 	
 	@RequestMapping(value = { "/" }, method = RequestMethod.GET)
-	public String chatGet(Model model, Principal principal) throws SQLException {
+	public String chatGet(Model model, Principal principal) throws SQLException, InvalidResultSetAccessException, IOException {
 		
 		String userName = "no user";
 		if (principal != null) {
@@ -121,6 +122,12 @@ public class MainController {
 		
 		// Fill contact list
         ArrayList<Contact> contactList = this.databaseAccess.contactList(userName);
+        
+        ///////////////////
+        for (Contact contact : contactList) {
+        	contact.setAvatar( fileProcessor.getBytesFromFTP(contact.getAvatarPath()) );
+        }
+        
 		model.addAttribute("contactList", contactList);
 
 		return "chat";
@@ -262,14 +269,23 @@ public class MainController {
 	@RequestMapping(value = "/user-avatar", method = RequestMethod.GET)
 	public @ResponseBody byte[] getUserAvatar(Principal principal) throws IOException, SQLException {
 		
-		return fileProcessor.getUserAvatar(principal.getName());
+		return null;
+		//return fileProcessor.getUserAvatar(principal.getName());
 	}
 	
 	
 	@GetMapping("/avatar/{username}")
 	public @ResponseBody byte[] getAvatar(@PathVariable String username) throws IOException, SQLException {
 		
+		//return null;
 		return fileProcessor.getUserAvatar(username);
+	}
+	
+	
+	@GetMapping("/picture/{path}")
+	public @ResponseBody byte[] getPicture(@PathVariable String path) throws IOException, SQLException {
+		
+		return fileProcessor.getBytesFromFTP(path);
 	}
 	
 	

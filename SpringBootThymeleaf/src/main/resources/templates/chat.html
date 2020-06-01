@@ -33,7 +33,9 @@
 		
 			<!-- PROFILE -->
 			<div id="profile" class="profile">
-				<img id="profile-img" class="contact-img" th:src="@{'/user-avatar'}" alt="no pic" />
+				<!--<img id="profile-img" class="contact-img" th:src="@{'/user-avatar'}" alt="no pic" />-->
+				<!--<img class="contact-img" th:unless="${contact.avatar == null}" th:src="@{/picture/{path}(path=${contact.avatarPath})}" alt="" />
+				<div class="contact-img" th:if="${contact.avatar == null}"></div>-->
 				<div id="profile-name" class="contact-name">Виктор</div>
 			</div>
 
@@ -60,7 +62,8 @@
 					<div class = "name">Settings</div>
 				</li> -->
 				<li class = "contact" th:each ="contact : ${contactList}">
-					<img class="contact-img" th:src="@{/avatar/{username}(username=${contact.login})}" alt="" />
+					<img class="contact-img" th:unless="${contact.avatar == null}" th:src="@{/picture/{path}(path=${contact.avatarPath})}" alt="" />
+					<div class="contact-img" th:if="${contact.avatar == null}"></div>
 					<div class = "contact-name" th:utext="${contact.login}"></div>
 					<div class = "counter" th:classappend = "${contact.unreadCount}==0 ? invisible : userclass" th:utext="${contact.unreadCount}"></div>
 				</li>
