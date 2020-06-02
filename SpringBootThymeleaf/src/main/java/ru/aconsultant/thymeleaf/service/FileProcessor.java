@@ -122,21 +122,6 @@ public class FileProcessor {
 	}
 	
 	
-	public void fillUsersAvatars(List<Contact> contacts) throws SocketException, IOException {
-		
-		//boolean answer = ftpClient.isConnected();
-        if(ftpClient==null || !ftpClient.isConnected()) {
-        	connectToFTP();
-        }
-        
-		//connectToFTP();
-		for (Contact contact : contacts) {
-			contact.setAvatar(getBytesWhenConnected(contact.getAvatarPath()));
-		}
-		disconnectFromFTP();
-	}
-	
-	
 	public void fillContactsBase64Images(List<Contact> contacts) throws SocketException, IOException {
 		
 		if(ftpClient==null || !ftpClient.isConnected()) {
@@ -172,9 +157,6 @@ public class FileProcessor {
 		
 		if (filename == null || filename == "") { return null; }
 		
-		
-		
-		//ftpClient.appendFileStream(remote)
 		InputStream inputStream = ftpClient.retrieveFileStream(filename);
 		byte[] bytes = inputStream.readAllBytes();
 		return bytes;
@@ -286,11 +268,6 @@ public class FileProcessor {
 		g.dispose();
 		return resizedImage;
 	}
-	
-	
-	////////////////////////////////////
-	
-	
 	
 	
 }
