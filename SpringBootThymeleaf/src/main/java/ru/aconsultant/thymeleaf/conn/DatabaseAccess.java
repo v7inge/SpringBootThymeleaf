@@ -91,13 +91,13 @@ public class DatabaseAccess extends JdbcDaoSupport {
     public List<Contact> userContactList(String username) throws InvalidResultSetAccessException, SQLException, IOException {
     	
     	String sql =
-    			"SELECT AppUser.USER_NAME AS Username, SUM(m.New) AS UnreadCount, AppUser.AVATAR AS Avatar, AppUser.BASE64IMAGE AS Base64Image, 0 AS Current FROM\r\n" + 
+    			"SELECT AppUser.USER_NAME AS Username, SUM(m.New) AS UnreadCount, AppUser.AVATAR AS Avatar, AppUser.BASE64IMAGE AS Base64Image, AppUser.LETTER AS Letter, 0 AS Current FROM\r\n" + 
     			"(SELECT chats.User, chats.Contact FROM PERSONAL_CHATS chats WHERE chats.User = ?) AS UserChats\r\n" + 
     			"LEFT JOIN MESSAGES m ON UserChats.Contact = m.Sender AND m.New = 1\r\n" + 
     			"LEFT JOIN APP_USER AppUser ON UserChats.Contact = AppUser.USER_NAME\r\n" + 
     			"GROUP BY UserChats.Contact, AppUser.AVATAR\r\n" + 
     			"UNION\r\n" + 
-    			"SELECT AppUser.USER_NAME, 0, AppUser.AVATAR, AppUser.BASE64IMAGE, 1 FROM\r\n" + 
+    			"SELECT AppUser.USER_NAME, 0, AppUser.AVATAR, AppUser.BASE64IMAGE, AppUser.LETTER, 1 FROM\r\n" + 
     			"APP_USER AppUser WHERE AppUser.USER_NAME = ?";
     	
     	Object[] args = new Object[] { username, username };
@@ -108,7 +108,7 @@ public class DatabaseAccess extends JdbcDaoSupport {
 			
 			ArrayList<Contact> list = new ArrayList<Contact>();
 		    while (rs.next()) {   	
-		    	Contact contact = new Contact(rs.getString("Username"), rs.getInt("UnreadCount"), rs.getString("Avatar"), rs.getInt("Current")==1, rs.getString("Base64Image"));
+		    	Contact contact = new Contact(rs.getString("Username"), rs.getInt("UnreadCount"), rs.getString("Avatar"), rs.getInt("Current")==1, rs.getString("Base64Image"), rs.getString("Letter"));
 		    	list.add(contact);
 		    }
 		    return list;
@@ -165,13 +165,12 @@ public class DatabaseAccess extends JdbcDaoSupport {
     public String addUserAccount(UserAccount user) throws SQLException {
     	
     	if (findUserAccount(user.getUserName()) != null) {
-    		return "Sorry, such username already exists";
+    		return "error";
     	}
     	
-		String sql = "INSERT INTO APP_USER (USER_NAME, ENCRYPTED_PASSWORD, ENABLED) VALUES (?, ?, 1)";
-        this.getJdbcTemplate().update(sql, user.getUserName(), user.getEncryptedPassword());
-    	
-    	return "";
+		String sql = "INSERT INTO APP_USER (USER_NAME, ENCRYPTED_PASSWORD, ENABLED, LETTER) VALUES (?, ?, 1, ?)";
+        this.getJdbcTemplate().update(sql, user.getUserName(), user.getEncryptedPassword(), user.getLetter());
+        return "";
     }
     
     

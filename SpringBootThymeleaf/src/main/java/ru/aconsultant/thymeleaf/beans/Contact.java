@@ -15,6 +15,7 @@ public class Contact {
 	public String avatarPath;
 	public boolean current;
 	public String base64Image;
+	public String letter;
 	
 	public Contact() {
 	
@@ -33,12 +34,13 @@ public class Contact {
 	}
 	
 	
-	public Contact(String username, Integer unreadCount, String avatarPath, boolean current, String base64Image) throws SQLException, IOException {
+	public Contact(String username, Integer unreadCount, String avatarPath, boolean current, String base64Image, String letter) throws SQLException, IOException {
 		this.username = username;
 		this.unreadCount = unreadCount;
 		this.avatarPath = avatarPath;
 		this.current = current;
 		this.base64Image = base64Image;
+		this.letter = letter;
 	}
 	
 
@@ -66,6 +68,10 @@ public class Contact {
 		this.current = current;
 	}
 	
+	public void setLetter(String letter) {
+		this.letter = letter;
+	}
+	
 	public String getUsername() {
 		return username;
 	}
@@ -88,6 +94,10 @@ public class Contact {
 	
 	public String getBase64Image() {
 		return base64Image;
+	}
+	
+	public String getLetter() {
+		return letter;
 	}
 	
 }

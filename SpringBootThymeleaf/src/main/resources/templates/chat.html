@@ -35,16 +35,17 @@
 			<!-- PROFILE -->
 			<div id="profile" class="profile">	
 				<img class="contact-img" th:unless="${user.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${user.base64Image}}" />
-				<div class="contact-placeholder" th:if="${user.base64Image == null}"></div>
-				<div class = "contact-name" th:utext="${user.username}"></div>
+				<div class="contact-placeholder" th:classappend="${user.letter}" th:if="${user.base64Image == null}"><div class="letter" th:utext="${user.username[0]}"></div></div>
+				<div class="contact-name" th:utext="${user.username}"></div>
 			</div>
 
 			<!-- MENU -->
 			<div class="menu">
-				<div class ="shadowRound"> 
+				<div class="shadowRound" th:classappend="${user.letter}">
 					<img th:unless="${user.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${user.base64Image}}" />
-				</div>	
-				<div class="username">victor</div>
+					<div class="letter" th:if="${user.base64Image == null}" th:utext="${user.username[0]}"></div>
+				</div>
+				<div class="username" th:utext="${user.username}"></div>
 				<div class="text">Sign out</div>
 			</div>
 	
@@ -63,7 +64,7 @@
 					<div class="contact-img" th:if="${contact.avatarPath == null}"></div> -->
 					
 					<img class="contact-img" th:unless="${contact.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${contact.base64Image}}" />
-					<div class="contact-placeholder" th:if="${contact.base64Image == null}"><div class="letter" th:utext="${contact.username[0]}"></div></div>
+					<div class="contact-placeholder" th:classappend="${contact.letter}" th:if="${contact.base64Image == null}"><div class="letter" th:utext="${contact.username[0]}"></div></div>
 					<div class = "contact-name" th:utext="${contact.username}"></div>
 					<div class = "counter" th:classappend = "${contact.unreadCount}==0 ? invisible : userclass" th:utext="${contact.unreadCount}"></div>
 				</li>

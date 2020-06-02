@@ -40,17 +40,7 @@ function test() {
 
 
 function onLoad() {
-	setPlaceholderColors();
 	connect();
-}
-
-
-function setPlaceholderColors() {
-
-	$(".contact-placeholder").each(function() {
-  	console.log($(this).text());
-		$(this).addClass($(this).text().toLowerCase());
-	});
 }
 
 
