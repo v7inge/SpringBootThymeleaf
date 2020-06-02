@@ -19,7 +19,7 @@
 	
 	<input type="file" class="invisible" id="file_input" name="file_input" />​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
 	
-	<div class="invisible" id="userName" th:utext="${loginedUser}"></div>
+	<div class="invisible" id="userName" th:utext="${user.username}"></div>
 	<div class="invisible" id="contactName">no contact</div>
 	
 	<div class="chat_window">
@@ -32,11 +32,10 @@
 		<div class = "sidebar">
 		
 			<!-- PROFILE -->
-			<div id="profile" class="profile">
-				<!--<img id="profile-img" class="contact-img" th:src="@{'/user-avatar'}" alt="no pic" />-->
-				<!--<img class="contact-img" th:unless="${contact.avatar == null}" th:src="@{/picture/{path}(path=${contact.avatarPath})}" alt="" />
-				<div class="contact-img" th:if="${contact.avatar == null}"></div>-->
-				<div id="profile-name" class="contact-name">Виктор</div>
+			<div id="profile" class="profile">	
+				<img class="contact-img" th:unless="${user.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${user.base64Image}}" />
+				<div class="contact-img" th:if="${user.base64Image == null}"></div>
+				<div class = "contact-name" th:utext="${user.username}"></div>
 			</div>
 
 			<!-- MENU -->
@@ -62,9 +61,14 @@
 					<div class = "name">Settings</div>
 				</li> -->
 				<li class = "contact" th:each ="contact : ${contactList}">
-					<img class="contact-img" th:unless="${contact.avatar == null}" th:src="@{/picture/{path}(path=${contact.avatarPath})}" alt="" />
-					<div class="contact-img" th:if="${contact.avatar == null}"></div>
-					<div class = "contact-name" th:utext="${contact.login}"></div>
+					
+					<!-- <img class="contact-img" th:unless="${contact.avatarPath == null}" th:src="@{/picture/{path}(path=${contact.avatarPath})}" alt="" />
+					<div class="contact-img" th:if="${contact.avatarPath == null}"></div> -->
+					
+					<img class="contact-img" th:unless="${contact.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${contact.base64Image}}" />
+					<div class="contact-img" th:if="${contact.base64Image == null}"></div>
+					
+					<div class = "contact-name" th:utext="${contact.username}"></div>
 					<div class = "counter" th:classappend = "${contact.unreadCount}==0 ? invisible : userclass" th:utext="${contact.unreadCount}"></div>
 				</li>
 				</ul>

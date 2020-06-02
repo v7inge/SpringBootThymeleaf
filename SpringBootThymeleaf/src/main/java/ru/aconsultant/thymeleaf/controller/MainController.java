@@ -69,6 +69,7 @@ import ru.aconsultant.thymeleaf.service.FileProcessor;
 import ru.aconsultant.thymeleaf.form.UploadForm;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.net.util.Base64;
 
 @Controller
 @SessionAttributes({"loginedUser","testUser"})
@@ -112,23 +113,48 @@ public class MainController {
 	
 	@RequestMapping(value = { "/" }, method = RequestMethod.GET)
 	public String chatGet(Model model, Principal principal) throws SQLException, InvalidResultSetAccessException, IOException {
-		
-		String userName = "no user";
-		if (principal != null) {
-			userName = principal.getName();
-		}
  
-        model.addAttribute("loginedUser", userName);
+		String username = principal.getName();
+		
+		/*Contact user = new Contact(username);
+		databaseAccess.fillAvatarPath(user);*/
+		
+        model.addAttribute("loginedUser", username);
 		
 		// Fill contact list
-        ArrayList<Contact> contactList = this.databaseAccess.contactList(userName);
+        List<Contact> contactList = databaseAccess.userContactList(username);
         
-        ///////////////////
-        for (Contact contact : contactList) {
-        	contact.setAvatar( fileProcessor.getBytesFromFTP(contact.getAvatarPath()) );
-        }
+        int indexLast = contactList.size() - 1;
+        Contact user = contactList.get(indexLast);
+        contactList.remove(indexLast);
+        
+        /*List<Contact> contactList = new ArrayList<Contact>();
+        
+        Contact contact1 = new Contact("userWithAva");
+        contact1.setAvatarPath("1590917884069 8_3.jpg");
+        contactList.add(contact1);
+        
+        Contact contact2 = new Contact("userWithNoAva");
+        contactList.add(contact2);*/
+        
+        //fileProcessor.fillContactsBase64Images(contactList);
+        
+        
+        
+        /*byte[] bytes = fileProcessor.getBytesFromFTP(avatarPath);
+        String b = Base64.encodeBase64String(bytes);
+        model.addAttribute("b", b);*/
+        
+        //fileProcessor.fillUsersAvatars(contactList);
+        
+        
+        
+        // Add user to the contact list
+        
+        
         
 		model.addAttribute("contactList", contactList);
+		model.addAttribute("user", user);
 
 		return "chat";
 	}
@@ -292,7 +318,10 @@ public class MainController {
 	@PostMapping("/avatar-upload")
 	public void avatarUpload(@ModelAttribute UploadForm form, HttpServletResponse response, Principal principal) throws SQLException, IOException {
 		
-		fileProcessor.saveUserAvatar(principal.getName(), form.getFiles());
+		Contact bufferContact = new Contact(principal.getName());
+		fileProcessor.saveUserBase64Image(bufferContact, form.getFiles());
+		
+		//fileProcessor.saveUserAvatar(principal.getName(), form.getFiles());
 	}
 	
 	

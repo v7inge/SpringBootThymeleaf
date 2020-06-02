@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.SocketException;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -17,10 +18,13 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
+import org.apache.commons.net.util.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import ru.aconsultant.thymeleaf.beans.Contact;
 import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
 
 @Component
@@ -68,6 +72,32 @@ public class FileProcessor {
 	}
 	
 	
+	public void saveUserBase64Image(Contact user, MultipartFile[] files) throws IOException, SQLException {
+		
+		// Check if file is empty
+		MultipartFile file = files[0];
+		if (file.isEmpty()) {
+	    	user.setBase64Image(null);
+	    	return;
+	    }
+		
+		// Check if it's an image
+		List<String> extensions = Arrays.asList("jpg", "jpeg", "png");
+		if (!filePassesFilter(file, extensions)) {
+        	System.out.println("File did not pass the filter");
+        	return;
+        }
+		
+		// Crop it
+		byte[] bytes = file.getBytes();        
+		bytes = cropImageSquare(bytes);
+		
+		String base63image = Base64.encodeBase64String(bytes);
+		user.setBase64Image(base63image);
+		databaseAccess.saveUserBase64Image(user.getUsername(), base63image);	
+	}
+	
+	
 	public void saveUserAvatar(String username, MultipartFile[] files) throws IOException, SQLException {
 		
 		List<String> extensions = Arrays.asList("jpg", "jpeg", "png");
@@ -83,12 +113,46 @@ public class FileProcessor {
 	
 	public byte[] getUserAvatar(String username) throws SQLException, IOException {
 		
-		String filename = databaseAccess.getUserAvatar(username);
+		String filename = databaseAccess.getUserAvatarPath(username);
 		if (filename == "" || filename == null) {
 			return null;
 		} else {
 			return getBytesFromFTP(filename);
 		}
+	}
+	
+	
+	public void fillUsersAvatars(List<Contact> contacts) throws SocketException, IOException {
+		
+		//boolean answer = ftpClient.isConnected();
+        if(ftpClient==null || !ftpClient.isConnected()) {
+        	connectToFTP();
+        }
+        
+		//connectToFTP();
+		for (Contact contact : contacts) {
+			contact.setAvatar(getBytesWhenConnected(contact.getAvatarPath()));
+		}
+		disconnectFromFTP();
+	}
+	
+	
+	public void fillContactsBase64Images(List<Contact> contacts) throws SocketException, IOException {
+		
+		if(ftpClient==null || !ftpClient.isConnected()) {
+        	connectToFTP();
+        }
+		
+		for (Contact contact : contacts) {
+			byte[] img = getBytesWhenConnected(contact.getAvatarPath());
+			if (img == null) {
+				contact.setBase64Image(null);
+			} else {
+				contact.setBase64Image(Base64.encodeBase64String(img));
+			}
+		}
+		disconnectFromFTP();
+		
 	}
 	
 	
@@ -104,15 +168,50 @@ public class FileProcessor {
 	}
 	
 	
+	private byte[] getBytesWhenConnected(String filename) throws IOException {
+		
+		if (filename == null || filename == "") { return null; }
+		
+		
+		
+		//ftpClient.appendFileStream(remote)
+		InputStream inputStream = ftpClient.retrieveFileStream(filename);
+		byte[] bytes = inputStream.readAllBytes();
+		return bytes;
+	}
+	
+	
 	public byte[] getBytesFromFTP(String filename) throws IOException {
 		
 		if (filename == null || filename == "") { return null; }
 		
-		connectToFTP();
+		if(ftpClient == null || !ftpClient.isConnected()) {
+        	connectToFTP();
+        }
 		InputStream inputStream = ftpClient.retrieveFileStream(filename);
 		byte[] bytes = inputStream.readAllBytes();
 		disconnectFromFTP();
-		return bytes;	
+		return bytes;
+		
+		
+		/*if(ftpClient == null || !ftpClient.isConnected()) {
+        	connectToFTP();
+        }
+		
+		try {
+		
+			InputStream inputStream = ftpClient.retrieveFileStream(filename);
+			byte[] bytes = inputStream.readAllBytes();
+			return bytes;
+		
+		} catch (FTPConnectionClosedException e) {
+			
+			connectToFTP();
+			InputStream inputStream = ftpClient.retrieveFileStream(filename);
+			byte[] bytes = inputStream.readAllBytes();
+			return bytes;
+			
+		}*/
 	}
 	
 	
@@ -187,5 +286,11 @@ public class FileProcessor {
 		g.dispose();
 		return resizedImage;
 	}
+	
+	
+	////////////////////////////////////
+	
+	
+	
 	
 }
