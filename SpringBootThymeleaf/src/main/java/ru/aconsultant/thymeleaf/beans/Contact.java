@@ -8,9 +8,6 @@ import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
 import ru.aconsultant.thymeleaf.service.FileProcessor;
 
 public class Contact {
-
-	/*@Autowired
-	private FileProcessor fileProcessor;*/
 	
 	public String username;
 	public Integer unreadCount;
@@ -36,12 +33,12 @@ public class Contact {
 	}
 	
 	
-	public Contact(String username, Integer unreadCount, String avatarPath, boolean current) throws SQLException, IOException {
+	public Contact(String username, Integer unreadCount, String avatarPath, boolean current, String base64Image) throws SQLException, IOException {
 		this.username = username;
 		this.unreadCount = unreadCount;
 		this.avatarPath = avatarPath;
 		this.current = current;
-		//this.avatar = fileProcessor.getBytesFromFTP(avatarPath);
+		this.base64Image = base64Image;
 	}
 	
 

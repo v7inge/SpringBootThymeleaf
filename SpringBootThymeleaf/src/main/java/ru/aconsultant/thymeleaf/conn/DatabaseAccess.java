@@ -107,13 +107,9 @@ public class DatabaseAccess extends JdbcDaoSupport {
 			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
 			
 			ArrayList<Contact> list = new ArrayList<Contact>();
-		    while (rs.next()) {
-		    	
-		    	Contact c = new Contact(rs.getString("Username"), rs.getInt("UnreadCount"), rs.getString("Avatar"), rs.getInt("Current")==1);
-		    	c.setBase64Image(rs.getString("Base64Image"));
-		    	list.add(c);
-		    	
-		        //list.add(new Contact(rs.getString("Username"), rs.getInt("UnreadCount"), rs.getString("Avatar"), rs.getInt("Current")==1));
+		    while (rs.next()) {   	
+		    	Contact contact = new Contact(rs.getString("Username"), rs.getInt("UnreadCount"), rs.getString("Avatar"), rs.getInt("Current")==1, rs.getString("Base64Image"));
+		    	list.add(contact);
 		    }
 		    return list;
 			
@@ -121,33 +117,6 @@ public class DatabaseAccess extends JdbcDaoSupport {
             return null;
         }
     	
-    }
-    
-    
-    public List<Contact> contactList(String userName) throws SQLException, InvalidResultSetAccessException, IOException {
-        
-		String sql = 
-				"SELECT UserChats.Contact, SUM(m.New) AS UnreadCount, AppUser.AVATAR AS Avatar FROM \n" +
-				"(SELECT chats.User, chats.Contact FROM PERSONAL_CHATS chats WHERE chats.User = ?) AS UserChats \n" +
-				"LEFT JOIN MESSAGES m ON UserChats.Contact = m.Sender AND m.New = 1 \n" +
-				"LEFT JOIN APP_USER AppUser ON UserChats.Contact = AppUser.USER_NAME \n" +
-				"GROUP BY UserChats.Contact, AppUser.AVATAR";
-				
-		Object[] args = new Object[] { userName };
-		int[] argTypes = new int[] { Types.VARCHAR };
-		
-		try {
-			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
-			
-			ArrayList<Contact> list = new ArrayList<Contact>();
-		    while (rs.next()) {
-		        list.add(new Contact(rs.getString("Contact"), rs.getInt("UnreadCount"), rs.getString("Avatar"), false));
-		    }
-		    return list;
-			
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
     }
     
     

@@ -90,7 +90,6 @@ public class MainController {
 	@Autowired
 	private FileProcessor fileProcessor;
 	
-	
 	@Autowired
     private ServletContext servletContext;
 	
@@ -113,45 +112,12 @@ public class MainController {
 	
 	@RequestMapping(value = { "/" }, method = RequestMethod.GET)
 	public String chatGet(Model model, Principal principal) throws SQLException, InvalidResultSetAccessException, IOException {
- 
-		String username = principal.getName();
-		
-		/*Contact user = new Contact(username);
-		databaseAccess.fillAvatarPath(user);*/
-		
-        model.addAttribute("loginedUser", username);
-		
+ 		
 		// Fill contact list
-        List<Contact> contactList = databaseAccess.userContactList(username);
-        
+        List<Contact> contactList = databaseAccess.userContactList(principal.getName());
         int indexLast = contactList.size() - 1;
         Contact user = contactList.get(indexLast);
         contactList.remove(indexLast);
-        
-        /*List<Contact> contactList = new ArrayList<Contact>();
-        
-        Contact contact1 = new Contact("userWithAva");
-        contact1.setAvatarPath("1590917884069 8_3.jpg");
-        contactList.add(contact1);
-        
-        Contact contact2 = new Contact("userWithNoAva");
-        contactList.add(contact2);*/
-        
-        //fileProcessor.fillContactsBase64Images(contactList);
-        
-        
-        
-        /*byte[] bytes = fileProcessor.getBytesFromFTP(avatarPath);
-        String b = Base64.encodeBase64String(bytes);
-        model.addAttribute("b", b);*/
-        
-        //fileProcessor.fillUsersAvatars(contactList);
-        
-        
-        
-        // Add user to the contact list
-        
-        
         
 		model.addAttribute("contactList", contactList);
 		model.addAttribute("user", user);
@@ -263,13 +229,6 @@ public class MainController {
 	}
 	
 	
-	@ResponseBody
-	@RequestMapping(value = "/image-resource", method = RequestMethod.GET)
-	public Resource getImageAsResource() {
-	   return new ServletContextResource(servletContext, "https://aconsultant.ru/wp-content/uploads/2017/10/synchronization_icon_sharing_data_exchange_sync_transfer_network-512.png");
-	}
-	
-	
 	@RequestMapping(value = { "/personal" }, method = RequestMethod.GET)
 	public String personalGet(Model model, Principal principal) {
         
@@ -283,31 +242,7 @@ public class MainController {
 	}
 	
 	
-	@GetMapping("/image")
-	public void showProductImage(HttpServletResponse response) throws IOException {
-	
-		response.setContentType("image/jpeg"); // Or whatever format you wanna use
-
-		//InputStream is = new ByteArrayInputStream(fileProcessor.getBytesFromFTP());
-		//IOUtils(is, response.getOutputStream());
-	}
-	
-	@RequestMapping(value = "/user-avatar", method = RequestMethod.GET)
-	public @ResponseBody byte[] getUserAvatar(Principal principal) throws IOException, SQLException {
-		
-		return null;
-		//return fileProcessor.getUserAvatar(principal.getName());
-	}
-	
-	
-	@GetMapping("/avatar/{username}")
-	public @ResponseBody byte[] getAvatar(@PathVariable String username) throws IOException, SQLException {
-		
-		//return null;
-		return fileProcessor.getUserAvatar(username);
-	}
-	
-	
+	// Unused yet, left as an example
 	@GetMapping("/picture/{path}")
 	public @ResponseBody byte[] getPicture(@PathVariable String path) throws IOException, SQLException {
 		
@@ -320,8 +255,6 @@ public class MainController {
 		
 		Contact bufferContact = new Contact(principal.getName());
 		fileProcessor.saveUserBase64Image(bufferContact, form.getFiles());
-		
-		//fileProcessor.saveUserAvatar(principal.getName(), form.getFiles());
 	}
 	
 	
