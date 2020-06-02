@@ -16,14 +16,36 @@ function onLoad() {
 
 function usernameInputChange() {
 
+	usernameCorrect = true;
 	let inputValue = $("#reg_username").val();
 	
+	// Check length
 	if (inputValue.length == null || inputValue.length < 3) {
 		$("#reg_username_tip").text("Username should contain at least 3 symbols");
 		usernameCorrect = false;
-	} else {
-		$("#reg_username_tip").text("");
-		usernameCorrect = true;
+	}
+
+	// Check symbols
+	if (usernameCorrect) {
+
+		for(let i=0; i<inputValue.length; i++) {
+		
+			let symbol = inputValue[i];
+
+			if (i==0) {
+				if (!isLetter(symbol)) {
+					usernameCorrect = false;
+					$("#reg_username_tip").text("Username should start with a letter");
+					break; 
+				}
+			} else {
+				if (!isAppropriateSymbol(symbol)) {
+					usernameCorrect = false;
+					$("#reg_username_tip").text("Username should contain only letters and numbers");
+					break;
+				}
+			}
+		}
 	}
 	
 	if (usernameCorrect) {
@@ -56,6 +78,23 @@ function usernameInputChange() {
 	    });
 	}
 	
+}
+
+
+function isAppropriateSymbol(symbol) {
+	return isLetter(symbol) || isNumber(symbol)
+}
+
+
+function isLetter(symbol) {
+	let letters = "abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+	return letters.includes(symbol.toLowerCase());
+}
+
+
+function isNumber(symbol) {
+	let numbers = "0123456789";
+	return numbers.includes(symbol);
 }
 
 
