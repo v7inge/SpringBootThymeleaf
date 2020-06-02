@@ -6,6 +6,7 @@
 	<link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<link href="/css/style.css" rel="stylesheet">
 	<link href="/css/avatar.css" rel="stylesheet">
+	<link href="/css/placeholder.css" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="/webjars/sockjs-client/sockjs.min.js"></script>
 	<script src="/webjars/stomp-websocket/stomp.min.js"></script>
@@ -34,14 +35,14 @@
 			<!-- PROFILE -->
 			<div id="profile" class="profile">	
 				<img class="contact-img" th:unless="${user.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${user.base64Image}}" />
-				<div class="contact-img" th:if="${user.base64Image == null}"></div>
+				<div class="contact-placeholder" th:if="${user.base64Image == null}"></div>
 				<div class = "contact-name" th:utext="${user.username}"></div>
 			</div>
 
 			<!-- MENU -->
 			<div class="menu">
 				<div class ="shadowRound"> 
-					<img th:src="@{'/user-avatar'}" />
+					<img th:unless="${user.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${user.base64Image}}" />
 				</div>	
 				<div class="username">victor</div>
 				<div class="text">Sign out</div>
@@ -56,18 +57,13 @@
 			
 			<!-- CONTACTS -->
 			<ul class = "contacts" id = "contacts">
-				<!-- <li class = "contact">
-					<img src="http://aconsultant.ru/wp-content/uploads/2020/05/gear.png" width="13" height="13" alt="gear">
-					<div class = "name">Settings</div>
-				</li> -->
 				<li class = "contact" th:each ="contact : ${contactList}">
 					
 					<!-- <img class="contact-img" th:unless="${contact.avatarPath == null}" th:src="@{/picture/{path}(path=${contact.avatarPath})}" alt="" />
 					<div class="contact-img" th:if="${contact.avatarPath == null}"></div> -->
 					
 					<img class="contact-img" th:unless="${contact.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${contact.base64Image}}" />
-					<div class="contact-img" th:if="${contact.base64Image == null}"></div>
-					
+					<div class="contact-placeholder" th:if="${contact.base64Image == null}"><div class="letter" th:utext="${contact.username[0]}"></div></div>
 					<div class = "contact-name" th:utext="${contact.username}"></div>
 					<div class = "counter" th:classappend = "${contact.unreadCount}==0 ? invisible : userclass" th:utext="${contact.unreadCount}"></div>
 				</li>

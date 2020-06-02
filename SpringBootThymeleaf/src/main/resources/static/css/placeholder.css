@@ -1,0 +1,123 @@
+.contact-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  position: relative; 
+}
+
+.contact-placeholder .letter {
+  position: absolute; 
+  padding-top: 5px;
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0;
+  font-size: 19px;
+  font-weight: bold;
+  text-align: center;
+  color: white;
+}
+
+.contact-placeholder.a {
+  background-color: rgb(87, 87, 250);
+}
+
+.contact-placeholder.b {
+  background-color: rgb(66, 167, 52);
+}
+
+.contact-placeholder.c {
+  background-color: rgb(66, 178, 206);
+}
+
+.contact-placeholder.d {
+  background-color: rgb(226, 163, 90);
+}
+
+.contact-placeholder.e {
+  background-color: rgb(110, 90, 226);
+}
+
+.contact-placeholder.f {
+  background-color: rgb(38, 16, 165);
+}
+
+.contact-placeholder.g {
+  background-color: rgb(226, 66, 38);
+}
+
+.contact-placeholder.h {
+  background-color: rgb(60, 197, 33);
+}
+
+.contact-placeholder.i {
+  background-color: rgb(71, 153, 54);
+}
+
+.contact-placeholder.j {
+  background-color: rgb(223, 181, 65);
+}
+
+.contact-placeholder.k {
+  background-color: rgb(33, 118, 197);
+}
+
+.contact-placeholder.l {
+  background-color: rgb(41, 90, 180);
+}
+
+.contact-placeholder.m {
+  background-color: rgb(97, 146, 87);
+}
+
+.contact-placeholder.n {
+  background-color: rgb(98, 31, 175);
+}
+
+.contact-placeholder.o {
+  background-color: rgb(218, 32, 177);
+}
+
+.contact-placeholder.p {
+  background-color: rgb(241, 83, 83);
+}
+
+.contact-placeholder.q {
+  background-color: rgb(218, 148, 108);
+}
+
+.contact-placeholder.r {
+  background-color: rgb(55, 126, 41);
+}
+
+.contact-placeholder.s {
+  background-color: rgb(113, 204, 95);
+}
+
+.contact-placeholder.t {
+  background-color: rgb(238, 186, 91);
+}
+
+.contact-placeholder.u {
+  background-color: rgb(189, 123, 206);
+}
+
+.contact-placeholder.v {
+  background-color: rgb(67, 187, 196);
+}
+
+.contact-placeholder.w {
+  background-color: rgb(85, 169, 207);
+}
+
+.contact-placeholder.x {
+  background-color: rgb(196, 179, 84);
+}
+
+.contact-placeholder.y {
+  background-color: rgb(156, 129, 230);
+}
+
+.contact-placeholder.z {
+  background-color: rgb(226, 119, 119);
+}
