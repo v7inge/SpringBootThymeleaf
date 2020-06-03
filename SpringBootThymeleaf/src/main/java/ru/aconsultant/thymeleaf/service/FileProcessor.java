@@ -72,10 +72,9 @@ public class FileProcessor {
 	}
 	
 	
-	public void saveUserBase64Image(Contact user, MultipartFile[] files) throws IOException, SQLException {
+public void saveUserBase64Image(Contact user, MultipartFile file) throws IOException, SQLException {
 		
 		// Check if file is empty
-		MultipartFile file = files[0];
 		if (file.isEmpty()) {
 	    	user.setBase64Image(null);
 	    	return;
@@ -95,6 +94,13 @@ public class FileProcessor {
 		String base63image = Base64.encodeBase64String(bytes);
 		user.setBase64Image(base63image);
 		databaseAccess.saveUserBase64Image(user.getUsername(), base63image);	
+	}
+	
+	
+	public void saveUserBase64Image(Contact user, MultipartFile[] files) throws IOException, SQLException {
+		
+		MultipartFile file = files[0];
+		saveUserBase64Image(user, file);
 	}
 	
 	

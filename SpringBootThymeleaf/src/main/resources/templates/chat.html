@@ -42,11 +42,11 @@
 			<!-- MENU -->
 			<div class="menu">
 				<div class="shadowRound" th:classappend="${user.letter}">
-					<img th:unless="${user.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${user.base64Image}}" />
+					<img id="menu-profile-img" th:unless="${user.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${user.base64Image}}" />
 					<div class="letter" th:if="${user.base64Image == null}" th:utext="${user.username[0]}"></div>
 				</div>
 				<div class="username" th:utext="${user.username}"></div>
-				<div class="text">Sign out</div>
+				<div class="text"><a th:href="@{/logout}">Sign out</a></div>
 			</div>
 	
 			<!-- CONTACT SEARCH -->

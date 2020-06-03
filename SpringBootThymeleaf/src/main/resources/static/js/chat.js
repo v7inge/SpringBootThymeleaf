@@ -358,7 +358,37 @@ function moveContactToTheList(text) {
         contentType: "application/json; charset=utf-8",
         success: function(data) { }
     });
+}
+
+
+function updateAvatar() {
 	
+	let file = document.getElementById("file_input").files[0];
+	let ext = file.name.split(".").pop().toLowerCase();
+	
+	if(jQuery.inArray(ext, ["png","jpg","jpeg"]) == -1) {
+		console.log("Sorry, only .jpg and .png files are accepted.");
+	} else {
+		
+		let data = new FormData();
+		data.append("file", file);
+		
+		$.ajax({
+	        type: "POST",
+	        url: "/profile-picture",
+	        data: data,
+	        processData: false,
+	        contentType: false,
+	        cache: false,
+	        dataType: "json",
+	        timeout: 1000000,
+	        complete: function() {
+	        	window.location.reload(true);
+	        }
+	    });
+	}
+	
+	document.getElementById("file_input").value = "";
 }
 
 
@@ -407,19 +437,7 @@ $(document).ready(function() {
 	
 	// Avatar file chosen
 	$(document).on("change", "#file_input", function() {
-		
-		var name = document.getElementById("file_input").files[0].name;
-		var form_data = new FormData();
-		var ext = name.split('.').pop().toLowerCase();
-		
-		if(jQuery.inArray(ext, ["png","jpg","jpeg"]) == -1) {
-			console.log("Invalid Image File");
-		} else {
-			console.log("Good Image File");
-		}
+		updateAvatar();		
 	});
-	
-	
-	
 	
 });

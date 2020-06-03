@@ -3,6 +3,7 @@ package ru.aconsultant.thymeleaf.controller;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -50,6 +51,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.context.support.ServletContextResource;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -250,6 +253,15 @@ public class MainController {
 	}
 	
 	
+	@PostMapping("/profile-picture")
+	public void profilePictureUpload(HttpServletResponse response, Principal principal, MultipartHttpServletRequest request) throws SQLException, IOException {
+		MultipartFile file = request.getFile("file");
+		Contact bufferContact = new Contact(principal.getName());
+		fileProcessor.saveUserBase64Image(bufferContact, file);
+	}
+	
+	
+	// Unused now, example from personal.html
 	@PostMapping("/avatar-upload")
 	public void avatarUpload(@ModelAttribute UploadForm form, HttpServletResponse response, Principal principal) throws SQLException, IOException {
 		

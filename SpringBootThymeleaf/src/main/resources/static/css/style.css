@@ -211,6 +211,10 @@ body {
   width: 100%;
 }
 
+.menu a {
+  color: red;
+}
+
 .menu.active {
   left: 0;
 }
