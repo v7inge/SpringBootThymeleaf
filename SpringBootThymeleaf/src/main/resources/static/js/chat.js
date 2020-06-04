@@ -69,28 +69,6 @@ function connect() {
 }
 
 
-function drawMessage(text, date, side) {
-
-	let messages = document.getElementById("messages");
-	let li = document.createElement("li");
-	
-	let m = document.createElement("div");
-	m.classList.add("m");
-	m.classList.add("m-" + side);
-	m.appendChild(document.createTextNode(text));
-	li.appendChild(m);
-	
-	let d = document.createElement("div");
-	d.classList.add("date");
-	d.classList.add(side);
-	d.appendChild(document.createTextNode(formatDate(date)));
-	li.appendChild(d);
-	
-	messages.appendChild(li);
-	scrollDown();
-}
-
-
 function disconnect(){
 	stompClient.disconnect();
 }
@@ -200,6 +178,122 @@ function sendMessage() {
 }
 
 
+function drawMessage(message) {
+
+	let side = "";
+	if (message.sender == $("#userName").text()) {
+		side = "right";
+	} else {
+		side = "left";
+	}
+	
+	let date = new Date(message.date);
+	if (message.image) {
+		drawImageMessage(message.filePath, side, date);
+	} else {
+		drawTextMessage(message.text, side, date);
+	}
+}
+
+
+function drawTextMessage(text, side, date) {
+	
+	let messages = document.getElementById("messages");
+	let li = document.createElement("li");
+	
+	let m = document.createElement("div");
+	m.classList.add("m");
+	m.classList.add("m-" + side);
+	m.appendChild(document.createTextNode(text));
+	li.appendChild(m);
+	
+	let d = document.createElement("div");
+	d.classList.add("date");
+	d.classList.add(side);
+	d.appendChild(document.createTextNode(formatDate(date)));
+	li.appendChild(d);
+	
+	messages.appendChild(li);
+	scrollDown();
+}
+
+
+function drawImageMessage(path, side, date) {
+	
+	let text = "Image loading...";
+	
+	let messages = document.getElementById("messages");
+	let li = document.createElement("li");
+	
+	// Create message
+	let m = document.createElement("div");
+	m.classList.add("m");
+	m.classList.add("m-" + side);
+	m.classList.add("image_loading");
+	m.appendChild(document.createTextNode(text));
+	
+	// Create image
+	let img = document.createElement("img");
+	m.appendChild(img);
+	
+	// Store image path
+	let inv = document.createElement("div");
+	inv.classList.add("invisible");
+	inv.appendChild(document.createTextNode(path));
+	m.appendChild(inv);
+	
+	li.appendChild(m);
+	
+	let d = document.createElement("div");
+	d.classList.add("date");
+	d.classList.add(side);
+	d.appendChild(document.createTextNode(formatDate(date)));
+	li.appendChild(d);
+	
+	messages.appendChild(li);
+	scrollDown();
+}
+
+
+function outputMessageHistory(data) {
+	
+	let side = "";
+	let mas = data.contactHistory;
+	for (let i = 0; i !== mas.length; i += 1) {
+		
+		if (mas[i].sender == $("#userName").text()) {
+			side = "right";
+		} else {
+			side = "left";
+		}
+		
+		drawMessage(mas[i]);
+	
+	}
+	
+	// Load images
+	$(".image_loading").each(function() {
+		
+		console.log("full text: " + $(this).text());
+		
+		let img = $(this).children("img");
+		img.prop("src", "https://aconsultant.ru/wp-content/uploads/2017/09/college_hat-512-150x150.png");
+
+		let path = $(this).children(".invisible").text();
+		console.log("path: " + path);
+		
+		/*if(counterElement.hasClass("invisible")) {
+			counterElement.toggleClass("invisible");
+		}*/
+		
+		
+		//$(this).text("Image loaded");
+		//$(this).addClass($(this).text().toLowerCase());
+	});
+
+}
+
+
 function contactClick(contactElement) {
 
 	// Counter
@@ -234,26 +328,9 @@ function contactClick(contactElement) {
         data: userJson,
         url: url,
         contentType: "application/json; charset=utf-8",
-        error: function(e)
-        {
-        	console.log("Запрос не удался!");
-        },
         success: function(data)
     	{
-
-        	let side = "";
-        	let mas = data.contactHistory;
-        	for (let i = 0; i !== mas.length; i += 1) {
-        		
-        		if (mas[i].sender == $("#userName").text()) {
-        			side = "right";
-        		} else {
-        			side = "left";
-        		}
-        		
-        		drawMessage(mas[i].text, new Date(mas[i].date), side);
-        	
-        	}
+        	outputMessageHistory(data);
     	}
     });
 	

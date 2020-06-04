@@ -10,7 +10,11 @@ public class MessageMapper implements RowMapper<Message> {
 
 	@Override
 	public Message mapRow(ResultSet rs, int rowNum) throws SQLException {
-		return new Message(rs.getString("Sender"), rs.getString("Reciever"), rs.getTimestamp("DateTime"), rs.getString("Text"));
+		
+		Message message = new Message(rs.getString("Sender"), rs.getString("Reciever"), rs.getTimestamp("DateTime"), rs.getString("Text"));
+		message.setFilePath(rs.getString("FilePath"));
+		message.setImage(rs.getInt("Image")==1);
+		return message;
 	}
 	
 }

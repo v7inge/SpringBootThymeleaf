@@ -11,6 +11,8 @@ public class Message {
 	private String reciever;
 	private Date date;
 	private String text;
+	private String filePath;
+	private boolean image;
 
 	public Message() {}
 	
@@ -37,6 +39,14 @@ public class Message {
 		return date;
 	}
 	
+	public String getFilePath() {
+		return filePath;
+	}
+	
+	public boolean getImage() {
+		return image;
+	}
+	
 	public void setSender(String st) {
 		this.sender = st;
 	}
@@ -51,6 +61,14 @@ public class Message {
 	
 	public void setText(String st) {
 		this.text = st;
+	}
+	
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+	
+	public void setImage(boolean image) {
+		this.image = image;
 	}
 	
 	@Override

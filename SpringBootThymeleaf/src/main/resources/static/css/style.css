@@ -269,6 +269,22 @@ body {
 	float: left;
 }
 
+.image_loading {
+	color: grey;
+}
+
+.m img {
+  max-width: 100%;
+}
+
+.m-right img {
+  border-radius: 10px 0 10px 10px;
+}
+
+.m-left img {
+  border-radius: 0 10px 10px 10px;
+}
+
 
 /* --------------------------------------- */
 /* HEAD - CURRENT CONTACT */

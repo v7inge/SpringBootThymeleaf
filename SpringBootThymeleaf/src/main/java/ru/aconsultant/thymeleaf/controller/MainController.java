@@ -280,10 +280,12 @@ public class MainController {
 	@PostMapping("/profile-picture")
 	public void profilePictureUpload(HttpServletResponse response, Principal principal, MultipartHttpServletRequest request) throws SQLException, IOException {
 		
+		// Saving uploaded picture
 		MultipartFile file = request.getFile("file");
 		Contact bufferContact = new Contact(principal.getName());
 		fileProcessor.saveUserBase64Image(bufferContact, file);
 		
+		// Sending it back
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("base64String", bufferContact.getBase64Image());
 		httpParamProcessor.translateResponseParameters(response, map);
