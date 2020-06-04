@@ -42,8 +42,14 @@ function submitAvatarUpload() {
 function test() {
 	
 	$.ajax({
-        type: "POST",
-        url: "/test"
-    });
+	    url: "/testload",
+	    async: true,
+	    type: "POST",
+	    dataType: "json",
+	    contentType: "application/json; charset=utf-8",
+	    success: function (response) {
+	        $("#imgsrv").attr("src", "data:image/png;base64," + response.base64String);
+	    }
+	});
 	
 }

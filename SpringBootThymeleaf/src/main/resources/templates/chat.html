@@ -34,7 +34,7 @@
 		
 			<!-- PROFILE -->
 			<div id="profile" class="profile">	
-				<img class="contact-img" th:unless="${user.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${user.base64Image}}" />
+				<img id="contact-profile-img" class="contact-img" th:unless="${user.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${user.base64Image}}" />
 				<div class="contact-placeholder" th:classappend="${user.letter}" th:if="${user.base64Image == null}"><div class="letter" th:utext="${user.username[0]}"></div></div>
 				<div class="contact-name" th:utext="${user.username}"></div>
 			</div>

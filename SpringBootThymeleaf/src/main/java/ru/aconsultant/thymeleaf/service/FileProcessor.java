@@ -72,7 +72,7 @@ public class FileProcessor {
 	}
 	
 	
-public void saveUserBase64Image(Contact user, MultipartFile file) throws IOException, SQLException {
+	public void saveUserBase64Image(Contact user, MultipartFile file) throws IOException, SQLException {
 		
 		// Check if file is empty
 		if (file.isEmpty()) {
@@ -94,6 +94,11 @@ public void saveUserBase64Image(Contact user, MultipartFile file) throws IOExcep
 		String base63image = Base64.encodeBase64String(bytes);
 		user.setBase64Image(base63image);
 		databaseAccess.saveUserBase64Image(user.getUsername(), base63image);	
+	}
+	
+	
+	public String getBase64String(byte[] bytes) {
+		return Base64.encodeBase64String(bytes);
 	}
 	
 	
@@ -165,7 +170,57 @@ public void saveUserBase64Image(Contact user, MultipartFile file) throws IOExcep
 		
 		InputStream inputStream = ftpClient.retrieveFileStream(filename);
 		byte[] bytes = inputStream.readAllBytes();
+		
+		System.out.println("Complete: " + ftpClient.completePendingCommand());
+		
 		return bytes;
+	}
+	
+	
+	// Testing method
+	public byte[] getMultipleFilesFromFTP() throws IOException {
+		
+		if(ftpClient == null || !ftpClient.isConnected()) {
+        	connectToFTP();
+        }
+		
+		InputStream inputStream = ftpClient.retrieveFileStream("1590680116034 Люк.png");
+		byte[] bytes1 = inputStream.readAllBytes();
+		
+		System.out.println("Complete: " + ftpClient.completePendingCommand());
+		//inputStream.close();
+		//inputStream.
+		
+		inputStream = ftpClient.retrieveFileStream("1590680245489 Коллекторы Неглини.png");
+		byte[] bytes2 = inputStream.readAllBytes();
+		System.out.println("Complete: " + ftpClient.completePendingCommand());
+		
+		inputStream = ftpClient.retrieveFileStream("1590917884069 8_3.jpg");
+		byte[] bytes3 = inputStream.readAllBytes();
+		System.out.println("Complete: " + ftpClient.completePendingCommand());
+		
+		disconnectFromFTP();
+		return bytes3;
+		
+		
+		/*if(ftpClient == null || !ftpClient.isConnected()) {
+        	connectToFTP();
+        }
+		
+		try {
+		
+			InputStream inputStream = ftpClient.retrieveFileStream(filename);
+			byte[] bytes = inputStream.readAllBytes();
+			return bytes;
+		
+		} catch (FTPConnectionClosedException e) {
+			
+			connectToFTP();
+			InputStream inputStream = ftpClient.retrieveFileStream(filename);
+			byte[] bytes = inputStream.readAllBytes();
+			return bytes;
+			
+		}*/
 	}
 	
 	

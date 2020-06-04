@@ -382,8 +382,10 @@ function updateAvatar() {
 	        cache: false,
 	        dataType: "json",
 	        timeout: 1000000,
-	        complete: function() {
-	        	window.location.reload(true);
+	        success: function(response) {
+	        	console.log("Success. Response: " + response);
+	        	$("#menu-profile-img").attr("src", "data:image/png;base64," + response.base64String);
+	        	$("#contact-profile-img").attr("src", "data:image/png;base64," + response.base64String);
 	        }
 	    });
 	}

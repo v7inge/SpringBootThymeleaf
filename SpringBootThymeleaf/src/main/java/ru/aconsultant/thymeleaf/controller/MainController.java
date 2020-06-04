@@ -253,11 +253,40 @@ public class MainController {
 	}
 	
 	
+	// Unused in product, used as testing method
+	@GetMapping("/user-avatar")
+	public @ResponseBody byte[] getUserAvatar() throws IOException, SQLException {
+		
+		return fileProcessor.getMultipleFilesFromFTP();
+	}
+	
+	
+	// Unused in product, used as testing method
+	@PostMapping("/testload")
+	public void testLoad(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+		
+		byte[] bytes = fileProcessor.getMultipleFilesFromFTP();
+		String base64String = fileProcessor.getBase64String(bytes);
+		
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("base64String", base64String);
+		httpParamProcessor.translateResponseParameters(response, map);
+		
+		
+		//return fileProcessor.getMultipleFilesFromFTP();
+	}
+	
+	
 	@PostMapping("/profile-picture")
 	public void profilePictureUpload(HttpServletResponse response, Principal principal, MultipartHttpServletRequest request) throws SQLException, IOException {
+		
 		MultipartFile file = request.getFile("file");
 		Contact bufferContact = new Contact(principal.getName());
 		fileProcessor.saveUserBase64Image(bufferContact, file);
+		
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("base64String", bufferContact.getBase64Image());
+		httpParamProcessor.translateResponseParameters(response, map);
 	}
 	
 	
