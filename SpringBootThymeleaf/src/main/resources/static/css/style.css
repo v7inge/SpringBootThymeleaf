@@ -237,7 +237,8 @@ body {
 	color:#222222;
 	padding:6px;
 	overflow: auto;
-  margin-bottom: 3px;
+  	margin-bottom: 3px;
+  	max-width: 70%;
 }
 
 .m-left {
@@ -274,7 +275,8 @@ body {
 }
 
 .m img {
-  max-width: 100%;
+  max-width: 500px;
+  max-height: 300px;
 }
 
 .m-right img {

@@ -2,7 +2,7 @@
 function test() {
 	
 	// Filling data
-	let userData = {"paramFromClient": "hi"};
+	/*let userData = {"paramFromClient": "hi"};
     let url = "/security-check";
     let userJson = JSON.stringify(userData);
 	
@@ -33,7 +33,7 @@ function test() {
         	
         	
     	}
-    });
+    });*/
 	
 }
 
@@ -272,24 +272,33 @@ function outputMessageHistory(data) {
 	}
 	
 	// Load images
+	let pathData = {};
+	let i = 0;
 	$(".image_loading").each(function() {
-		
-		console.log("full text: " + $(this).text());
-		
-		let img = $(this).children("img");
-		img.prop("src", "https://aconsultant.ru/wp-content/uploads/2017/09/college_hat-512-150x150.png");
-
 		let path = $(this).children(".invisible").text();
-		console.log("path: " + path);
-		
-		/*if(counterElement.hasClass("invisible")) {
-			counterElement.toggleClass("invisible");
-		}*/
-		
-		
-		//$(this).text("Image loaded");
-		//$(this).addClass($(this).text().toLowerCase());
+		pathData[path] = path;
 	});
+	
+    let url = "/get-images";
+    console.log("pathData: " + pathData);
+    let userJson = JSON.stringify(pathData);
+	
+    $.ajax
+    ({
+    	type: "POST",
+        data: userJson,
+        url: url,
+        contentType: "application/json; charset=utf-8",
+        success: function(response)
+    	{
+        	$(".image_loading").each(function(e) {
+        		path = $(this).children(".invisible").text();
+        		$(this).children("img").prop("src", "data:image/png;base64," + response[path]);
+        		console.log("text: " + $(this).childNodes[0].nodeValue);
+        		//$(this).text("");
+        	})
+    	}
+    });
 
 }
 

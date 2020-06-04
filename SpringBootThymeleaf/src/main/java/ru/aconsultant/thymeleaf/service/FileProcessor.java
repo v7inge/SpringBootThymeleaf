@@ -224,6 +224,14 @@ public class FileProcessor {
 	}
 	
 	
+	public String getFileAsBase64FromFTP(String filename) throws IOException {
+		
+		byte[] bytes = getBytesFromFTP(filename);
+		String base64String = getBase64String(bytes);
+		return base64String;
+	}
+	
+	
 	public byte[] getBytesFromFTP(String filename) throws IOException {
 		
 		if (filename == null || filename == "") { return null; }

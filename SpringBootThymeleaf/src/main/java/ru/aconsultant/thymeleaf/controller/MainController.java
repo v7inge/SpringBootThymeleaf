@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -274,6 +275,21 @@ public class MainController {
 		
 		
 		//return fileProcessor.getMultipleFilesFromFTP();
+	}
+	
+	
+	@PostMapping("/get-images")
+	public void getImages(HttpServletResponse response, HttpServletRequest request) throws IOException {
+		
+		
+		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
+		HashMap<String, Object> responseParameters = new HashMap<String, Object>();
+		
+		for (Map.Entry<String, Object> entry: requestParameters.entrySet()) {
+			responseParameters.put(entry.getKey(), fileProcessor.getFileAsBase64FromFTP(entry.getKey()));
+		}
+		
+		httpParamProcessor.translateResponseParameters(response, responseParameters);
 	}
 	
 	
