@@ -220,35 +220,41 @@ function drawTextMessage(text, side, date) {
 
 function drawImageMessage(path, side, date) {
 	
-	let text = "Image loading...";
-	
 	let messages = document.getElementById("messages");
 	let li = document.createElement("li");
 	
 	// Create message
-	let m = document.createElement("div");
-	m.classList.add("m");
-	m.classList.add("m-" + side);
-	m.classList.add("image_loading");
-	m.appendChild(document.createTextNode(text));
+	let messageContainer = document.createElement("div");
+	messageContainer.classList.add("m");
+	messageContainer.classList.add("m-" + side);
+	messageContainer.classList.add("image_loading_message");
+	
+	// Create "loading" text
+	let imageLoadingText = document.createElement("div");
+	imageLoadingText.classList.add("image_loading_text");
+	imageLoadingText.appendChild(document.createTextNode("Image loading..."));
+	messageContainer.appendChild(imageLoadingText);
 	
 	// Create image
 	let img = document.createElement("img");
-	m.appendChild(img);
+	img.classList.add("invisible");
+	messageContainer.appendChild(img);
 	
 	// Store image path
-	let inv = document.createElement("div");
-	inv.classList.add("invisible");
-	inv.appendChild(document.createTextNode(path));
-	m.appendChild(inv);
+	let pathText = document.createElement("div");
+	pathText.classList.add("invisible");
+	pathText.classList.add("path_text");
+	pathText.appendChild(document.createTextNode(path));
+	messageContainer.appendChild(pathText);
 	
-	li.appendChild(m);
+	li.appendChild(messageContainer);
 	
-	let d = document.createElement("div");
-	d.classList.add("date");
-	d.classList.add(side);
-	d.appendChild(document.createTextNode(formatDate(date)));
-	li.appendChild(d);
+	// Create date
+	let dateContainer = document.createElement("div");
+	dateContainer.classList.add("date");
+	dateContainer.classList.add(side);
+	dateContainer.appendChild(document.createTextNode(formatDate(date)));
+	li.appendChild(dateContainer);
 	
 	messages.appendChild(li);
 	scrollDown();
@@ -274,13 +280,12 @@ function outputMessageHistory(data) {
 	// Load images
 	let pathData = {};
 	let i = 0;
-	$(".image_loading").each(function() {
-		let path = $(this).children(".invisible").text();
+	$(".image_loading_message").each(function() {
+		let path = $(this).children(".path_text").text();
 		pathData[path] = path;
 	});
 	
     let url = "/get-images";
-    console.log("pathData: " + pathData);
     let userJson = JSON.stringify(pathData);
 	
     $.ajax
@@ -291,11 +296,16 @@ function outputMessageHistory(data) {
         contentType: "application/json; charset=utf-8",
         success: function(response)
     	{
-        	$(".image_loading").each(function(e) {
-        		path = $(this).children(".invisible").text();
-        		$(this).children("img").prop("src", "data:image/png;base64," + response[path]);
-        		console.log("text: " + $(this).childNodes[0].nodeValue);
-        		//$(this).text("");
+        	$(".image_loading_message").each(function(e) {
+        		
+        		// Update image path
+        		path = $(this).children(".path_text").text();
+        		img = $(this).children("img");
+        		img.prop("src", "data:image/png;base64," + response[path]);
+        		img.removeClass("invisible");
+        		
+        		// Update message text
+        		$(this).children(".image_loading_text").contents().last()[0].textContent = "";
         	})
     	}
     });

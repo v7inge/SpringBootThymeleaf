@@ -270,8 +270,16 @@ body {
 	float: left;
 }
 
-.image_loading {
+.image_loading_text {
 	color: grey;
+}
+
+.image_loading_message {
+	
+}
+
+.path_text {
+	
 }
 
 .m img {
