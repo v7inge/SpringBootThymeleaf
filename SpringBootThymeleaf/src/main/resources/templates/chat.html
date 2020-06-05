@@ -18,7 +18,9 @@
 
 <body onload="onLoad()">
 	
-	<input type="file" class="invisible" id="file_input" name="file_input" />​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
+	<button onclick="chooseImage()">Send image</button>
+	<input type="file" class="invisible" id="avatar_input" name="avatar_input" />
+	<input type="file" class="invisible" id="image_input" name="image_input" />​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
 	
 	<div class="invisible" id="userName" th:utext="${user.username}"></div>
 	<div class="invisible" id="contactName">no contact</div>

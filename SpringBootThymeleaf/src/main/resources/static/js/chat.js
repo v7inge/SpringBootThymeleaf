@@ -1,39 +1,7 @@
 
 function test() {
 	
-	// Filling data
-	/*let userData = {"paramFromClient": "hi"};
-    let url = "/security-check";
-    let userJson = JSON.stringify(userData);
-	
-	$.ajax
-    ({
-        type: "POST",
-        data: userJson,
-        url: url,
-        contentType: "application/json; charset=utf-8",
-        success: function(data)
-    	{
 
-        	let paramFromServer = data.paramFromServer;
-        	console.log(paramFromServer);
-        	
-        	let side = "";
-        	let mas = data.history;
-        	for (let i = 0; i !== mas.length; i += 1) {
-        		
-        		if (mas[i].sender == $("#userName").text()) {
-        			side = "right";
-        		} else {
-        			side = "left";
-        		}
-        		
-        		drawMessage(mas[i].text, new Date(mas[i].date), side);
-        	}
-        	
-        	
-    	}
-    });*/
 	
 }
 
@@ -53,13 +21,13 @@ function connect() {
 		
 		stompClient.subscribe("/user/queue/reply", function (data) {
 			
-			var data = JSON.parse(data.body);
+			var message = JSON.parse(data.body);
 			
-			let messageFrom = data.sender;
+			let messageFrom = message.sender;
 			let activeContact = $("#contactName").text();
 			
 			if (messageFrom == activeContact) {
-				drawMessage(data.text, new Date(data.date), "left");
+				drawMessage(message);
 			} else {
 				increaseCounter(messageFrom);
 			}
@@ -127,6 +95,11 @@ function findContact(str) {
 }
 
 
+function getCurrentContactName() {
+	
+}
+
+
 function getContactName(el) {
 	return $(el).children(".contact-name").text();	
 }
@@ -161,6 +134,7 @@ function sendMessage() {
 	
 	// Preparing data
 	let text = $("#message_input_value").val();
+	console.log("text: " + text);
 	let date = new Date();
 	let sender = $("#userName").text();
 	let reciever = $("#contactName").text();
@@ -172,14 +146,14 @@ function sendMessage() {
 	}
     
 	// Sending message
-	drawMessage(text, date, "right");
+	drawMessage(message);
 	stompClient.send("/app/message-flow", {}, userJson);
 	$("#message_input_value").val("");
 }
 
 
 function drawMessage(message) {
-
+	
 	let side = "";
 	if (message.sender == $("#userName").text()) {
 		side = "right";
@@ -277,39 +251,99 @@ function outputMessageHistory(data) {
 	
 	}
 	
-	// Load images
+	updateMessageImages();
+}
+
+
+function updateMessageImages() {
+	
+	// Loop image messages
+	let needToLoad = false;
 	let pathData = {};
-	let i = 0;
 	$(".image_loading_message").each(function() {
-		let path = $(this).children(".path_text").text();
-		pathData[path] = path;
+		
+		// Check if we still need to load it
+		if ($(this).children(".image_loading_text").contents().last()[0].textContent != "") {
+			needToLoad = true;
+			let path = $(this).children(".path_text").text();
+			pathData[path] = path;
+		}
 	});
 	
     let url = "/get-images";
     let userJson = JSON.stringify(pathData);
 	
-    $.ajax
-    ({
-    	type: "POST",
-        data: userJson,
-        url: url,
-        contentType: "application/json; charset=utf-8",
-        success: function(response)
-    	{
-        	$(".image_loading_message").each(function(e) {
-        		
-        		// Update image path
-        		path = $(this).children(".path_text").text();
-        		img = $(this).children("img");
-        		img.prop("src", "data:image/png;base64," + response[path]);
-        		img.removeClass("invisible");
-        		
-        		// Update message text
-        		$(this).children(".image_loading_text").contents().last()[0].textContent = "";
-        	})
-    	}
-    });
+    // Send ajax query
+    if (needToLoad) {
+	    $.ajax
+	    ({
+	    	type: "POST",
+	        data: userJson,
+	        url: url,
+	        contentType: "application/json; charset=utf-8",
+	        success: function(response)
+	    	{
+	        	$(".image_loading_message").each(function(e) {
+	        		
+	        		// Check if we need to update
+	        		let textPlaceholder = $(this).children(".image_loading_text");
+	        		if (textPlaceholder.contents().last()[0].textContent != "") {
+	        			
+	        			// Update image path
+	        			path = $(this).children(".path_text").text();
+	        			img = $(this).children("img");
+	        			img.prop("src", "data:image/png;base64," + response[path]);
+	        			img.removeClass("invisible");
+	        			
+	        			// Update text placeholder
+	        			textPlaceholder.contents().last()[0].textContent = "";
+	        		}
+	        	});
+	    	}	
+	    });
+    }
+    scrollDown();
+}
 
+
+function chooseImage() {
+	console.log("chooseImage");
+	$("#image_input").click();
+} 
+
+
+function sendImage() {
+	
+	let file = document.getElementById("image_input").files[0];
+	let ext = file.name.split(".").pop().toLowerCase();
+	
+	if(jQuery.inArray(ext, ["png","jpg","jpeg"]) == -1) {
+		console.log("Sorry, only .jpg and .png files are accepted.");
+	} else {
+		
+		let data = new FormData();
+		data.append("file", file);
+		data.append("contact", $("#contactName").text());
+		data.append("date", new Date());
+		
+		$.ajax({
+	        type: "POST",
+	        url: "/send-image",
+	        data: data,
+	        processData: false,
+	        contentType: false,
+	        cache: false,
+	        dataType: "json",
+	        timeout: 1000000,
+	        success: function(response) {
+	        	/*console.log("Success. Response: " + response);
+	        	$("#menu-profile-img").attr("src", "data:image/png;base64," + response.base64String);
+	        	$("#contact-profile-img").attr("src", "data:image/png;base64," + response.base64String);*/
+	        }
+	    });
+	}
+	
+	document.getElementById("image_input").value = "";
 }
 
 
@@ -459,7 +493,7 @@ function moveContactToTheList(text) {
 
 function updateAvatar() {
 	
-	let file = document.getElementById("file_input").files[0];
+	let file = document.getElementById("avatar_input").files[0];
 	let ext = file.name.split(".").pop().toLowerCase();
 	
 	if(jQuery.inArray(ext, ["png","jpg","jpeg"]) == -1) {
@@ -479,14 +513,13 @@ function updateAvatar() {
 	        dataType: "json",
 	        timeout: 1000000,
 	        success: function(response) {
-	        	console.log("Success. Response: " + response);
 	        	$("#menu-profile-img").attr("src", "data:image/png;base64," + response.base64String);
 	        	$("#contact-profile-img").attr("src", "data:image/png;base64," + response.base64String);
 	        }
 	    });
 	}
 	
-	document.getElementById("file_input").value = "";
+	document.getElementById("avatar_input").value = "";
 }
 
 
@@ -520,22 +553,27 @@ $(document).ready(function() {
 
 	// Click on avatar in menu
 	$(".shadowRound").click(function() {
-		$("#file_input").click();
+		$("#avatar_input").click();
 	});
 
 	// Click on any space
 	$(document).click(function(event) {
     if ($(event.target).closest(".menu").length
 		|| $(event.target).closest(".profile").length
-		|| $(event.target).closest("#file_input").length) {
+		|| $(event.target).closest("#avatar_input").length) {
 			return;
 		}
 		$(".menu").removeClass("active");
 	});
 	
 	// Avatar file chosen
-	$(document).on("change", "#file_input", function() {
+	$(document).on("change", "#avatar_input", function() {
 		updateAvatar();		
+	});
+	
+	// Image file chosen
+	$(document).on("change", "#image_input", function() {
+		sendImage();		
 	});
 	
 });

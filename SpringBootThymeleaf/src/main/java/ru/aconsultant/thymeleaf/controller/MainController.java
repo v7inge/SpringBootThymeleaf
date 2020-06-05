@@ -308,6 +308,23 @@ public class MainController {
 	}
 	
 	
+	@PostMapping("/send-image")
+	public void sendImage(HttpServletResponse response, Principal principal, MultipartHttpServletRequest request) throws SQLException, IOException {
+		
+		// Saving uploaded picture
+		MultipartFile file = request.getFile("file");
+		String username = principal.getName();
+		String contact = request.getParameter("contact");
+		//Date date = request.getParameter("date");
+		System.out.println(contact);
+		
+		Message message = new Message(username, contact, null, "bruh, there's an image for you");
+		
+		messagingTemplate.convertAndSendToUser(message.getReciever(), "/queue/reply", message);
+			
+	}
+	
+	
 	// Unused now, example from personal.html
 	@PostMapping("/avatar-upload")
 	public void avatarUpload(@ModelAttribute UploadForm form, HttpServletResponse response, Principal principal) throws SQLException, IOException {
