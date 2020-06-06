@@ -313,14 +313,16 @@ public class MainController {
 		
 		// Saving uploaded picture
 		MultipartFile file = request.getFile("file");
+		//file.getOriginalFilename()
 		String username = principal.getName();
 		String contact = request.getParameter("contact");
-		//Date date = request.getParameter("date");
+		String millisecondsS = request.getParameter("milliseconds");
+		long milliseconds = Long.parseLong(millisecondsS);
 		System.out.println(contact);
 		
-		Message message = new Message(username, contact, null, "bruh, there's an image for you");
-		message.setFilePath("1590919474726 8_3.jpg");
-		message.setImage(true);
+		Message message = new Message(username, contact, milliseconds, "bruh, there's an image for you");
+		/*message.setFilePath("1590919474726 8_3.jpg");
+		message.setImage(true);*/
 		
 		messagingTemplate.convertAndSendToUser(message.getReciever(), "/queue/reply", message);
 			

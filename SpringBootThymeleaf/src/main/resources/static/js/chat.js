@@ -137,11 +137,9 @@ function sendMessage() {
 	
 	// Preparing data
 	let text = $("#message_input_value").val();
-	console.log("text: " + text);
-	let date = new Date();
 	let sender = $("#userName").text();
 	let reciever = $("#contactName").text();
-	let message = {"text": text, "sender": sender, "date": date, "reciever": reciever};
+	let message = {"text": text, "sender": sender, "reciever": reciever, "milliseconds" : Date.now()};
     let userJson = JSON.stringify(message);
 	
     if ((reciever == "") || (text == "")) {
@@ -164,7 +162,8 @@ function drawMessage(message) {
 		side = "left";
 	}
 	
-	let date = new Date(message.date);
+	let date = new Date(message.milliseconds);
+	
 	if (message.image) {
 		drawImageMessage(message.filePath, side, date);
 	} else {
@@ -327,7 +326,7 @@ function sendImage() {
 		let data = new FormData();
 		data.append("file", file);
 		data.append("contact", $("#contactName").text());
-		data.append("date", new Date());
+		data.append("milliseconds", Date.now());
 		
 		$.ajax({
 	        type: "POST",

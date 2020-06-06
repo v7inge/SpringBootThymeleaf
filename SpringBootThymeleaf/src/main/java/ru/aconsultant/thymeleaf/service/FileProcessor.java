@@ -201,26 +201,6 @@ public class FileProcessor {
 		
 		disconnectFromFTP();
 		return bytes3;
-		
-		
-		/*if(ftpClient == null || !ftpClient.isConnected()) {
-        	connectToFTP();
-        }
-		
-		try {
-		
-			InputStream inputStream = ftpClient.retrieveFileStream(filename);
-			byte[] bytes = inputStream.readAllBytes();
-			return bytes;
-		
-		} catch (FTPConnectionClosedException e) {
-			
-			connectToFTP();
-			InputStream inputStream = ftpClient.retrieveFileStream(filename);
-			byte[] bytes = inputStream.readAllBytes();
-			return bytes;
-			
-		}*/
 	}
 	
 	
