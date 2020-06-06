@@ -45,17 +45,19 @@ public class FileProcessor {
 	
 	private void connectToFTP() throws SocketException, IOException {
 		
-		try {
-			ftpClient = new FTPClient();
-	        ftpClient.setControlEncoding("UTF-8");
-	        ftpClient.connect(server, port);
-	        ftpClient.login(user, pass);
-	        ftpClient.enterLocalPassiveMode();
-	        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-		} catch (IOException ex) {
-            System.out.println("Error: " + ex.getMessage());
-            ex.printStackTrace();
-        } 
+		if(ftpClient == null || !ftpClient.isConnected()) {
+			try {
+				ftpClient = new FTPClient();
+		        ftpClient.setControlEncoding("UTF-8");
+		        ftpClient.connect(server, port);
+		        ftpClient.login(user, pass);
+		        ftpClient.enterLocalPassiveMode();
+		        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+			} catch (IOException ex) {
+	            System.out.println("Error: " + ex.getMessage());
+	            ex.printStackTrace();
+	        }
+		}
 	}
 	
 	
@@ -94,6 +96,11 @@ public class FileProcessor {
 		String base63image = Base64.encodeBase64String(bytes);
 		user.setBase64Image(base63image);
 		databaseAccess.saveUserBase64Image(user.getUsername(), base63image);	
+	}
+	
+	
+	public List<String> imageExtensions() {
+		return Arrays.asList("jpg", "jpeg", "png");
 	}
 	
 	
@@ -223,26 +230,38 @@ public class FileProcessor {
 		byte[] bytes = inputStream.readAllBytes();
 		disconnectFromFTP();
 		return bytes;
+	}
+	
+	
+	public boolean saveFile(MultipartFile file, long milliseconds, List<String> extensions) throws IOException {
 		
+        return saveFile(file, milliseconds, extensions, false);
+	}
+	
+	
+	public boolean saveFile(MultipartFile file, long milliseconds, List<String> extensions, boolean cropAvatar) throws IOException {
 		
-		/*if(ftpClient == null || !ftpClient.isConnected()) {
-        	connectToFTP();
+        if (file.isEmpty()) {
+	    	return false;
+	    }
+        
+        if (!filePassesFilter(file, extensions)) {
+        	System.out.println("File did not pass the filter");
+        	return false;
         }
+        
+        connectToFTP();
+		byte[] bytes = file.getBytes();        
+		String filename = milliseconds + " " + file.getOriginalFilename();
+		OutputStream outputStream = ftpClient.storeFileStream(filename);
 		
-		try {
+		if (cropAvatar) {
+			bytes = cropImageSquare(bytes);
+		}
 		
-			InputStream inputStream = ftpClient.retrieveFileStream(filename);
-			byte[] bytes = inputStream.readAllBytes();
-			return bytes;
-		
-		} catch (FTPConnectionClosedException e) {
-			
-			connectToFTP();
-			InputStream inputStream = ftpClient.retrieveFileStream(filename);
-			byte[] bytes = inputStream.readAllBytes();
-			return bytes;
-			
-		}*/
+		outputStream.write(bytes);
+		outputStream.close();
+		return ftpClient.completePendingCommand();
 	}
 	
 	

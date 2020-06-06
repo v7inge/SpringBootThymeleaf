@@ -105,6 +105,11 @@ public class MainController {
 	@MessageMapping("/message-flow")
     public void broadcast(@Payload Message message, Principal principal) {
 
+		// Firstly notify user himself
+		String username = principal.getName();
+		messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
+		
+		// Send message to the reciever
         messagingTemplate.convertAndSendToUser(message.getReciever(), "/queue/reply", message);
         
         // Save massage to database with minor thread priority
@@ -311,21 +316,31 @@ public class MainController {
 	@PostMapping("/send-image")
 	public void sendImage(HttpServletResponse response, Principal principal, MultipartHttpServletRequest request) throws SQLException, IOException {
 		
-		// Saving uploaded picture
-		MultipartFile file = request.getFile("file");
-		//file.getOriginalFilename()
 		String username = principal.getName();
 		String contact = request.getParameter("contact");
-		String millisecondsS = request.getParameter("milliseconds");
-		long milliseconds = Long.parseLong(millisecondsS);
-		System.out.println(contact);
+		MultipartFile file = request.getFile("file");
+		long milliseconds = Long.parseLong(request.getParameter("milliseconds"));
+		String filename = milliseconds + " " + file.getOriginalFilename();
 		
-		Message message = new Message(username, contact, milliseconds, "bruh, there's an image for you");
-		/*message.setFilePath("1590919474726 8_3.jpg");
-		message.setImage(true);*/
+		// Firstly notify that there's an image loading
+		Message message = new Message(username, contact, milliseconds, "", filename, false);
+		message.setCode(1);
+		messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
+		messagingTemplate.convertAndSendToUser(contact, "/queue/reply", message);
 		
-		messagingTemplate.convertAndSendToUser(message.getReciever(), "/queue/reply", message);
-			
+		// Save uploaded picture
+		fileProcessor.saveFile(file, milliseconds, fileProcessor.imageExtensions());
+		
+		// Notify that it's time to update image sources
+		message.setCode(2);
+		//messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
+		messagingTemplate.convertAndSendToUser(contact, "/queue/reply", message);
+		
+		// Save massage to database with minor thread priority
+		message.setCode(1);
+        MessageSaveThread messageSaveThread = new MessageSaveThread(message, this.databaseAccess);
+        messageSaveThread.setPriority(3);
+        messageSaveThread.start(); 
 	}
 	
 	

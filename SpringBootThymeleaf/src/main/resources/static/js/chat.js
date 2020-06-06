@@ -23,16 +23,23 @@ function connect() {
 			
 			var message = JSON.parse(data.body);
 			
-			let messageFrom = message.sender;
 			let activeContact = $("#contactName").text();
+			let username = $("#userName").text();
 			
-			if (messageFrom == activeContact) {
-				drawMessage(message);
-				if (message.image) {
+			// Broadcast incoming message
+			if (message.sender == username && message.reciever == activeContact || message.sender == activeContact) {
+				
+				// Active dialogue
+				if (message.code == 2) {
 					updateMessageImages();
+				} else {
+					drawMessage(message);
 				}
-			} else {
-				increaseCounter(messageFrom);
+				
+			} else if (message.sender != username && message.code != 1) {
+				
+				// Inactive dialogue
+				increaseCounter(message.sender);
 			}
 			
 		});
@@ -147,7 +154,7 @@ function sendMessage() {
 	}
     
 	// Sending message
-	drawMessage(message);
+	//drawMessage(message);
 	stompClient.send("/app/message-flow", {}, userJson);
 	$("#message_input_value").val("");
 }
@@ -164,7 +171,7 @@ function drawMessage(message) {
 	
 	let date = new Date(message.milliseconds);
 	
-	if (message.image) {
+	if (message.code == 1) {
 		drawImageMessage(message.filePath, side, date);
 	} else {
 		drawTextMessage(message.text, side, date);

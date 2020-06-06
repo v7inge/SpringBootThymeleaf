@@ -10,12 +10,18 @@ public class Message {
 
 	private String sender;
 	private String reciever;
-	//private Calendar date;
 	private String text;
 	private String filePath;
 	private boolean image;
 	private long milliseconds;
-
+	
+	private int code;
+	// null or 0: Plain text message
+	// 1: Notify the client that there's an image uploading for him
+	// 2: Notify the client that image is uploaded and should be downloaded
+	
+	// --- CONSTRUCTORS --- //
+	
 	public Message() {}
 	
 	public Message(String sender, String reciever, Calendar date, String text) {
@@ -64,10 +70,6 @@ public class Message {
 		return reciever;
 	}
 	
-	/*public Calendar getDate() {
-		return date;
-	}*/
-	
 	public String getFilePath() {
 		return filePath;
 	}
@@ -88,6 +90,10 @@ public class Message {
 		return calendar.getTime();
 	}
 	
+	public int getCode() {
+		return code;
+	}
+	
 	// --- SET --- //
 	
 	public void setSender(String st) {
@@ -97,10 +103,6 @@ public class Message {
 	public void setReciever(String st) {
 		this.reciever = st;
 	}
-	
-	/*public void setDate(Calendar date) {
-		this.date = date;
-	}*/
 	
 	public void setText(String st) {
 		this.text = st;
@@ -117,6 +119,12 @@ public class Message {
 	public void setMilliseconds(long milliseconds) {
 		this.milliseconds = milliseconds;
 	}
+	
+	public void setCode(int code) {
+		this.code = code;
+	}
+	
+	// --- OTHER --- //
 	
 	@Override
 	public String toString() {
