@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -184,14 +185,22 @@ public class FileProcessor {
 	}
 	
 	
-	// Testing method
-	public byte[] getMultipleFilesFromFTP() throws IOException {
+	public HashMap<String, Object> getMultipleFilesBase64(Set<String> filenames) throws IOException {
 		
-		if(ftpClient == null || !ftpClient.isConnected()) {
-        	connectToFTP();
+        connectToFTP();
+        HashMap<String, Object> result = new HashMap<String, Object>();
+        
+        for (String filename : filenames) {
+        	
+        	InputStream inputStream = ftpClient.retrieveFileStream(filename);
+        	byte[] bytes = inputStream.readAllBytes();
+        	result.put(filename, getBase64String(bytes));
+        	ftpClient.completePendingCommand();
         }
-		
-		InputStream inputStream = ftpClient.retrieveFileStream("1590680116034 Люк.png");
+        
+        return result;
+        
+		/*InputStream inputStream = ftpClient.retrieveFileStream("1590680116034 Люк.png");
 		byte[] bytes1 = inputStream.readAllBytes();
 		
 		System.out.println("Complete: " + ftpClient.completePendingCommand());
@@ -207,7 +216,7 @@ public class FileProcessor {
 		System.out.println("Complete: " + ftpClient.completePendingCommand());
 		
 		disconnectFromFTP();
-		return bytes3;
+		return bytes3;*/
 	}
 	
 	

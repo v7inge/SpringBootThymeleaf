@@ -316,7 +316,6 @@ function updateMessageImages() {
 
 
 function chooseImage() {
-	console.log("chooseImage");
 	$("#image_input").click();
 } 
 
@@ -324,6 +323,19 @@ function chooseImage() {
 function sendImage() {
 	
 	let file = document.getElementById("image_input").files[0];
+	
+	
+	//
+	
+	/*var fileReader = new FileReader();
+	fileReader.onload = function () {
+        document.getElementById("contact-profile-img").src = fileReader.result;
+    }
+    fileReader.readAsDataURL(file);
+	
+	//$("#contact-profile-img").attr("src", "data:image/png;base64," + response.base64String);
+	return;*/
+	
 	let ext = file.name.split(".").pop().toLowerCase();
 	
 	if(jQuery.inArray(ext, ["png","jpg","jpeg"]) == -1) {

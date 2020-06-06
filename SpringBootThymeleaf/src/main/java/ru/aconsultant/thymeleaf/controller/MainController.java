@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -263,7 +264,8 @@ public class MainController {
 	@GetMapping("/user-avatar")
 	public @ResponseBody byte[] getUserAvatar() throws IOException, SQLException {
 		
-		return fileProcessor.getMultipleFilesFromFTP();
+		return null;
+		//return fileProcessor.getMultipleFilesFromFTP();
 	}
 	
 	
@@ -271,30 +273,15 @@ public class MainController {
 	@PostMapping("/testload")
 	public void testLoad(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		
-		byte[] bytes = fileProcessor.getMultipleFilesFromFTP();
-		String base64String = fileProcessor.getBase64String(bytes);
-		
-		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("base64String", base64String);
-		httpParamProcessor.translateResponseParameters(response, map);
-		
-		
-		//return fileProcessor.getMultipleFilesFromFTP();
 	}
 	
 	
 	@PostMapping("/get-images")
 	public void getImages(HttpServletResponse response, HttpServletRequest request) throws IOException {
 		
-		
 		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
-		HashMap<String, Object> responseParameters = new HashMap<String, Object>();
-		
-		for (Map.Entry<String, Object> entry: requestParameters.entrySet()) {
-			responseParameters.put(entry.getKey(), fileProcessor.getFileAsBase64FromFTP(entry.getKey()));
-		}
-		
-		httpParamProcessor.translateResponseParameters(response, responseParameters);
+		Set<String> filenames = requestParameters.keySet();
+		httpParamProcessor.translateResponseParameters(response, fileProcessor.getMultipleFilesBase64(filenames));
 	}
 	
 	
