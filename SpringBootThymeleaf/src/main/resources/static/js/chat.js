@@ -28,6 +28,9 @@ function connect() {
 			
 			if (messageFrom == activeContact) {
 				drawMessage(message);
+				if (message.image) {
+					updateMessageImages();
+				}
 			} else {
 				increaseCounter(messageFrom);
 			}

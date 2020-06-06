@@ -319,6 +319,8 @@ public class MainController {
 		System.out.println(contact);
 		
 		Message message = new Message(username, contact, null, "bruh, there's an image for you");
+		message.setFilePath("1590919474726 8_3.jpg");
+		message.setImage(true);
 		
 		messagingTemplate.convertAndSendToUser(message.getReciever(), "/queue/reply", message);
 			
