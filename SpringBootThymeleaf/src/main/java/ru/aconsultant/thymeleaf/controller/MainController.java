@@ -254,7 +254,7 @@ public class MainController {
 	
 	// Unused yet, left as an example
 	@GetMapping("/picture/{path}")
-	public @ResponseBody byte[] getPicture(@PathVariable String path) throws IOException, SQLException {
+	public @ResponseBody byte[] getPicture(@PathVariable String path) throws IOException, SQLException, InterruptedException {
 		
 		return fileProcessor.getBytesFromFTP(path);
 	}
@@ -277,11 +277,23 @@ public class MainController {
 	
 	
 	@PostMapping("/get-images")
-	public void getImages(HttpServletResponse response, HttpServletRequest request) throws IOException {
+	public void getImages(HttpServletResponse response, HttpServletRequest request, Principal principal) throws IOException, InterruptedException {
 		
 		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
 		Set<String> filenames = requestParameters.keySet();
+		
+		//
+		//System.out.println("Invoke getMultipleFilesBase64. filenames size: " + filenames.size() + ". User: " + principal.getName() + ". Busy: " + fileProcessor.busy + ". System time: " + System.currentTimeMillis());
+		//fileProcessor.busy = true;
+		//
+		
+		
 		httpParamProcessor.translateResponseParameters(response, fileProcessor.getMultipleFilesBase64(filenames));
+		
+		//
+		//System.out.println("Parameters translated to: " + principal.getName());
+		//fileProcessor.busy = false;
+		//
 	}
 	
 	
@@ -301,18 +313,23 @@ public class MainController {
 	
 	
 	@PostMapping("/send-image")
-	public void sendImage(HttpServletResponse response, Principal principal, MultipartHttpServletRequest request) throws SQLException, IOException {
+	public void sendImage(HttpServletResponse response, Principal principal, MultipartHttpServletRequest request) throws SQLException, IOException, InterruptedException {
 		
+		String millisecondsString = request.getParameter("milliseconds");
 		String username = principal.getName();
 		String contact = request.getParameter("contact");
 		MultipartFile file = request.getFile("file");
-		long milliseconds = Long.parseLong(request.getParameter("milliseconds"));
+		long milliseconds = Long.parseLong(millisecondsString);
 		String filename = milliseconds + " " + file.getOriginalFilename();
 		
-		// Firstly notify that there's an image loading
+		// Build message
 		Message message = new Message(username, contact, milliseconds, "", filename, false);
+		message.setId(millisecondsString);
+		
+		// Firstly notify that there's an image loading
 		message.setCode(1);
 		messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
+		//messagingTemplate
 		messagingTemplate.convertAndSendToUser(contact, "/queue/reply", message);
 		
 		// Save uploaded picture
@@ -320,7 +337,7 @@ public class MainController {
 		
 		// Notify that it's time to update image sources
 		message.setCode(2);
-		//messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
+		messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
 		messagingTemplate.convertAndSendToUser(contact, "/queue/reply", message);
 		
 		// Save massage to database with minor thread priority

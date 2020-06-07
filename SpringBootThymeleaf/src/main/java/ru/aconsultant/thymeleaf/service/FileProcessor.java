@@ -40,12 +40,29 @@ public class FileProcessor {
 	private static final String pass = "hgy7fD531cvZ";
 	private static int avaWidth = 150;
 	private static int avaHeight = 150;
+	private static int attempts = 20;
 	
 	private FTPClient ftpClient;
 	
+	public boolean busy;
 	
-	private void connectToFTP() throws SocketException, IOException {
+	private void connectToFTP() throws SocketException, IOException, InterruptedException {
 		
+		// If FTP is busy we wait
+		int i = 0;
+		while (busy) {
+			
+			if (i >= attempts) {
+				System.out.println("Error connecting to FTP: it's busy for a long time.");
+				break;
+			}
+			
+			Thread.sleep(500);
+			i++;
+		}
+		busy = true;
+		
+		// Connect if necessary
 		if(ftpClient == null || !ftpClient.isConnected()) {
 			try {
 				ftpClient = new FTPClient();
@@ -117,7 +134,7 @@ public class FileProcessor {
 	}
 	
 	
-	public void saveUserAvatar(String username, MultipartFile[] files) throws IOException, SQLException {
+	public void saveUserAvatar(String username, MultipartFile[] files) throws IOException, SQLException, InterruptedException {
 		
 		List<String> extensions = Arrays.asList("jpg", "jpeg", "png");
 		
@@ -130,7 +147,7 @@ public class FileProcessor {
 	}
 	
 	
-	public byte[] getUserAvatar(String username) throws SQLException, IOException {
+	public byte[] getUserAvatar(String username) throws SQLException, IOException, InterruptedException {
 		
 		String filename = databaseAccess.getUserAvatarPath(username);
 		if (filename == "" || filename == null) {
@@ -141,7 +158,7 @@ public class FileProcessor {
 	}
 	
 	
-	public void fillContactsBase64Images(List<Contact> contacts) throws SocketException, IOException {
+	public void fillContactsBase64Images(List<Contact> contacts) throws SocketException, IOException, InterruptedException {
 		
 		if(ftpClient==null || !ftpClient.isConnected()) {
         	connectToFTP();
@@ -155,8 +172,7 @@ public class FileProcessor {
 				contact.setBase64Image(Base64.encodeBase64String(img));
 			}
 		}
-		disconnectFromFTP();
-		
+		busy = false;
 	}
 	
 	
@@ -185,42 +201,23 @@ public class FileProcessor {
 	}
 	
 	
-	public HashMap<String, Object> getMultipleFilesBase64(Set<String> filenames) throws IOException {
+	public HashMap<String, Object> getMultipleFilesBase64(Set<String> filenames) throws IOException, InterruptedException {
 		
         connectToFTP();
         HashMap<String, Object> result = new HashMap<String, Object>();
         
         for (String filename : filenames) {
-        	
-        	InputStream inputStream = ftpClient.retrieveFileStream(filename);
-        	byte[] bytes = inputStream.readAllBytes();
-        	result.put(filename, getBase64String(bytes));
-        	ftpClient.completePendingCommand();
+	    	InputStream inputStream = ftpClient.retrieveFileStream(filename);
+	    	byte[] bytes = inputStream.readAllBytes();
+	       	result.put(filename, getBase64String(bytes));
+	       	ftpClient.completePendingCommand();
         }
-        
+        busy = false;
         return result;
-        
-		/*InputStream inputStream = ftpClient.retrieveFileStream("1590680116034 Люк.png");
-		byte[] bytes1 = inputStream.readAllBytes();
-		
-		System.out.println("Complete: " + ftpClient.completePendingCommand());
-		//inputStream.close();
-		//inputStream.
-		
-		inputStream = ftpClient.retrieveFileStream("1590680245489 Коллекторы Неглини.png");
-		byte[] bytes2 = inputStream.readAllBytes();
-		System.out.println("Complete: " + ftpClient.completePendingCommand());
-		
-		inputStream = ftpClient.retrieveFileStream("1590917884069 8_3.jpg");
-		byte[] bytes3 = inputStream.readAllBytes();
-		System.out.println("Complete: " + ftpClient.completePendingCommand());
-		
-		disconnectFromFTP();
-		return bytes3;*/
 	}
 	
 	
-	public String getFileAsBase64FromFTP(String filename) throws IOException {
+	public String getFileAsBase64FromFTP(String filename) throws IOException, InterruptedException {
 		
 		byte[] bytes = getBytesFromFTP(filename);
 		String base64String = getBase64String(bytes);
@@ -228,7 +225,7 @@ public class FileProcessor {
 	}
 	
 	
-	public byte[] getBytesFromFTP(String filename) throws IOException {
+	public byte[] getBytesFromFTP(String filename) throws IOException, InterruptedException {
 		
 		if (filename == null || filename == "") { return null; }
 		
@@ -237,18 +234,18 @@ public class FileProcessor {
         }
 		InputStream inputStream = ftpClient.retrieveFileStream(filename);
 		byte[] bytes = inputStream.readAllBytes();
-		disconnectFromFTP();
+		busy = false;
 		return bytes;
 	}
 	
 	
-	public boolean saveFile(MultipartFile file, long milliseconds, List<String> extensions) throws IOException {
+	public boolean saveFile(MultipartFile file, long milliseconds, List<String> extensions) throws IOException, InterruptedException {
 		
         return saveFile(file, milliseconds, extensions, false);
 	}
 	
 	
-	public boolean saveFile(MultipartFile file, long milliseconds, List<String> extensions, boolean cropAvatar) throws IOException {
+	public boolean saveFile(MultipartFile file, long milliseconds, List<String> extensions, boolean cropAvatar) throws IOException, InterruptedException {
 		
         if (file.isEmpty()) {
 	    	return false;
@@ -270,11 +267,13 @@ public class FileProcessor {
 		
 		outputStream.write(bytes);
 		outputStream.close();
-		return ftpClient.completePendingCommand();
+		boolean complete = ftpClient.completePendingCommand();
+		busy = false;
+		return complete;
 	}
 	
 	
-	public String saveUploadedFile(MultipartFile file, List<String> extensions, boolean cropAvatar) throws IOException {
+	public String saveUploadedFile(MultipartFile file, List<String> extensions, boolean cropAvatar) throws IOException, InterruptedException {
 		
 		String fileName = "";
         if (file.isEmpty()) {
@@ -297,8 +296,7 @@ public class FileProcessor {
 		
 		outputStream.write(bytes);
 		outputStream.close();
-		disconnectFromFTP();
-        
+		busy = false;
         return fileName;
     }
 	

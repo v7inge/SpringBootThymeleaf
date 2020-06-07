@@ -20,6 +20,9 @@ public class Message {
 	// 1: Notify the client that there's an image uploading for him
 	// 2: Notify the client that image is uploaded and should be downloaded
 	
+	private String id;
+	// Needed to recognize message when get image from the server
+	
 	// --- CONSTRUCTORS --- //
 	
 	public Message() {}
@@ -94,6 +97,10 @@ public class Message {
 		return code;
 	}
 	
+	public String getId() {
+		return id;
+	}
+	
 	// --- SET --- //
 	
 	public void setSender(String st) {
@@ -122,6 +129,10 @@ public class Message {
 	
 	public void setCode(int code) {
 		this.code = code;
+	}
+	
+	public void setId(String id) {
+		this.id = id;
 	}
 	
 	// --- OTHER --- //

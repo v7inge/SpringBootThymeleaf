@@ -27,7 +27,34 @@ function connect() {
 			let username = $("#userName").text();
 			
 			// Broadcast incoming message
-			if (message.sender == username && message.reciever == activeContact || message.sender == activeContact) {
+			
+			if (message.sender == activeContact) {
+				// Message from an active contact
+				
+				if (message.code == 2) {
+					updateMessageImages();
+				} else {
+					drawMessage(message);
+				}
+				
+			} else if (message.sender == username && message.reciever == activeContact) {
+				// Message from user himself
+				
+				if (message.code == 2) {
+					updateMessageImages();
+				
+				} else if (message.code == 1) {
+					// Check if we need to draw a message placeholder
+					
+					let messageContainer = findImageMessageById(message.id);
+					if (messageContainer == null) {
+						drawMessage(message);
+					}
+				}
+			}
+			
+			
+			/*if (message.sender == username && message.reciever == activeContact || message.sender == activeContact) {
 				
 				// Active dialogue
 				if (message.code == 2) {
@@ -40,7 +67,7 @@ function connect() {
 				
 				// Inactive dialogue
 				increaseCounter(message.sender);
-			}
+			}*/
 			
 		});
 	});
@@ -172,7 +199,7 @@ function drawMessage(message) {
 	let date = new Date(message.milliseconds);
 	
 	if (message.code == 1) {
-		drawImageMessage(message.filePath, side, date);
+		drawImageMessage(message.filePath, side, date, message.id);
 	} else {
 		drawTextMessage(message.text, side, date);
 	}
@@ -201,7 +228,7 @@ function drawTextMessage(text, side, date) {
 }
 
 
-function drawImageMessage(path, side, date) {
+function drawImageMessage(path, side, date, id = null) {
 	
 	let messages = document.getElementById("messages");
 	let li = document.createElement("li");
@@ -223,12 +250,21 @@ function drawImageMessage(path, side, date) {
 	img.classList.add("invisible");
 	messageContainer.appendChild(img);
 	
+	// Store message id
+	let idContainer = document.createElement("div");
+	idContainer.classList.add("invisible");
+	idContainer.classList.add("id_container");
+	if (id != null) { 
+		idContainer.appendChild(document.createTextNode(id)); 
+	}
+	messageContainer.appendChild(idContainer);
+	
 	// Store image path
-	let pathText = document.createElement("div");
-	pathText.classList.add("invisible");
-	pathText.classList.add("path_text");
-	pathText.appendChild(document.createTextNode(path));
-	messageContainer.appendChild(pathText);
+	let pathContainer = document.createElement("div");
+	pathContainer.classList.add("invisible");
+	pathContainer.classList.add("path_text");
+	pathContainer.appendChild(document.createTextNode(path));
+	messageContainer.appendChild(pathContainer);
 	
 	li.appendChild(messageContainer);
 	
@@ -315,7 +351,79 @@ function updateMessageImages() {
 }
 
 
+function getText(el) {
+	
+	let text = el.contents().filter(function() {
+		  return this.nodeType == Node.TEXT_NODE;
+		}).text();
+	return text;
+}
+
+
+function updateMessageImageByBase64(id, base64) {
+	
+	let messageContainer = findImageMessageById(id);
+
+	let textPlaceholder = messageContainer.children(".image_loading_text");
+	if (getText(textPlaceholder) != "") {
+	
+		// Set source
+		let img = messageContainer.children("img");
+		img.prop("src", "data:image/png;base64," + base64);
+		img.removeClass("invisible");
+		
+		// Clear placeholder text
+		textPlaceholder.contents().last()[0].textContent = "";
+	}
+}
+
+
+function findImageMessageById(id) {
+	
+	let messageContainer = null;
+	$(".image_loading_message").each(function(e) {
+		
+		let idContainer = $(this).children(".id_container");
+		let idText = getText(idContainer);
+		
+		if (idText == ("" + id)) {
+			messageContainer = $(this);
+		}
+	});
+	return messageContainer;
+}
+
+
+function updateMessageImageByFile(id, file) {
+	
+	let fileReader = new FileReader();
+	if (fileReader) {
+		fileReader.onload = function () {
+			
+			let messageContainer = findImageMessageById(id);
+			let textPlaceholder = messageContainer.children(".image_loading_text");
+			if (getText(textPlaceholder) != "") {
+	
+				// Set source
+				let img = messageContainer.children("img");
+				img.prop("src", fileReader.result);
+				img.removeClass("invisible");
+				
+				// Clear placeholder text
+				textPlaceholder.contents().last()[0].textContent = "";
+			}
+	    }
+	    fileReader.readAsDataURL(file);
+	}
+}
+
+
 function chooseImage() {
+	
+	if ($("#contactName").text()=="") {
+		return;
+	}
+	
 	$("#image_input").click();
 } 
 
@@ -323,29 +431,22 @@ function chooseImage() {
 function sendImage() {
 	
 	let file = document.getElementById("image_input").files[0];
-	
-	
-	//
-	
-	/*var fileReader = new FileReader();
-	fileReader.onload = function () {
-        document.getElementById("contact-profile-img").src = fileReader.result;
-    }
-    fileReader.readAsDataURL(file);
-	
-	//$("#contact-profile-img").attr("src", "data:image/png;base64," + response.base64String);
-	return;*/
-	
 	let ext = file.name.split(".").pop().toLowerCase();
 	
 	if(jQuery.inArray(ext, ["png","jpg","jpeg"]) == -1) {
 		console.log("Sorry, only .jpg and .png files are accepted.");
 	} else {
 		
+		// Firstly draw it
+		let milliseconds = Date.now();
+		drawImageMessage("", "right", new Date(), "" + milliseconds);
+		updateMessageImageByFile("" + milliseconds, file);
+
+		// Send to the server
 		let data = new FormData();
 		data.append("file", file);
 		data.append("contact", $("#contactName").text());
-		data.append("milliseconds", Date.now());
+		data.append("milliseconds", milliseconds);
 		
 		$.ajax({
 	        type: "POST",
@@ -355,12 +456,7 @@ function sendImage() {
 	        contentType: false,
 	        cache: false,
 	        dataType: "json",
-	        timeout: 1000000,
-	        success: function(response) {
-	        	/*console.log("Success. Response: " + response);
-	        	$("#menu-profile-img").attr("src", "data:image/png;base64," + response.base64String);
-	        	$("#contact-profile-img").attr("src", "data:image/png;base64," + response.base64String);*/
-	        }
+	        timeout: 1000000
 	    });
 	}
 	
