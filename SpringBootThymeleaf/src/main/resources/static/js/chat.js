@@ -673,6 +673,11 @@ $(document).ready(function() {
 		$("#avatar_input").click();
 	});
 
+	// Click on attach icon
+	$("#attach").click(function() {
+		chooseImage();
+	});
+	
 	// Click on any space
 	$(document).click(function(event) {
     if ($(event.target).closest(".menu").length

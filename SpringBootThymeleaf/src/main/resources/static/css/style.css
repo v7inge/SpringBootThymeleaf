@@ -319,24 +319,7 @@ body {
   bottom: 0;
   height: 70px;
 }
-.bottom_wrapper .message_input_wrapper {
-  display: inline-block;
-  height: 50px;
-  border-radius: 10px;
-  border: 1px solid #bcbdc0;
-  width: 78%;
-  position: relative;
-  padding: 0 20px;
-}
-.bottom_wrapper .message_input_wrapper .message_input {
-  border: none;
-  height: 100%;
-  box-sizing: border-box;
-  width: calc(100% - 40px);
-  position: absolute;
-  outline-width: 0;
-  color: gray;
-}
+
 .bottom_wrapper .send_message {
   width: 10%;
   height: 50px;
@@ -359,8 +342,61 @@ body {
   line-height: 48px;
 }
 
-.message_template {
-  display: none;
+.bottom-block {
+  height: 100%;
+  text-align: center;
+  display: flex;
+  /*border: 1px solid;*/
+}
+
+.bottom-block img {
+  margin: auto;
+  height: 100%;
+  max-height: 40px;
+  cursor: pointer;
+}
+
+.bottom-block.block1 {
+  float: left;
+  width: calc(85% - 60px);
+  display: inline-block;
+  height: 50px;
+  border-radius: 10px;
+  border: 1px solid #bcbdc0;
+  margin-left: 10px;
+}
+
+.bottom-block.block2 {
+  float: right;
+  width: 40px;
+  /*max-width: 50px;*/
+}
+
+.block1 .message_input {
+  border: none;
+  height: 100%;
+  box-sizing: border-box;
+  width: calc(100% - 40px);
+  outline-width: 0;
+  color: gray;
+}
+
+.bottom-block.block3 {
+  width: 15%;
+  margin-right: 10px;
+  float: right;
+}
+
+.bottom-block .send_message {
+  width: 100%;
+  height: 50px;
+  display: inline-block;
+  border-radius: 10px;
+  background-color: var(--light-green);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s linear;
+  text-align: center;
 }
 
 /* --------------------------------------- */
