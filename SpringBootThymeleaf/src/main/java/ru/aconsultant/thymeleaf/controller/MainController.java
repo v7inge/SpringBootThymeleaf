@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -98,6 +99,8 @@ public class MainController {
 	@Autowired
     private ServletContext servletContext;
 	
+	private HashMap<String, String> fileCache = new HashMap<String, String>();
+	private static int fileCacheSize = 10;
 	
 	// How to get principal as a user:
 	//User loginedUser = (User) ((Authentication) principal).getPrincipal();
@@ -280,20 +283,39 @@ public class MainController {
 	public void getImages(HttpServletResponse response, HttpServletRequest request, Principal principal) throws IOException, InterruptedException {
 		
 		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
-		Set<String> filenames = requestParameters.keySet();
 		
-		//
-		//System.out.println("Invoke getMultipleFilesBase64. filenames size: " + filenames.size() + ". User: " + principal.getName() + ". Busy: " + fileProcessor.busy + ". System time: " + System.currentTimeMillis());
-		//fileProcessor.busy = true;
-		//
+		// Prepare variables
+		HashMap<String, Object> responseParameters = new HashMap<String, Object>();
+		String base64 = "";
+		Set<String> filenamesToDownload = new HashSet<String>();
 		
+		// Try to get files from cache
+		for (String key: requestParameters.keySet()) {
+			
+			base64 = fileCache.get(key);
+			if (base64 == null) {
+				filenamesToDownload.add(key);
+			} else {
+				responseParameters.put(key, base64);
+			}
+		}
 		
-		httpParamProcessor.translateResponseParameters(response, fileProcessor.getMultipleFilesBase64(filenames));
+		// Get other files from FTP
+		HashMap<String, Object> filesFromFTP = fileProcessor.getMultipleFilesBase64(filenamesToDownload);
+		for (Map.Entry<String, Object> entry : filesFromFTP.entrySet()) {
+			
+			responseParameters.put(entry.getKey(), entry.getValue());
+		}
 		
-		//
-		//System.out.println("Parameters translated to: " + principal.getName());
-		//fileProcessor.busy = false;
-		//
+		// Response
+		httpParamProcessor.translateResponseParameters(response, responseParameters);
+		
+		// Save to the cache downloaded files
+		for (Map.Entry<String, Object> entry : filesFromFTP.entrySet()) {
+			
+			storeFileInCache(entry.getKey(), entry.getValue().toString());
+		}
+		
 	}
 	
 	
@@ -329,16 +351,18 @@ public class MainController {
 		// Firstly notify that there's an image loading
 		message.setCode(1);
 		messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
-		//messagingTemplate
 		messagingTemplate.convertAndSendToUser(contact, "/queue/reply", message);
 		
-		// Save uploaded picture
-		fileProcessor.saveFile(file, milliseconds, fileProcessor.imageExtensions());
+		// Store file in cache
+		storeFileInCache(filename, file);
 		
 		// Notify that it's time to update image sources
 		message.setCode(2);
 		messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
 		messagingTemplate.convertAndSendToUser(contact, "/queue/reply", message);
+		
+		// Save uploaded picture // #refactor make a thread
+		fileProcessor.saveFile(file, milliseconds, fileProcessor.imageExtensions());
 		
 		// Save massage to database with minor thread priority
 		message.setCode(1);
@@ -362,6 +386,32 @@ public class MainController {
 	public void securityCheck(Model model, HttpServletResponse response, Principal principal) throws SQLException, IOException {
         
 		System.out.println("testing");
+	}
+	
+	
+	private void checkCacheSize() {
+		
+		if (fileCache.size() >= fileCacheSize) {
+			
+			String firstKey = fileCache.keySet().stream().findFirst().get();
+			fileCache.remove(firstKey);
+		}
+	}
+	
+	
+	private void storeFileInCache(String filename, MultipartFile file) throws IOException {
+		
+		checkCacheSize();
+		byte[] bytes = file.getBytes();
+		String base64 = Base64.encodeBase64String(bytes);
+		fileCache.put(filename, base64);
+	}
+	
+	
+	private void storeFileInCache(String filename, String base64) throws IOException {
+		
+		checkCacheSize();
+		fileCache.put(filename, base64);
 	}
 	
 	
