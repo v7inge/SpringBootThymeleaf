@@ -1,0 +1,50 @@
+.top_menu {
+  background-color: var(--light-green);
+  width: 100%;
+  padding: 5px 0 5px;
+  height: 35px;
+}
+
+.top_menu .title {
+  text-align: center;
+  color: white;
+  font-size: 18px;
+}
+
+.menu {
+  position: fixed;
+  display: block;
+  width: 200px;
+  height: 100%;
+  left: -100%;
+  top: 0;
+  z-index: 1;
+  background: rgb(240, 240, 240);
+  transition: 500ms;
+}
+
+.menu .username {
+  font-weight: bold;
+  margin: 0 auto;
+  text-align: center;  
+  margin-top: 10px;
+}
+
+.menu .text {
+  margin: 0 auto;
+  text-align: center;
+  margin-top: 5px;
+}
+
+.menu img {
+  height: 100%;
+  width: 100%;
+}
+
+.menu a {
+  color: red;
+}
+
+.menu.active {
+  left: 0;
+}

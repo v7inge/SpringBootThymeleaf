@@ -1,0 +1,72 @@
+.messages {
+  position: relative;
+  list-style: none;
+  padding: 20px 10px 0 10px;
+  margin: 0;
+  height: calc(100% - 70px);
+  overflow: auto;
+}
+
+.m {
+	clear: both;
+	display: block;
+	color:#222222;
+	padding:6px;
+	overflow: auto;
+  	margin-bottom: 3px;
+  	max-width: 70%;
+}
+
+.m-left {
+	border-radius: 0 10px 10px 10px;
+	background:#e0ecfe;
+	float: left;
+}
+
+.m-right {
+	border-radius: 10px 0 10px 10px;
+	background: var(--light-green);
+	float: right;
+}
+
+.date {
+  clear: both;
+	display: block;
+	color:#222222;
+  font-size: 11px;
+  font-weight: 200;
+  margin-bottom: 5px;
+}
+
+.right {
+	float: right;
+}
+
+.left {
+	float: left;
+}
+
+.image_loading_text {
+	color: grey;
+}
+
+.image_loading_message {
+	
+}
+
+.path_text {
+	
+}
+
+.m img {
+  max-width: 500px;
+  max-height: 300px;
+}
+
+.m-right img {
+  border-radius: 10px 0 10px 10px;
+}
+
+.m-left img {
+  border-radius: 0 10px 10px 10px;
+}

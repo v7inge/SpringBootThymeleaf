@@ -1,0 +1,96 @@
+.contacts {
+  position: relative;
+  list-style: none;
+  padding-left: 0px;
+  margin: 0;
+  overflow: auto;
+}
+
+.contact {
+  display: flex;
+  align-items: center;
+	color: var(--dark-text);
+  cursor: pointer;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+	color: var(--dark-text);
+  cursor: pointer;
+  margin-top: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  font-weight: bold;
+}
+
+.profile:hover {
+	background: var(--light-blue);
+}
+
+.contact-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: blue;
+}
+
+.contact-active {
+  display: flex;
+  align-items: center;
+	color: var(--dark-text);
+  cursor: pointer;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  background: var(--deep-blue);
+}
+
+.contact:hover {
+	background: var(--light-blue);
+}
+
+.contact .counter {
+  font-size: 13px;
+  position: relative;
+  background-color: rgb(255, 219, 122);
+  padding: 1px 4px 1px 4px;
+  margin-left: 10px;
+  border-radius: 25%;
+  display: inline-block;
+}
+
+.contact-name {
+  margin-left: 10px;
+}
+
+.top_contact {
+  width: 100%;
+  background-color: #fff;
+  padding: 10px 10px;
+  position: absolute;
+  top: 0;
+  height: 70px;
+}
+
+.contact_input {
+  display: inline-block;
+  border-radius: 10px;
+  border: 1px solid #bcbdc0;
+  width: calc(100% - 20px);
+  position: relative;
+  margin: 10px;
+  padding: 8px 8px 8px 8px;
+}
+
+.searching-tip {
+  clear: both;
+	display: block;
+	color: var(--dark-gray);
+  margin-left: 14px;
+  margin-top: 6px;
+}
