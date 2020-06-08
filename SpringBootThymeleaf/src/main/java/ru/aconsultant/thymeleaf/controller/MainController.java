@@ -337,16 +337,16 @@ public class MainController {
 	@PostMapping("/send-image")
 	public void sendImage(HttpServletResponse response, Principal principal, MultipartHttpServletRequest request) throws SQLException, IOException, InterruptedException {
 		
-		String millisecondsString = request.getParameter("milliseconds");
+		long milliseconds = Long.parseLong(request.getParameter("milliseconds"));
+		String id = request.getParameter("id");
 		String username = principal.getName();
 		String contact = request.getParameter("contact");
 		MultipartFile file = request.getFile("file");
-		long milliseconds = Long.parseLong(millisecondsString);
-		String filename = milliseconds + " " + file.getOriginalFilename();
+		String filename = id + " " + file.getOriginalFilename();
 		
 		// Build message
 		Message message = new Message(username, contact, milliseconds, "", filename, false);
-		message.setId(millisecondsString);
+		message.setId(id);
 		
 		// Firstly notify that there's an image loading
 		message.setCode(1);
@@ -362,7 +362,7 @@ public class MainController {
 		messagingTemplate.convertAndSendToUser(contact, "/queue/reply", message);
 		
 		// Save uploaded picture // #refactor make a thread
-		fileProcessor.saveFile(file, milliseconds, fileProcessor.imageExtensions());
+		fileProcessor.saveFile(file, filename, fileProcessor.imageExtensions());
 		
 		// Save massage to database with minor thread priority
 		message.setCode(1);

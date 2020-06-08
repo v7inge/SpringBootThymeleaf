@@ -7,6 +7,16 @@
   overflow: auto;
 }
 
+.message-box {
+	clear: both;
+	display: block;
+	color:#222222;
+	padding:6px;
+	overflow: auto;
+  	margin-bottom: 3px;
+  	max-width: 70%;
+}
+
 .m {
 	clear: both;
 	display: block;
@@ -58,7 +68,7 @@
 	
 }
 
-.m img {
+.message-box img {
   max-width: 500px;
   max-height: 300px;
 }

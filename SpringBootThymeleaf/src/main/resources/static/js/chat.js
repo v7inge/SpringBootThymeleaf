@@ -1,4 +1,24 @@
 
+class Message {
+
+  constructor(sender, reciever, code) {
+	  
+	let milliseconds = Date.now();  
+	  
+	this.sender = sender;
+	this.reciever = reciever;
+	this.id = null;
+	this.code = code;
+	this.milliseconds = milliseconds;
+	this.id = "" + sender[0] + reciever[0] + milliseconds;
+  }
+
+  /*sayHi() {
+    alert(this.name);
+  }*/
+
+}
+
 function test() {
 	
 
@@ -41,34 +61,25 @@ function connect() {
 				// Message from user himself
 				
 				if (message.code == 2) {
+					
+					console.log("we need to update images");
 					updateMessageImages();
+					updateMessageDate(message);
 				
 				} else if (message.code == 1) {
 					// Check if we need to draw a message placeholder
 					
-					let messageContainer = findImageMessageById(message.id);
-					if (messageContainer == null) {
+					console.log("we need to draw a placeholder msg");
+					
+					let messageContainer = $("#" + message.id);
+					console.log("message.id: " + message.id);
+					console.log("messageContainer: " + messageContainer);
+					console.log("messageContainer id: " + messageContainer.prop("id"));
+					if (messageContainer.prop("id") == null) {
 						drawMessage(message);
 					}
 				}
 			}
-			
-			
-			/*if (message.sender == username && message.reciever == activeContact || message.sender == activeContact) {
-				
-				// Active dialogue
-				if (message.code == 2) {
-					updateMessageImages();
-				} else {
-					drawMessage(message);
-				}
-				
-			} else if (message.sender != username && message.code != 1) {
-				
-				// Inactive dialogue
-				increaseCounter(message.sender);
-			}*/
-			
 		});
 	});
 }
@@ -76,6 +87,36 @@ function connect() {
 
 function disconnect(){
 	stompClient.disconnect();
+}
+
+
+function updateMessageDate(message) {
+	
+	let messageContainer = $("#" + message.id);
+	dateText = formatDate(new Date(message.milliseconds));
+	messageContainer.children(".date").text(dateText);
+}
+
+
+function setMessageDateText(messageContainer, dateText = null) {
+	
+	// Create date text from milliseconds
+	if (dateText == null) {
+		
+		let ms = +messageContainer.children(".ms_container").text();
+		dateText = formatDate(new Date(ms));
+	}
+	
+	let dateContainer = messageContainer.children(".date");
+	dateContainer.text(dateText);
+}
+
+
+function createMessageId(message, milliseconds) {
+
+	let id = "" + message.sender[0] + message.reciever[0] + milliseconds;
+	message.id = id;
+	return id;
 }
 
 
@@ -187,8 +228,18 @@ function sendMessage() {
 }
 
 
-function drawMessage(message) {
+function drawMessage(message, datePlaceholder) {
 	
+	// Fill data
+	let milliseconds = Date.now();
+	if (message.id == null) {
+		createMessageId(message, milliseconds);
+	}
+	if (message.milliseconds == null) {
+		message.milliseconds = milliseconds;
+	}
+	
+	// Define side
 	let side = "";
 	if (message.sender == $("#userName").text()) {
 		side = "right";
@@ -199,10 +250,22 @@ function drawMessage(message) {
 	let date = new Date(message.milliseconds);
 	
 	if (message.code == 1) {
-		drawImageMessage(message.filePath, side, date, message.id);
+		drawImageMessage(message, datePlaceholder); //.filePath, side, date, message.id);
 	} else {
 		drawTextMessage(message.text, side, date);
 	}
+}
+
+
+function getMessageSide(message) {
+	
+	let side = "";
+	if (message.sender == $("#userName").text()) {
+		side = "right";
+	} else {
+		side = "left";
+	}
+	return side;
 }
 
 
@@ -233,69 +296,11 @@ function outputMessageHistory(data) {
 	let side = "";
 	let mas = data.contactHistory;
 	for (let i = 0; i !== mas.length; i += 1) {
-		
-		if (mas[i].sender == $("#userName").text()) {
-			side = "right";
-		} else {
-			side = "left";
-		}
-		
-		drawMessage(mas[i]);
 	
+		drawMessage(mas[i], "Loading...");
 	}
 	
 	updateMessageImages();
-}
-
-
-function updateMessageImages() {
-	
-	// Loop image messages
-	let needToLoad = false;
-	let pathData = {};
-	$(".image_loading_message").each(function() {
-		
-		// Check if we still need to load it
-		if ($(this).children(".image_loading_text").contents().last()[0].textContent != "") {
-			needToLoad = true;
-			let path = $(this).children(".path_text").text();
-			pathData[path] = path;
-		}
-	});
-	
-    let url = "/get-images";
-    let userJson = JSON.stringify(pathData);
-	
-    // Send ajax query
-    if (needToLoad) {
-	    $.ajax
-	    ({
-	    	type: "POST",
-	        data: userJson,
-	        url: url,
-	        contentType: "application/json; charset=utf-8",
-	        success: function(response)
-	    	{
-	        	$(".image_loading_message").each(function(e) {
-	        		
-	        		// Check if we need to update
-	        		let textPlaceholder = $(this).children(".image_loading_text");
-	        		if (textPlaceholder.contents().last()[0].textContent != "") {
-	        			
-	        			// Update image path
-	        			path = $(this).children(".path_text").text();
-	        			img = $(this).children("img");
-	        			img.prop("src", "data:image/png;base64," + response[path]);
-	        			img.removeClass("invisible");
-	        			
-	        			// Update text placeholder
-	        			textPlaceholder.contents().last()[0].textContent = "";
-	        		}
-	        	});
-	    	}	
-	    });
-    }
-    scrollDown();
 }
 
 

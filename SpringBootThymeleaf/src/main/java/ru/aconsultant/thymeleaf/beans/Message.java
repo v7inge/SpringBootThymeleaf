@@ -23,7 +23,6 @@ public class Message {
 	// 4: Notify the client that file is uploaded and should be downloaded
 	
 	private String id;
-	// Needed to recognize message when get image from the server
 	
 	// --- CONSTRUCTORS --- //
 	

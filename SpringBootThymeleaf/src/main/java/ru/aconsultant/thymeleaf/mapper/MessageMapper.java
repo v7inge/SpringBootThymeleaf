@@ -23,11 +23,8 @@ public class MessageMapper implements RowMapper<Message> {
 		
 		Message message = new Message(sender, reciever, date, text, filePath, image);
 		
-		/*int code = 0;
-		if (rs.getInt("Image")==1) {
-			code = 1;
-		}*/
 		message.setCode(rs.getInt("Code"));
+		message.setId(rs.getString("id"));
 		
 		return message;
 	}

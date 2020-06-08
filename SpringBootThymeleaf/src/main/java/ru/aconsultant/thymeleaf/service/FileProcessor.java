@@ -195,8 +195,6 @@ public class FileProcessor {
 		InputStream inputStream = ftpClient.retrieveFileStream(filename);
 		byte[] bytes = inputStream.readAllBytes();
 		
-		System.out.println("Complete: " + ftpClient.completePendingCommand());
-		
 		return bytes;
 	}
 	
@@ -239,13 +237,13 @@ public class FileProcessor {
 	}
 	
 	
-	public boolean saveFile(MultipartFile file, long milliseconds, List<String> extensions) throws IOException, InterruptedException {
+	public boolean saveFile(MultipartFile file, String filename, List<String> extensions) throws IOException, InterruptedException {
 		
-        return saveFile(file, milliseconds, extensions, false);
+        return saveFile(file, filename, extensions, false);
 	}
 	
 	
-	public boolean saveFile(MultipartFile file, long milliseconds, List<String> extensions, boolean cropAvatar) throws IOException, InterruptedException {
+	public boolean saveFile(MultipartFile file, String filename, List<String> extensions, boolean cropAvatar) throws IOException, InterruptedException {
 		
         if (file.isEmpty()) {
 	    	return false;
@@ -257,8 +255,7 @@ public class FileProcessor {
         }
         
         connectToFTP();
-		byte[] bytes = file.getBytes();        
-		String filename = milliseconds + " " + file.getOriginalFilename();
+		byte[] bytes = file.getBytes();
 		OutputStream outputStream = ftpClient.storeFileStream(filename);
 		
 		if (cropAvatar) {

@@ -137,8 +137,8 @@ public class DatabaseAccess extends JdbcDaoSupport {
     
     public void saveMessage(Message message) throws SQLException {
     	
-        String sql = "INSERT INTO MESSAGES (Sender, Reciever, DateTime, Text, FilePath, Code) VALUES (?, ?, ?, ?, ?, ?)";
-        this.getJdbcTemplate().update(sql, message.getSender(), message.getReciever(), message.getDateTime(), message.getText(), message.getFilePath(), message.getCode());
+        String sql = "INSERT INTO MESSAGES (Sender, Reciever, DateTime, Text, FilePath, Code, ID) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        this.getJdbcTemplate().update(sql, message.getSender(), message.getReciever(), message.getDateTime(), message.getText(), message.getFilePath(), message.getCode(), message.getId());
     }
     
     
