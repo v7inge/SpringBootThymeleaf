@@ -434,7 +434,7 @@ function sendImage() {
 	let ext = file.name.split(".").pop().toLowerCase();
 	
 	if(jQuery.inArray(ext, ["png","jpg","jpeg"]) == -1) {
-		console.log("Sorry, only .jpg and .png files are accepted.");
+		showPopUp("Sorry, only .jpg and .png files are accepted.");
 	} else {
 		
 		// Firstly draw it

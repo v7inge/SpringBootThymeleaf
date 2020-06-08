@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Simple chat</title>
-	<link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-	<link href="/css/style.css" rel="stylesheet">
-	<link href="/css/avatar.css" rel="stylesheet">
-	<link href="/css/placeholder.css" rel="stylesheet">
+	
+	<link rel="stylesheet" href="/webjars/bootstrap/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="/css/style.css" />
+	<link rel="stylesheet" href="/css/avatar.css" />
+	<link rel="stylesheet" href="/css/placeholder.css" />
+	<link rel="stylesheet" href="/css/pop-up.css" />
+	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="/webjars/sockjs-client/sockjs.min.js"></script>
 	<script src="/webjars/stomp-websocket/stomp.min.js"></script>
-	<script src="/js/chat.js"></script>	
+	<script src="/js/chat.js"></script>
+	<script src="/js/pop-up.js"></script>
 	
 	<link type="text/css" rel="stylesheet" data-th-href="@{css/style.css}" />
 	
@@ -18,12 +22,17 @@
 
 <body onload="onLoad()">
 	
-	<!--<button onclick="chooseImage()">Send image</button>-->
+	<button onclick="showPopUp()">Test</button>
+	
 	<input type="file" class="invisible" id="avatar_input" name="avatar_input" />
 	<input type="file" class="invisible" id="image_input" name="image_input" />​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
 	
 	<div class="invisible" id="userName" th:utext="${user.username}"></div>
 	<div class="invisible" id="contactName"></div>
+	
+	<div class="pop-up" style="bottom:5px;">
+		<div class = "text"></div>
+	</div>
 	
 	<div class="chat_window">
 	

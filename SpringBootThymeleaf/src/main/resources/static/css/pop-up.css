@@ -1,0 +1,25 @@
+.pop-up {
+  border-radius: 5px;
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  height: 50px;
+  width: 300px;
+  transition: opacity 500ms;
+  background-color: var(--light-green);
+  color: white;
+  opacity: 0;
+}
+
+.pop-up .text {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
+
+.pop-up.show {
+  opacity: 1;
+}
