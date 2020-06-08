@@ -19,8 +19,7 @@ public class Message {
 	// null or 0: Plain text message
 	// 1: Notify the client that there's an image uploading for him
 	// 2: Notify the client that image is uploaded and should be downloaded
-	// 3: Notify the client that there's a file uploading for him
-	// 4: Notify the client that file is uploaded and should be downloaded
+	// 3: Notify the client that his plain text is successfully sent
 	
 	private String id;
 	

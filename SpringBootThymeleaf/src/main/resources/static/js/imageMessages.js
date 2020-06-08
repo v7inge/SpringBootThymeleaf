@@ -4,7 +4,6 @@ let imagePlaceholderSource = "http://aconsultant.ru/wp-content/uploads/2020/06/i
 function drawImageMessage(message, datePlaceholder = null) {
 	
 	let side = getMessageSide(message);
-	let plaseholderText = "Placeholder text";
 	
 	let messages = document.getElementById("messages");
 	
@@ -22,21 +21,30 @@ function drawImageMessage(message, datePlaceholder = null) {
 	messageContainer.appendChild(msContainer);
 	
 	// Store image path
-	let pathContainer = document.createElement("div");
-	pathContainer.classList.add("invisible");
-	pathContainer.classList.add("path-text");
-	pathContainer.appendChild(document.createTextNode(message.filePath));
-	messageContainer.appendChild(pathContainer);
+	if (message.code == 1) {
+		let pathContainer = document.createElement("div");
+		pathContainer.classList.add("invisible");
+		pathContainer.classList.add("path-text");
+		pathContainer.appendChild(document.createTextNode(message.filePath));
+		messageContainer.appendChild(pathContainer);
+	}
 	
 	// Create message box
 	let messageBox = document.createElement("div");
 	messageBox.classList.add("message-box");
 	messageBox.classList.add("m-" + side);
 	
+	// Add message text
+	if (message.text != "" && message.text != null) {
+		messageBox.appendChild(document.createTextNode(message.text));
+	}
+	
 	// Create image
-	let img = document.createElement("img");
-	img.src = imagePlaceholderSource;
-	messageBox.appendChild(img);
+	if (message.code == 1) {
+		let img = document.createElement("img");
+		img.src = imagePlaceholderSource;
+		messageBox.appendChild(img);
+	}
 	
 	// Append message box to a message container
 	messageContainer.appendChild(messageBox);
@@ -115,8 +123,8 @@ function sendImage() {
 	} else {
 		
 		// Create and draw message
-		let message = new Message($("#userName").text(), $("#contactName").text(), 1);
-		drawMessage(message, "Sending...");
+		let message = new Message($("#userName").text(), $("#contactName").text(), 1, "");
+		drawImageMessage(message, "Sending...");
 		updateMessageImageByFile(message.id, file);
 
 		// Send to the server

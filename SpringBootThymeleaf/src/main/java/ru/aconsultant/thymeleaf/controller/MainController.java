@@ -109,13 +109,14 @@ public class MainController {
 	@MessageMapping("/message-flow")
     public void broadcast(@Payload Message message, Principal principal) {
 
-		// Firstly notify user himself
+		// Send message to the reciever
+        messagingTemplate.convertAndSendToUser(message.getReciever(), "/queue/reply", message);
+		
+		// Notify user himself
+        message.setCode(3);
 		String username = principal.getName();
 		messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
 		
-		// Send message to the reciever
-        messagingTemplate.convertAndSendToUser(message.getReciever(), "/queue/reply", message);
-        
         // Save massage to database with minor thread priority
         MessageSaveThread messageSaveThread = new MessageSaveThread(message, this.databaseAccess);
         messageSaveThread.setPriority(3);

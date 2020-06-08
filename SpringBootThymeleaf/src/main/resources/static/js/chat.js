@@ -1,7 +1,7 @@
 
 class Message {
 
-  constructor(sender, reciever, code) {
+  constructor(sender, reciever, code, text) {
 	  
 	let milliseconds = Date.now();  
 	  
@@ -11,6 +11,7 @@ class Message {
 	this.code = code;
 	this.milliseconds = milliseconds;
 	this.id = "" + sender[0] + reciever[0] + milliseconds;
+	this.text = text;
   }
 
   /*sayHi() {
@@ -54,29 +55,34 @@ function connect() {
 				if (message.code == 2) {
 					updateMessageImages();
 				} else {
-					drawMessage(message);
+					drawImageMessage(message);
 				}
 				
 			} else if (message.sender == username && message.reciever == activeContact) {
 				// Message from user himself
 				
-				if (message.code == 2) {
+				if (message.code == 3) {
+					// Plain text is delivered
 					
-					console.log("we need to update images");
-					updateMessageImages();
+					let messageContainer = $("#" + message.id);
+					if (messageContainer.prop("id") == null) {
+						drawImageMessage(message);
+					} else {
+						updateMessageDate(message);
+					}
+						
+				} else if (message.code == 2) {
+					// Image is uploaded
+					
+					updateMessageImages(); // Needed only in case there's no file reader in the browser
 					updateMessageDate(message);
 				
 				} else if (message.code == 1) {
 					// Check if we need to draw a message placeholder
 					
-					console.log("we need to draw a placeholder msg");
-					
 					let messageContainer = $("#" + message.id);
-					console.log("message.id: " + message.id);
-					console.log("messageContainer: " + messageContainer);
-					console.log("messageContainer id: " + messageContainer.prop("id"));
 					if (messageContainer.prop("id") == null) {
-						drawMessage(message);
+						drawImageMessage(message, "Loading...");
 					}
 				}
 			}
@@ -210,16 +216,25 @@ function increaseCounter(str, num = 1) {
 
 function sendMessage() {
 	
-	// Preparing data
-	let text = $("#message_input_value").val();
 	let sender = $("#userName").text();
 	let reciever = $("#contactName").text();
-	let message = {"text": text, "sender": sender, "reciever": reciever, "milliseconds" : Date.now()};
-    let userJson = JSON.stringify(message);
+	let text = $("#message_input_value").val();
 	
-    if ((reciever == "") || (text == "")) {
+	if ((reciever == "") || (text == "")) {
 		return;
 	}
+	
+	// Build and draw it
+	let message = new Message(sender, reciever, 0, text);
+	drawImageMessage(message, "Sending...");
+	
+	// Preparing data
+	//
+	
+	//let data = {"text": text, "sender": sender, "reciever": reciever, "milliseconds" : Date.now()};
+    let userJson = JSON.stringify(message);
+	
+    
     
 	// Sending message
 	//drawMessage(message);
