@@ -19,12 +19,11 @@ public class MessageMapper implements RowMapper<Message> {
 		String reciever = rs.getString("Reciever");
 		String text = rs.getString("Text");
 		String filePath = rs.getString("FilePath");
-		boolean image = (rs.getInt("Image")==1);
+		String fileName = rs.getString("FileName");
+		int code = rs.getInt("Code");
+		String id = rs.getString("id");
 		
-		Message message = new Message(sender, reciever, date, text, filePath, image);
-		
-		message.setCode(rs.getInt("Code"));
-		message.setId(rs.getString("id"));
+		Message message = new Message(sender, reciever, date, text, filePath, fileName, code, id);
 		
 		return message;
 	}

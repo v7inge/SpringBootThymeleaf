@@ -118,6 +118,7 @@ public class MainController {
 		messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
 		
         // Save massage to database with minor thread priority
+		message.setCode(0);
         MessageSaveThread messageSaveThread = new MessageSaveThread(message, this.databaseAccess);
         messageSaveThread.setPriority(3);
         messageSaveThread.start(); 
@@ -343,19 +344,18 @@ public class MainController {
 		String username = principal.getName();
 		String contact = request.getParameter("contact");
 		MultipartFile file = request.getFile("file");
-		String filename = id + " " + file.getOriginalFilename();
+		String fileName = file.getOriginalFilename();
+		String filePath = id + " " + fileName;
 		
-		// Build message
-		Message message = new Message(username, contact, milliseconds, "", filename, false);
-		message.setId(id);
+		// Build message with code 1: image loading
+		Message message = new Message(username, contact, milliseconds, "", filePath, fileName, 1, id);
 		
 		// Firstly notify that there's an image loading
-		message.setCode(1);
 		messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
 		messagingTemplate.convertAndSendToUser(contact, "/queue/reply", message);
 		
 		// Store file in cache
-		storeFileInCache(filename, file);
+		storeFileInCache(filePath, file);
 		
 		// Notify that it's time to update image sources
 		message.setCode(2);
@@ -363,13 +363,13 @@ public class MainController {
 		messagingTemplate.convertAndSendToUser(contact, "/queue/reply", message);
 		
 		// Save uploaded picture // #refactor make a thread
-		fileProcessor.saveFile(file, filename, fileProcessor.imageExtensions());
+		fileProcessor.saveFile(file, filePath, fileProcessor.imageExtensions());
 		
 		// Save massage to database with minor thread priority
 		message.setCode(1);
         MessageSaveThread messageSaveThread = new MessageSaveThread(message, this.databaseAccess);
         messageSaveThread.setPriority(3);
-        messageSaveThread.start(); 
+        messageSaveThread.start();
 	}
 	
 	

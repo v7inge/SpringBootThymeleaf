@@ -65,6 +65,7 @@ public class FileProcessor {
 		// Connect if necessary
 		if(ftpClient == null || !ftpClient.isConnected()) {
 			try {
+				//System.out.println("Connecting to FTP at " + System.currentTimeMillis());
 				ftpClient = new FTPClient();
 		        ftpClient.setControlEncoding("UTF-8");
 		        ftpClient.connect(server, port);

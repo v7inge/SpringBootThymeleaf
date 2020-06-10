@@ -1,7 +1,8 @@
 
 let imagePlaceholderSource = "http://aconsultant.ru/wp-content/uploads/2020/06/img_148071.png";
+let fileIconSource = "http://aconsultant.ru/wp-content/uploads/2020/06/attach-file.png";
 
-function drawImageMessage(message, datePlaceholder = null) {
+function drawMessage(message, datePlaceholder = null) {
 	
 	let side = getMessageSide(message);
 	
@@ -11,7 +12,13 @@ function drawImageMessage(message, datePlaceholder = null) {
 	let messageContainer = document.createElement("li");
 	messageContainer.id = message.id;
 	messageContainer.classList.add("message-container");
-	messageContainer.classList.add("image-message");
+	
+	// Define message category
+	if (message.code == 1) {
+		messageContainer.classList.add("image-message");
+	} else if (message.code == 4) {
+		messageContainer.classList.add("file-message");
+	}
 	
 	// Store message milliseconds
 	let msContainer = document.createElement("div");
@@ -20,8 +27,8 @@ function drawImageMessage(message, datePlaceholder = null) {
 	msContainer.appendChild(document.createTextNode(message.milliseconds));
 	messageContainer.appendChild(msContainer);
 	
-	// Store image path
-	if (message.code == 1) {
+	// Store file path
+	if (message.code == 1 || message.code == 4) {
 		let pathContainer = document.createElement("div");
 		pathContainer.classList.add("invisible");
 		pathContainer.classList.add("path-text");
@@ -29,21 +36,42 @@ function drawImageMessage(message, datePlaceholder = null) {
 		messageContainer.appendChild(pathContainer);
 	}
 	
+	// Store file name
+	/*if (message.code == 4) {
+		let filenameContainer = document.createElement("div");
+		filenameContainer.classList.add("invisible");
+		filenameContainer.classList.add("filename");
+		filenameContainer.appendChild(document.createTextNode(message.fileName));
+		messageContainer.appendChild(filenameContainer);
+	}*/
+	
 	// Create message box
 	let messageBox = document.createElement("div");
 	messageBox.classList.add("message-box");
 	messageBox.classList.add("m-" + side);
 	
-	// Add message text
-	if (message.text != "" && message.text != null) {
-		messageBox.appendChild(document.createTextNode(message.text));
-	}
-	
-	// Create image
+	// Create image placeholder
 	if (message.code == 1) {
 		let img = document.createElement("img");
 		img.src = imagePlaceholderSource;
 		messageBox.appendChild(img);
+	}
+	
+	// Create file icon
+	if (message.code == 4) {
+		let img = document.createElement("img");
+		img.src = fileIconSource;
+		messageBox.appendChild(img);
+	}
+	
+	// Add message text
+	if (message.code == 0 || message.code == null) {
+		messageBox.appendChild(document.createTextNode(message.text));
+	} else if (message.code == 4) {
+		let filenameContainer = document.createElement("div");
+		filenameContainer.classList.add("filename");
+		filenameContainer.appendChild(document.createTextNode(message.fileName));
+		messageBox.appendChild(filenameContainer);
 	}
 	
 	// Append message box to a message container
@@ -117,23 +145,39 @@ function sendImage() {
 	
 	let file = document.getElementById("image_input").files[0];
 	let ext = file.name.split(".").pop().toLowerCase();
+	let username = $("#userName").text();
+	let contact = $("#contactName").text();
+	let code;
+	let filename = "test filename";
 	
-	if(jQuery.inArray(ext, ["png","jpg","jpeg"]) == -1) {
-		showPopUp("Sorry, only .jpg and .png files are accepted.");
+	if(jQuery.inArray(ext, ["exe","rar","zip"]) != -1) {
+		// Not accepted
+		
+		showPopUp("Sorry, .exe and archives are not accepted.");
+	
 	} else {
 		
+		if (jQuery.inArray(ext, ["png","jpg","jpeg"]) != -1) {
+			code = 1; // Send as image
+		} else {
+			code = 4; // Send as file
+		}
+		
 		// Create and draw message
-		let message = new Message($("#userName").text(), $("#contactName").text(), 1, "");
-		drawImageMessage(message, "Sending...");
-		updateMessageImageByFile(message.id, file);
-
+		let message = new Message(username, contact, code, "", filename);
+		drawMessage(message, "Sending...");
+		//return;
+		// Set uploaded image as a source
+		if (code == 1) {
+			updateMessageImageByFile(message.id, file);
+		}
+		
 		// Send to the server
 		let data = new FormData();
 		data.append("file", file);
-		data.append("contact", $("#contactName").text());
+		data.append("contact", contact);
 		data.append("id", message.id);
 		data.append("milliseconds", message.milliseconds);
-		//data.append("milliseconds", milliseconds);
 		
 		$.ajax({
 	        type: "POST",
@@ -144,7 +188,7 @@ function sendImage() {
 	        cache: false,
 	        dataType: "json",
 	        timeout: 1000000
-	    });
+	    });		
 	}
 	
 	document.getElementById("image_input").value = "";
@@ -198,9 +242,6 @@ function updateMessageImages() {
 	        			img.prop("src", "data:image/png;base64," + response[path]);
 	        			
 	        			setMessageDateText($(this));
-	        			
-	        			// Update text placeholder
-	        			//textPlaceholder.contents().last()[0].textContent = "";
 	        		}
 	        	});
 	    	}	

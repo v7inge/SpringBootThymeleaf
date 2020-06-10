@@ -1,23 +1,18 @@
 
 class Message {
 
-  constructor(sender, reciever, code, text) {
+  constructor(sender, reciever, code, text, filename) {
 	  
 	let milliseconds = Date.now();  
 	  
 	this.sender = sender;
 	this.reciever = reciever;
-	this.id = null;
 	this.code = code;
 	this.milliseconds = milliseconds;
 	this.id = "" + sender[0] + reciever[0] + milliseconds;
 	this.text = text;
+	this.filename = filename;
   }
-
-  /*sayHi() {
-    alert(this.name);
-  }*/
-
 }
 
 function test() {
@@ -55,7 +50,7 @@ function connect() {
 				if (message.code == 2) {
 					updateMessageImages();
 				} else {
-					drawImageMessage(message);
+					drawMessage(message);
 				}
 				
 			} else if (message.sender == username && message.reciever == activeContact) {
@@ -66,7 +61,7 @@ function connect() {
 					
 					let messageContainer = $("#" + message.id);
 					if (messageContainer.prop("id") == null) {
-						drawImageMessage(message);
+						drawMessage(message);
 					} else {
 						updateMessageDate(message);
 					}
@@ -82,7 +77,7 @@ function connect() {
 					
 					let messageContainer = $("#" + message.id);
 					if (messageContainer.prop("id") == null) {
-						drawImageMessage(message, "Loading...");
+						drawMessage(message, "Loading...");
 					}
 				}
 			}
@@ -115,14 +110,6 @@ function setMessageDateText(messageContainer, dateText = null) {
 	
 	let dateContainer = messageContainer.children(".date");
 	dateContainer.text(dateText);
-}
-
-
-function createMessageId(message, milliseconds) {
-
-	let id = "" + message.sender[0] + message.reciever[0] + milliseconds;
-	message.id = id;
-	return id;
 }
 
 
@@ -179,11 +166,6 @@ function findContact(str) {
 }
 
 
-function getCurrentContactName() {
-	
-}
-
-
 function getContactName(el) {
 	return $(el).children(".contact-name").text();	
 }
@@ -226,49 +208,12 @@ function sendMessage() {
 	
 	// Build and draw it
 	let message = new Message(sender, reciever, 0, text);
-	drawImageMessage(message, "Sending...");
+	drawMessage(message, "Sending...");
 	
-	// Preparing data
-	//
-	
-	//let data = {"text": text, "sender": sender, "reciever": reciever, "milliseconds" : Date.now()};
-    let userJson = JSON.stringify(message);
-	
-    
-    
-	// Sending message
-	//drawMessage(message);
+	// Send message
+	let userJson = JSON.stringify(message);
 	stompClient.send("/app/message-flow", {}, userJson);
 	$("#message_input_value").val("");
-}
-
-
-function drawMessage(message, datePlaceholder) {
-	
-	// Fill data
-	let milliseconds = Date.now();
-	if (message.id == null) {
-		createMessageId(message, milliseconds);
-	}
-	if (message.milliseconds == null) {
-		message.milliseconds = milliseconds;
-	}
-	
-	// Define side
-	let side = "";
-	if (message.sender == $("#userName").text()) {
-		side = "right";
-	} else {
-		side = "left";
-	}
-	
-	let date = new Date(message.milliseconds);
-	
-	if (message.code == 1) {
-		drawImageMessage(message, datePlaceholder); //.filePath, side, date, message.id);
-	} else {
-		drawTextMessage(message.text, side, date);
-	}
 }
 
 
@@ -284,35 +229,17 @@ function getMessageSide(message) {
 }
 
 
-function drawTextMessage(text, side, date) {
-	
-	let messages = document.getElementById("messages");
-	let li = document.createElement("li");
-	
-	let m = document.createElement("div");
-	m.classList.add("m");
-	m.classList.add("m-" + side);
-	m.appendChild(document.createTextNode(text));
-	li.appendChild(m);
-	
-	let d = document.createElement("div");
-	d.classList.add("date");
-	d.classList.add(side);
-	d.appendChild(document.createTextNode(formatDate(date)));
-	li.appendChild(d);
-	
-	messages.appendChild(li);
-	scrollDown();
-}
-
-
 function outputMessageHistory(data) {
 	
 	let side = "";
 	let mas = data.contactHistory;
 	for (let i = 0; i !== mas.length; i += 1) {
 	
-		drawMessage(mas[i], "Loading...");
+		if (mas[i].code == 1) {
+			drawMessage(mas[i], "Loading...");
+		} else {
+			drawMessage(mas[i]);
+		}
 	}
 	
 	updateMessageImages();

@@ -9,7 +9,8 @@
 
 .message-box {
 	clear: both;
-	display: block;
+	/*display: block;*/
+  	display: inline-flex;
 	color:#222222;
 	padding:6px;
 	overflow: auto;
@@ -79,4 +80,15 @@
 
 .m-left img {
   border-radius: 0 10px 10px 10px;
+}
+
+.message-container.file-message img {
+  height: 30px;
+}
+
+.message-container.file-message .filename {
+  display: inline-block;
+  margin-left: 7px;
+	margin-top: 5px;
+	margin-right: 4px;
 }

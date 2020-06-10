@@ -12,14 +12,15 @@ public class Message {
 	private String reciever;
 	private String text;
 	private String filePath;
-	private boolean image;
 	private long milliseconds;
+	private String fileName;
 	
 	private int code;
 	// null or 0: Plain text message
-	// 1: Notify the client that there's an image uploading for him
-	// 2: Notify the client that image is uploaded and should be downloaded
-	// 3: Notify the client that his plain text is successfully sent
+	// 1: Image uploading
+	// 2: Image is uploaded and should be downloaded
+	// 3: Plain text is successfully sent
+	// 4: File uploading
 	
 	private String id;
 	
@@ -41,22 +42,26 @@ public class Message {
 		this.milliseconds = milliseconds;
 	}
 	
-	public Message(String sender, String reciever, Calendar date, String text, String filePath, boolean image) {
+	public Message(String sender, String reciever, Calendar date, String text, String filePath, String fileName, int code, String id) {
 		this.sender = sender;
 		this.reciever = reciever;
 		this.text = text;
 		this.filePath = filePath;
-		this.image = image;
 		this.milliseconds = date.getTimeInMillis();
+		this.fileName = fileName;
+		this.code = code;
+		this.id = id;
 	}
 	
-	public Message(String sender, String reciever, long milliseconds, String text, String filePath, boolean image) {
+	public Message(String sender, String reciever, long milliseconds, String text, String filePath, String fileName, int code, String id) {
 		this.sender = sender;
 		this.reciever = reciever;
 		this.text = text;
 		this.filePath = filePath;
-		this.image = image;
 		this.milliseconds = milliseconds;
+		this.fileName = fileName;
+		this.code = code;
+		this.id = id;
 	}
 
 	// --- GET --- //
@@ -75,10 +80,6 @@ public class Message {
 	
 	public String getFilePath() {
 		return filePath;
-	}
-	
-	public boolean getImage() {
-		return image;
 	}
 	
 	public long getMilliseconds() {
@@ -101,6 +102,10 @@ public class Message {
 		return id;
 	}
 	
+	public String getFileName() {
+		return fileName;
+	}
+	
 	// --- SET --- //
 	
 	public void setSender(String st) {
@@ -119,10 +124,6 @@ public class Message {
 		this.filePath = filePath;
 	}
 	
-	public void setImage(boolean image) {
-		this.image = image;
-	}
-	
 	public void setMilliseconds(long milliseconds) {
 		this.milliseconds = milliseconds;
 	}
@@ -133,6 +134,10 @@ public class Message {
 	
 	public void setId(String id) {
 		this.id = id;
+	}
+	
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 	
 	// --- OTHER --- //
