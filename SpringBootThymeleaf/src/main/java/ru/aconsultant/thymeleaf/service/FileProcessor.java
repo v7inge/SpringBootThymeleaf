@@ -11,6 +11,7 @@ import java.net.SocketException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -205,22 +206,26 @@ public class FileProcessor {
         connectToFTP();
         HashMap<String, Object> result = new HashMap<String, Object>();
         
-        for (String filename : filenames) {
-	    	InputStream inputStream = ftpClient.retrieveFileStream(filename);
-	    	byte[] bytes = inputStream.readAllBytes();
-	       	result.put(filename, getBase64String(bytes));
-	       	ftpClient.completePendingCommand();
+        try {
+	        for (String filename : filenames) {
+		    	InputStream inputStream = ftpClient.retrieveFileStream(filename);
+		    	byte[] bytes = inputStream.readAllBytes();
+		       	result.put(filename, getBase64String(bytes));
+		       	ftpClient.completePendingCommand();
+	        }
+        } catch (IOException e) {
+        	busy = false;
         }
         busy = false;
         return result;
 	}
 	
 	
-	public String getFileAsBase64FromFTP(String filename) throws IOException, InterruptedException {
+	public Object getFileBase64(String filename) throws IOException, InterruptedException {
 		
-		byte[] bytes = getBytesFromFTP(filename);
-		String base64String = getBase64String(bytes);
-		return base64String;
+		Set<String> filenames = new HashSet<String>();
+		filenames.add(filename);
+		return getMultipleFilesBase64(filenames).get(filename);
 	}
 	
 	
@@ -271,6 +276,7 @@ public class FileProcessor {
 	}
 	
 	
+	// #refactor merge 2 different save functions
 	public String saveUploadedFile(MultipartFile file, List<String> extensions, boolean cropAvatar) throws IOException, InterruptedException {
 		
 		String fileName = "";

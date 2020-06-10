@@ -281,7 +281,7 @@ public class MainController {
 	}
 	
 	
-	@PostMapping("/get-images")
+	@PostMapping("/get-files")
 	public void getImages(HttpServletResponse response, HttpServletRequest request, Principal principal) throws IOException, InterruptedException {
 		
 		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
@@ -384,9 +384,15 @@ public class MainController {
 	
 	// Service method for debugging
 	@RequestMapping(value = { "/test" }, method = RequestMethod.POST)
-	public void securityCheck(Model model, HttpServletResponse response, Principal principal) throws SQLException, IOException {
+	public void test(HttpServletResponse response, Principal principal, HttpServletRequest request) throws SQLException, IOException, InterruptedException {
         
-		System.out.println("testing");
+		Object fileBase64 = fileProcessor.getFileBase64("id1111111 text text file.txt");
+		
+		HashMap<String, Object> responseParameters = new HashMap<String, Object>();
+		responseParameters.put("id1111111 text text file.txt", fileBase64);
+				
+		// Response
+		httpParamProcessor.translateResponseParameters(response, responseParameters);
 	}
 	
 	

@@ -77,7 +77,7 @@ function connect() {
 					
 					let messageContainer = $("#" + message.id);
 					if (messageContainer.prop("id") == null) {
-						drawMessage(message, "Loading...");
+						drawMessage(message, loadingPlaceholderText);
 					}
 				}
 			}
@@ -339,7 +339,7 @@ function updateAvatar() {
 $(document).ready(function() {
 	
 	$(document).keypress(function (e) {
-	    if (e.which == 13) {
+	    if (e.which == 13) { ////!!!!! сюда вписать проверку: пусто ли поле ввода контакта
 	    	sendMessage();
 	    }
 	});
@@ -372,6 +372,23 @@ $(document).ready(function() {
 	// Click on attach icon
 	$("#attach").click(function() {
 		chooseImage();
+	});
+	
+	// Click on the file
+	$("body").on("click", ".file-message .message-box", function () {
+		
+		let messageContainer = $(this).parent();
+		let currentDate = messageContainer.children(".date").text();
+		if (currentDate == loadingPlaceholderText || currentDate == sendingPlaceholderText) {
+			
+			showPopUp("Please wait until file is downloaded");
+		
+		} else {
+			
+			let path = messageContainer.children(".path-text").text();
+			let filename = messageContainer.children(".message-box").children(".filename").text();
+			getFile(path, filename);
+		}
 	});
 	
 	// Click on any space

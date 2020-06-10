@@ -15,20 +15,9 @@
 
 	<h2 th:utext="${username}"></h2>
 	
+	<input type="file" class="invisible" id="file-input" name="file-input" />
+	
 	<button onclick="test()">Test</button>
-	
-	<!-- <img th:src="${imageSource}"> -->
-	<img height=200px th:src="@{'/user-avatar'}">
-	
-	Some personal content
-	
-	<form method="POST" enctype="multipart/form-data" id="fileUploadForm">           
-	    Profile picture: <input type="file" name="files"/><br /> 
-	    <input type="submit" value="Submit" id="submitButton"/>
-	</form>
-	
-	<h2>Image from server</h2>
-	<img id="imgsrv" height=200px />
 	
 </body>
 </html>

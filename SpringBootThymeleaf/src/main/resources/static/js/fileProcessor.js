@@ -1,9 +1,10 @@
 
-
-function test() {
+function getFile(path, filename) {
 	
 	let pathData = {};
-	let url = "/test";
+	let ext = getFileExt(filename);
+	pathData[path] = path;
+	let url = "/get-files";
     let userJson = JSON.stringify(pathData);
 	
 	    $.ajax
@@ -15,11 +16,9 @@ function test() {
 	        success: function(response)
 	    	{
 	        	
-	        	let arrayBuffer = base64ToArrayBuffer(response["id1111111 text text file.txt"]);
-	        	saveByteArray("Sample Report.txt", arrayBuffer);
-	        	
-	        	//console.log(response["id1111111 text text file.txt"]);
-	    	}	
+	        	let arrayBuffer = base64ToArrayBuffer(response[path]);
+	        	saveByteArray(filename, arrayBuffer, ext);
+	    	}
 	    });
 	
 }
@@ -36,12 +35,16 @@ function base64ToArrayBuffer(base64) {
     return bytes;
 }
 
-function saveByteArray(reportName, byte) {
+function saveByteArray(filename, byte, ext) {
 	
-    var blob = new Blob([byte], {type: "application/txt"});
+    var blob = new Blob([byte], {type: "application/" + ext});
     var link = document.createElement('a');
     link.href = window.URL.createObjectURL(blob);
-    var fileName = reportName;
-    link.download = fileName;
+    link.download = filename;
     link.click();
 };
+
+function getFileExt(filename) {
+	
+	return filename.split(".").pop().toLowerCase();
+}

@@ -1,6 +1,8 @@
 
 let imagePlaceholderSource = "http://aconsultant.ru/wp-content/uploads/2020/06/img_148071.png";
 let fileIconSource = "http://aconsultant.ru/wp-content/uploads/2020/06/attach-file.png";
+let loadingPlaceholderText = "Loading...";
+let sendingPlaceholderText = "Sending...";
 
 function drawMessage(message, datePlaceholder = null) {
 	
@@ -165,7 +167,7 @@ function sendImage() {
 		
 		// Create and draw message
 		let message = new Message(username, contact, code, "", filename);
-		drawMessage(message, "Sending...");
+		drawMessage(message, sendingPlaceholderText);
 		//return;
 		// Set uploaded image as a source
 		if (code == 1) {
@@ -216,7 +218,7 @@ function updateMessageImages() {
 		}
 	});
 	
-    let url = "/get-images";
+    let url = "/get-files";
     let userJson = JSON.stringify(pathData);
 	
     // Send ajax query
