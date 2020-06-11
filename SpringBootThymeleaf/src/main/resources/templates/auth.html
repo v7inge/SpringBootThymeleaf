@@ -43,10 +43,10 @@
       <input type="text" id="login" name="username" placeholder="username" />
       <input type="password" id="password" name="password" placeholder="password" />
       <input type="submit" id="login_button" value="Sign In" />
-      <!-- <div class="checkbox">
-      <input class="custom-checkbox" type="checkbox" id="rememberMe" name="rememberMe" th:field="*{remember}" checked />
-      <label for="rememberMe">Remember me</label>
-      </div> -->
+      <div class="checkbox">
+	      <input class="custom-checkbox" type="checkbox" id="remember-me" name="remember-me" checked />
+	      <label for="remember-me">Remember me</label>
+      </div>
     </form>
     
     <form id="form_signup" class="invisible" th:object="${authForm}" th:action="@{/register}" method="POST">
@@ -56,12 +56,10 @@
       <input id = "reg_password_repeat" type="password" placeholder="please, repeat password" onchange ="passwordInputChange()" />
       <div id = "reg_password_tip"></div>
       <input type="submit" class="inactive-input" id="reg_button" value="Sign up" />
-      <!--
       <div class="checkbox">
-      <input class="custom-checkbox" type="checkbox" id="rememberMe" name="rememberMe" th:field="*{remember}" checked />
-      <label for="rememberMe">Remember me</label>
+	      <input class="custom-checkbox" type="checkbox" id="remember-me-reg" name="remember-me" checked />
+	      <label for="remember-me-reg">Remember me</label>
       </div>
-      -->
     </form>
 
   </div>
