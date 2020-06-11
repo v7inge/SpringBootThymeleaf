@@ -166,12 +166,10 @@ public class MainController {
 	@RequestMapping(value = { "/auth" }, method = RequestMethod.GET)
 	public String authGet(Model model, Principal principal) {
 		
-		String userName = "no user";
 		if (principal != null) {
-			userName = principal.getName();
+			return "redirect:/";
 		}
- 
-        model.addAttribute("message", userName);
+		
 		model.addAttribute("authForm", new AuthForm());
 
 		return "auth";
@@ -346,27 +344,29 @@ public class MainController {
 		MultipartFile file = request.getFile("file");
 		String fileName = file.getOriginalFilename();
 		String filePath = id + " " + fileName;
+		int code = Integer.parseInt(request.getParameter("code"));
+		int readyCode = (code == 1) ? 2 : 5;
 		
-		// Build message with code 1: image loading
-		Message message = new Message(username, contact, milliseconds, "", filePath, fileName, 1, id);
+		// Build message
+		Message message = new Message(username, contact, milliseconds, "", filePath, fileName, code, id);
 		
-		// Firstly notify that there's an image loading
+		// Firstly notify that there's a file uploading
 		messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
 		messagingTemplate.convertAndSendToUser(contact, "/queue/reply", message);
 		
 		// Store file in cache
 		storeFileInCache(filePath, file);
 		
-		// Notify that it's time to update image sources
-		message.setCode(2);
+		// Notify that the file is ready
+		message.setCode(readyCode);
 		messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
 		messagingTemplate.convertAndSendToUser(contact, "/queue/reply", message);
 		
 		// Save uploaded picture // #refactor make a thread
-		fileProcessor.saveFile(file, filePath, fileProcessor.imageExtensions());
+		fileProcessor.saveFile(file, filePath);
 		
 		// Save massage to database with minor thread priority
-		message.setCode(1);
+		message.setCode(code);
         MessageSaveThread messageSaveThread = new MessageSaveThread(message, this.databaseAccess);
         messageSaveThread.setPriority(3);
         messageSaveThread.start();

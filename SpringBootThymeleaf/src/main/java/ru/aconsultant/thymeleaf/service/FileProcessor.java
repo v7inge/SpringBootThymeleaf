@@ -90,6 +90,8 @@ public class FileProcessor {
 	        }
 	    } catch (IOException ex) {
 	        ex.printStackTrace();
+	    } finally {
+	    	busy = false;
 	    }
 	}
 	
@@ -180,7 +182,7 @@ public class FileProcessor {
 	
 	public static boolean filePassesFilter(MultipartFile file, List<String> extensions) {
 		
-		if (extensions.size() == 0) {
+		if (extensions == null || extensions.size() == 0) {
 			return true;
 		}
 		
@@ -214,7 +216,8 @@ public class FileProcessor {
 		       	ftpClient.completePendingCommand();
 	        }
         } catch (IOException e) {
-        	busy = false;
+        	System.out.println(e);
+        	disconnectFromFTP();
         }
         busy = false;
         return result;
@@ -243,6 +246,12 @@ public class FileProcessor {
 	}
 	
 	
+	public boolean saveFile(MultipartFile file, String filename) throws IOException, InterruptedException {
+		
+        return saveFile(file, filename, null, false);
+	}
+	
+	
 	public boolean saveFile(MultipartFile file, String filename, List<String> extensions) throws IOException, InterruptedException {
 		
         return saveFile(file, filename, extensions, false);
@@ -250,6 +259,8 @@ public class FileProcessor {
 	
 	
 	public boolean saveFile(MultipartFile file, String filename, List<String> extensions, boolean cropAvatar) throws IOException, InterruptedException {
+		
+		boolean complete = false;
 		
         if (file.isEmpty()) {
 	    	return false;
@@ -262,15 +273,25 @@ public class FileProcessor {
         
         connectToFTP();
 		byte[] bytes = file.getBytes();
-		OutputStream outputStream = ftpClient.storeFileStream(filename);
 		
-		if (cropAvatar) {
-			bytes = cropImageSquare(bytes);
+		try {
+			OutputStream outputStream = ftpClient.storeFileStream(filename);
+			
+			if (cropAvatar) {
+				bytes = cropImageSquare(bytes);
+			}
+			
+			outputStream.write(bytes);
+			outputStream.close();
+			complete = ftpClient.completePendingCommand();
+			
+		} catch (IOException e) {
+			
+			System.out.println(e);
+        	disconnectFromFTP();
+        	complete = false;
 		}
 		
-		outputStream.write(bytes);
-		outputStream.close();
-		boolean complete = ftpClient.completePendingCommand();
 		busy = false;
 		return complete;
 	}

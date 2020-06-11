@@ -1,5 +1,5 @@
 
-function getFile(path, filename) {
+function getFile(path, filename, messageContainer = null) {
 	
 	let pathData = {};
 	let ext = getFileExt(filename);
@@ -18,6 +18,9 @@ function getFile(path, filename) {
 	        	
 	        	let arrayBuffer = base64ToArrayBuffer(response[path]);
 	        	saveByteArray(filename, arrayBuffer, ext);
+	        	if (messageContainer != null) {
+	        		setMessageDateText(messageContainer);
+	        	}
 	    	}
 	    });
 	

@@ -3,6 +3,8 @@ let imagePlaceholderSource = "http://aconsultant.ru/wp-content/uploads/2020/06/i
 let fileIconSource = "http://aconsultant.ru/wp-content/uploads/2020/06/attach-file.png";
 let loadingPlaceholderText = "Loading...";
 let sendingPlaceholderText = "Sending...";
+let uploadingPlaceholderText = "Uploading...";
+let downloadingPlaceholderText = "Downloading...";
 
 function drawMessage(message, datePlaceholder = null) {
 	
@@ -146,11 +148,11 @@ function chooseImage() {
 function sendImage() {
 	
 	let file = document.getElementById("image_input").files[0];
-	let ext = file.name.split(".").pop().toLowerCase();
 	let username = $("#userName").text();
 	let contact = $("#contactName").text();
 	let code;
-	let filename = "test filename";
+	let filename = file.name;
+	let ext = getFileExt(filename);
 	
 	if(jQuery.inArray(ext, ["exe","rar","zip"]) != -1) {
 		// Not accepted
@@ -167,7 +169,7 @@ function sendImage() {
 		
 		// Create and draw message
 		let message = new Message(username, contact, code, "", filename);
-		drawMessage(message, sendingPlaceholderText);
+		drawMessage(message, uploadingPlaceholderText);
 		//return;
 		// Set uploaded image as a source
 		if (code == 1) {
@@ -179,6 +181,7 @@ function sendImage() {
 		data.append("file", file);
 		data.append("contact", contact);
 		data.append("id", message.id);
+		data.append("code", message.code);
 		data.append("milliseconds", message.milliseconds);
 		
 		$.ajax({

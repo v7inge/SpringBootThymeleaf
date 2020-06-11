@@ -1,7 +1,7 @@
 
 class Message {
 
-  constructor(sender, reciever, code, text, filename) {
+  constructor(sender, reciever, code, text, fileName) {
 	  
 	let milliseconds = Date.now();  
 	  
@@ -11,7 +11,8 @@ class Message {
 	this.milliseconds = milliseconds;
 	this.id = "" + sender[0] + reciever[0] + milliseconds;
 	this.text = text;
-	this.filename = filename;
+	this.fileName = fileName;
+	this.filePath = this.id + " " + fileName;
   }
 }
 
@@ -44,15 +45,19 @@ function connect() {
 			
 			// Broadcast incoming message
 			
+			///////////////////////////////////////////////////////////////
 			if (message.sender == activeContact) {
 				// Message from an active contact
 				
 				if (message.code == 2) {
 					updateMessageImages();
+				} else if (message.code == 5) {
+					updateMessageDate(message);
 				} else {
 					drawMessage(message);
 				}
 				
+			///////////////////////////////////////////////////////////////
 			} else if (message.sender == username && message.reciever == activeContact) {
 				// Message from user himself
 				
@@ -72,13 +77,18 @@ function connect() {
 					updateMessageImages(); // Needed only in case there's no file reader in the browser
 					updateMessageDate(message);
 				
-				} else if (message.code == 1) {
+				} else if (message.code == 1 || message.code == 4) {
 					// Check if we need to draw a message placeholder
 					
 					let messageContainer = $("#" + message.id);
 					if (messageContainer.prop("id") == null) {
-						drawMessage(message, loadingPlaceholderText);
+						drawMessage(message, uploadingPlaceholderText);
 					}
+				
+				} else if (message.code == 5) {
+					// File is uploaded
+					
+					updateMessageDate(message);
 				}
 			}
 		});
@@ -95,7 +105,7 @@ function updateMessageDate(message) {
 	
 	let messageContainer = $("#" + message.id);
 	dateText = formatDate(new Date(message.milliseconds));
-	messageContainer.children(".date").text(dateText);
+	setMessageDateText(messageContainer, dateText);
 }
 
 
@@ -379,15 +389,16 @@ $(document).ready(function() {
 		
 		let messageContainer = $(this).parent();
 		let currentDate = messageContainer.children(".date").text();
-		if (currentDate == loadingPlaceholderText || currentDate == sendingPlaceholderText) {
+		if (currentDate == uploadingPlaceholderText || currentDate == downloadingPlaceholderText) {
 			
 			showPopUp("Please wait until file is downloaded");
 		
 		} else {
 			
+			setMessageDateText(messageContainer, downloadingPlaceholderText);
 			let path = messageContainer.children(".path-text").text();
 			let filename = messageContainer.children(".message-box").children(".filename").text();
-			getFile(path, filename);
+			getFile(path, filename, messageContainer);
 		}
 	});
 	

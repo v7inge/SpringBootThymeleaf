@@ -18,9 +18,10 @@ public class Message {
 	private int code;
 	// null or 0: Plain text message
 	// 1: Image uploading
-	// 2: Image is uploaded and should be downloaded
+	// 2: Image is ready
 	// 3: Plain text is successfully sent
 	// 4: File uploading
+	// 5: File is ready
 	
 	private String id;
 	
