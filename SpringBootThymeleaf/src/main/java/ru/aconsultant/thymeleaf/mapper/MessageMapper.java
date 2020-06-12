@@ -16,14 +16,14 @@ public class MessageMapper implements RowMapper<Message> {
 		date.setTimeInMillis(rs.getTimestamp("DateTime").getTime());
 		
 		String sender = rs.getString("Sender");
-		String reciever = rs.getString("Reciever");
+		String receiver = rs.getString("Receiver");
 		String text = rs.getString("Text");
 		String filePath = rs.getString("FilePath");
 		String fileName = rs.getString("FileName");
 		int code = rs.getInt("Code");
 		String id = rs.getString("id");
 		
-		Message message = new Message(sender, reciever, date, text, filePath, fileName, code, id);
+		Message message = new Message(sender, receiver, date, text, filePath, fileName, code, id);
 		
 		return message;
 	}

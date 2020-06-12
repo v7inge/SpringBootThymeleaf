@@ -109,8 +109,8 @@ public class MainController {
 	@MessageMapping("/message-flow")
     public void broadcast(@Payload Message message, Principal principal) {
 
-		// Send message to the reciever
-        messagingTemplate.convertAndSendToUser(message.getReciever(), "/queue/reply", message);
+		// Send message to the receiver
+        messagingTemplate.convertAndSendToUser(message.getReceiver(), "/queue/reply", message);
 		
 		// Notify user himself
         message.setCode(3);
@@ -334,7 +334,7 @@ public class MainController {
 	}
 	
 	
-	@PostMapping("/send-image")
+	@PostMapping("/send-file")
 	public void sendImage(HttpServletResponse response, Principal principal, MultipartHttpServletRequest request) throws SQLException, IOException, InterruptedException {
 		
 		long milliseconds = Long.parseLong(request.getParameter("milliseconds"));

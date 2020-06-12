@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class Message {
 
 	private String sender;
-	private String reciever;
+	private String receiver;
 	private String text;
 	private String filePath;
 	private long milliseconds;
@@ -29,23 +29,23 @@ public class Message {
 	
 	public Message() {}
 	
-	public Message(String sender, String reciever, Calendar date, String text) {
+	public Message(String sender, String receiver, Calendar date, String text) {
 		this.sender = sender;
-		this.reciever = reciever;
+		this.receiver = receiver;
 		this.text = text;
 		this.milliseconds = date.getTimeInMillis();
 	}
 	
-	public Message(String sender, String reciever, long milliseconds, String text) {
+	public Message(String sender, String receiver, long milliseconds, String text) {
 		this.sender = sender;
-		this.reciever = reciever;
+		this.receiver = receiver;
 		this.text = text;
 		this.milliseconds = milliseconds;
 	}
 	
-	public Message(String sender, String reciever, Calendar date, String text, String filePath, String fileName, int code, String id) {
+	public Message(String sender, String receiver, Calendar date, String text, String filePath, String fileName, int code, String id) {
 		this.sender = sender;
-		this.reciever = reciever;
+		this.receiver = receiver;
 		this.text = text;
 		this.filePath = filePath;
 		this.milliseconds = date.getTimeInMillis();
@@ -54,9 +54,9 @@ public class Message {
 		this.id = id;
 	}
 	
-	public Message(String sender, String reciever, long milliseconds, String text, String filePath, String fileName, int code, String id) {
+	public Message(String sender, String receiver, long milliseconds, String text, String filePath, String fileName, int code, String id) {
 		this.sender = sender;
-		this.reciever = reciever;
+		this.receiver = receiver;
 		this.text = text;
 		this.filePath = filePath;
 		this.milliseconds = milliseconds;
@@ -75,8 +75,8 @@ public class Message {
 		return sender;
 	}
 	
-	public String getReciever() {
-		return reciever;
+	public String getReceiver() {
+		return receiver;
 	}
 	
 	public String getFilePath() {
@@ -113,8 +113,8 @@ public class Message {
 		this.sender = st;
 	}
 	
-	public void setReciever(String st) {
-		this.reciever = st;
+	public void setReceiver(String st) {
+		this.receiver = st;
 	}
 	
 	public void setText(String st) {

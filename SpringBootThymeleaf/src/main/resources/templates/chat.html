@@ -17,11 +17,12 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="/webjars/sockjs-client/sockjs.min.js"></script>
 	<script src="/webjars/stomp-websocket/stomp.min.js"></script>
-	<script src="/js/chat.js"></script>
+	<script src="/js/main.js"></script>
 	<script src="/js/contactSearch.js"></script>
-	<script src="/js/imageMessages.js"></script>
+	<script src="/js/images.js"></script>
 	<script src="/js/pop-up.js"></script>
 	<script src="/js/fileProcessor.js"></script>
+	<script src="/js/service.js"></script>
 	
 	<link type="text/css" rel="stylesheet" data-th-href="@{css/style.css}" />
 	
@@ -32,10 +33,9 @@
 	<button onclick="showPopUp()">Test</button>
 	
 	<input type="file" class="invisible" id="avatar_input" name="avatar_input" />
-	<input type="file" class="invisible" id="image_input" name="image_input" />​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
+	<input type="file" class="invisible" id="file-input" name="file-input" />​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
 	
 	<div class="invisible" id="userName" th:utext="${user.username}"></div>
-	<div class="invisible" id="contactName"></div>
 	
 	<div class="pop-up" style="bottom:5px;">
 		<div class = "text"></div>

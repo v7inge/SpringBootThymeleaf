@@ -1,37 +1,44 @@
 
+let imagePlaceholderSource = "http://aconsultant.ru/wp-content/uploads/2020/06/img_148071.png";
+let fileIconSource = "http://aconsultant.ru/wp-content/uploads/2020/06/attach-file.png";
+let uploadingPlaceholderText = "Uploading...";
+let downloadingPlaceholderText = "Downloading...";
+
+let userName;
+let contactName;
+
 class Message {
 
-  constructor(sender, reciever, code, text, fileName) {
+  constructor(sender, receiver, code, text, fileName) {
 	  
 	let milliseconds = Date.now();  
 	  
 	this.sender = sender;
-	this.reciever = reciever;
+	this.receiver = receiver;
 	this.code = code;
 	this.milliseconds = milliseconds;
-	this.id = "" + sender[0] + reciever[0] + milliseconds;
+	this.id = "" + sender[0] + receiver[0] + milliseconds;
 	this.text = text;
 	this.fileName = fileName;
 	this.filePath = this.id + " " + fileName;
   }
 }
 
-function test() {
-	
 
+function onLoad() {
 	
+	userName = $("#userName").text();
+	connect();
 }
 
 
-
-function onLoad() {
-	connect();
+function disconnect(){
+	stompClient.disconnect();
 }
 
 
 function connect() {
 	
-	let sender = $("#userName").text();
 	var socket = new SockJS("/chat-messaging");
 	stompClient = Stomp.over(socket);
 	stompClient.connect({}, function (frame) {
@@ -40,13 +47,10 @@ function connect() {
 			
 			var message = JSON.parse(data.body);
 			
-			let activeContact = $("#contactName").text();
-			let username = $("#userName").text();
-			
 			// Broadcast incoming message
 			
 			///////////////////////////////////////////////////////////////
-			if (message.sender == activeContact) {
+			if (message.sender == contactName) {
 				// Message from an active contact
 				
 				if (message.code == 2) {
@@ -58,7 +62,7 @@ function connect() {
 				}
 				
 			///////////////////////////////////////////////////////////////
-			} else if (message.sender == username && message.reciever == activeContact) {
+			} else if (message.sender == userName && message.receiver == contactName) {
 				// Message from user himself
 				
 				if (message.code == 3) {
@@ -96,128 +100,101 @@ function connect() {
 }
 
 
-function disconnect(){
-	stompClient.disconnect();
-}
-
-
-function updateMessageDate(message) {
+function drawMessage(message, datePlaceholder = null) {
 	
-	let messageContainer = $("#" + message.id);
-	dateText = formatDate(new Date(message.milliseconds));
-	setMessageDateText(messageContainer, dateText);
-}
-
-
-function setMessageDateText(messageContainer, dateText = null) {
+	let side = getMessageSide(message);
 	
-	// Create date text from milliseconds
-	if (dateText == null) {
-		
-		let ms = +messageContainer.children(".ms_container").text();
-		dateText = formatDate(new Date(ms));
+	let messages = document.getElementById("messages");
+	
+	// Create message container
+	let messageContainer = document.createElement("li");
+	messageContainer.id = message.id;
+	messageContainer.classList.add("message-container");
+	
+	// Define message category
+	if (message.code == 1) {
+		messageContainer.classList.add("image-message");
+	} else if (message.code == 4) {
+		messageContainer.classList.add("file-message");
 	}
 	
-	let dateContainer = messageContainer.children(".date");
-	dateContainer.text(dateText);
-}
-
-
-function formatDate(date) {
-
-	  let day = date.getDate();
-	  if (day < 10) day = "0" + day;
-
-	  let month = date.getMonth() + 1;
-	  if (month < 10) month = "0" + month;
-
-	  let year = date.getFullYear();
-
-	  let hour = date.getHours();
-	  
-	  let minute = date.getMinutes();
-	  if (minute < 10) minute = "0" + minute;
-	  
-	  return day + "." + month + "." + year + " " + hour + ":" + minute;
-}
-
-
-function resetCounter(str) {
-
-	let el = findContact(str);
-	if (el != null) {
+	// Store message milliseconds
+	let msContainer = document.createElement("div");
+	msContainer.classList.add("invisible");
+	msContainer.classList.add("ms_container");
+	msContainer.appendChild(document.createTextNode(message.milliseconds));
+	messageContainer.appendChild(msContainer);
 	
-		let counterElement = $(el).children(".counter");
-
-		if(counterElement.hasClass("invisible") == false) {
-			counterElement.toggleClass("invisible");
-		}
-
-		counterElement.text("");
-
-	};
-}
-
-
-function findContact(str) {
-
-	let contact = null;
-
-	$(".contact").each(function (index, el) {
-
-		if (getContactName(el) == str) {
-			contact = el;	
-			return false;
-		}
-
-	});
-
-	return contact;
-}
-
-
-function getContactName(el) {
-	return $(el).children(".contact-name").text();	
-}
-
-
-function getContactCounter(el) {
-	let counterElement = $(el).children(".counter");
-	let counterNumber = Number(counterElement.text());
-	return counterNumber;
-}
-
-
-function increaseCounter(str, num = 1) {
-
-	let el = findContact(str);
-	if (el != null) {
+	// Store file path
+	if (message.code == 1 || message.code == 4) {
+		let pathContainer = document.createElement("div");
+		pathContainer.classList.add("invisible");
+		pathContainer.classList.add("path-text");
+		pathContainer.appendChild(document.createTextNode(message.filePath));
+		messageContainer.appendChild(pathContainer);
+	}
 	
-		let counterElement = $(el).children(".counter");
-
-		if(counterElement.hasClass("invisible")) {
-			counterElement.toggleClass("invisible");
-		}
-
-		let counterNumber = Number(counterElement.text());
-		counterElement.text(counterNumber + num);
-
-	};
+	// Create message box
+	let messageBox = document.createElement("div");
+	messageBox.classList.add("message-box");
+	messageBox.classList.add("m-" + side);
+	
+	// Create image placeholder
+	if (message.code == 1) {
+		let img = document.createElement("img");
+		img.src = imagePlaceholderSource;
+		messageBox.appendChild(img);
+	}
+	
+	// Create file icon
+	if (message.code == 4) {
+		let img = document.createElement("img");
+		img.src = fileIconSource;
+		messageBox.appendChild(img);
+	}
+	
+	// Add message text
+	if (message.code == 0 || message.code == null) {
+		messageBox.appendChild(document.createTextNode(message.text));
+	} else if (message.code == 4) {
+		let filenameContainer = document.createElement("div");
+		filenameContainer.classList.add("filename");
+		filenameContainer.appendChild(document.createTextNode(message.fileName));
+		messageBox.appendChild(filenameContainer);
+	}
+	
+	// Append message box to a message container
+	messageContainer.appendChild(messageBox);
+	
+	// Create date
+	let dateText;
+	if (datePlaceholder == null) {
+		dateText = formatDate(new Date(message.milliseconds));
+	} else {
+		dateText = datePlaceholder;
+	}
+	let dateContainer = document.createElement("div");
+	dateContainer.classList.add("date");
+	dateContainer.classList.add(side);
+	dateContainer.appendChild(document.createTextNode(dateText));
+	messageContainer.appendChild(dateContainer);
+	
+	// Append to a message list
+	messages.appendChild(messageContainer);
+	scrollDown();
 }
 
 
 function sendMessage() {
 	
-	let sender = $("#userName").text();
-	let reciever = $("#contactName").text();
 	let text = $("#message_input_value").val();
 	
-	if ((reciever == "") || (text == "")) {
+	if ((contactName == "") || (text == "")) {
 		return;
 	}
 	
 	// Build and draw it
-	let message = new Message(sender, reciever, 0, text);
+	let message = new Message(userName, contactName, 0, text);
 	drawMessage(message, "Sending...");
 	
 	// Send message
@@ -227,15 +204,56 @@ function sendMessage() {
 }
 
 
-function getMessageSide(message) {
+function sendFile() {
 	
-	let side = "";
-	if (message.sender == $("#userName").text()) {
-		side = "right";
+	let file = document.getElementById("file-input").files[0];
+	let code;
+	let filename = file.name;
+	let ext = getFileExt(filename);
+	
+	if(jQuery.inArray(ext, ["exe","rar","zip"]) != -1) {
+		// Not accepted
+		
+		showPopUp("Sorry, .exe and archives are not accepted.");
+	
 	} else {
-		side = "left";
+		
+		if (jQuery.inArray(ext, ["png","jpg","jpeg"]) != -1) {
+			code = 1; // Send as image
+		} else {
+			code = 4; // Send as file
+		}
+		
+		// Create and draw message
+		let message = new Message(userName, contactName, code, "", filename);
+		drawMessage(message, uploadingPlaceholderText);
+		
+		// Set uploaded image as a source
+		if (code == 1) {
+			updateMessageImageByFile(message.id, file);
+		}
+		
+		// Send to the server
+		let data = new FormData();
+		data.append("file", file);
+		data.append("contact", contactName);
+		data.append("id", message.id);
+		data.append("code", message.code);
+		data.append("milliseconds", message.milliseconds);
+		
+		$.ajax({
+	        type: "POST",
+	        url: "/send-file",
+	        data: data,
+	        processData: false,
+	        contentType: false,
+	        cache: false,
+	        dataType: "json",
+	        timeout: 1000000
+	    });		
 	}
-	return side;
+	
+	document.getElementById("file-input").value = "";
 }
 
 
@@ -256,23 +274,13 @@ function outputMessageHistory(data) {
 }
 
 
-function getText(el) {
-	
-	let text = el.contents().filter(function() {
-		  return this.nodeType == Node.TEXT_NODE;
-		}).text();
-	return text;
-}
-
-
 function contactClick(contactElement) {
 
 	// Counter
 	let contactCounter = getContactCounter(contactElement);
 	let needToResetCounter = (contactCounter != 0);
 	
-	let contactName = getContactName(contactElement);
-	$("#contactName").text(contactName);
+	contactName = getContactName(contactElement);
 
 	// Changing styles and content
 	resetCounter(contactName);
@@ -306,11 +314,6 @@ function contactClick(contactElement) {
     });
 	
 	scrollDown();
-}
-
-
-function scrollDown() {
-	$("#messages").scrollTop($("#messages")[0].scrollHeight);
 }
 
 
@@ -349,7 +352,7 @@ function updateAvatar() {
 $(document).ready(function() {
 	
 	$(document).keypress(function (e) {
-	    if (e.which == 13) { ////!!!!! сюда вписать проверку: пусто ли поле ввода контакта
+	    if (e.which == 13 && $("#message_input_value").is(":focus")) {
 	    	sendMessage();
 	    }
 	});
@@ -381,7 +384,7 @@ $(document).ready(function() {
 
 	// Click on attach icon
 	$("#attach").click(function() {
-		chooseImage();
+		chooseFile();
 	});
 	
 	// Click on the file
@@ -417,9 +420,9 @@ $(document).ready(function() {
 		updateAvatar();		
 	});
 	
-	// Image file chosen
-	$(document).on("change", "#image_input", function() {
-		sendImage();		
+	// File chosen
+	$(document).on("change", "#file-input", function() {
+		sendFile();		
 	});
 	
 });
