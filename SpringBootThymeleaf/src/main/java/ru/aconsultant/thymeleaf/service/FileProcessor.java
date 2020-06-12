@@ -55,6 +55,7 @@ public class FileProcessor {
 			
 			if (i >= attempts) {
 				System.out.println("Error connecting to FTP: it's busy for a long time.");
+				disconnectFromFTP();
 				break;
 			}
 			
@@ -105,8 +106,7 @@ public class FileProcessor {
 	    }
 		
 		// Check if it's an image
-		List<String> extensions = Arrays.asList("jpg", "jpeg", "png");
-		if (!filePassesFilter(file, extensions)) {
+		if (!filePassesFilter(file, imageExtensions())) {
         	System.out.println("File did not pass the filter");
         	return;
         }
@@ -135,30 +135,6 @@ public class FileProcessor {
 		
 		MultipartFile file = files[0];
 		saveUserBase64Image(user, file);
-	}
-	
-	
-	public void saveUserAvatar(String username, MultipartFile[] files) throws IOException, SQLException, InterruptedException {
-		
-		List<String> extensions = Arrays.asList("jpg", "jpeg", "png");
-		
-		String fileName = saveUploadedFile(files[0], extensions, true);
-		if (fileName == "") {
-			System.out.println("Error occured during file uploading to FTP");
-		} else {
-			databaseAccess.setUserAvatar(username, fileName);
-		}
-	}
-	
-	
-	public byte[] getUserAvatar(String username) throws SQLException, IOException, InterruptedException {
-		
-		String filename = databaseAccess.getUserAvatarPath(username);
-		if (filename == "" || filename == null) {
-			return null;
-		} else {
-			return getBytesFromFTP(filename);
-		}
 	}
 	
 	
@@ -295,35 +271,6 @@ public class FileProcessor {
 		busy = false;
 		return complete;
 	}
-	
-	
-	// #refactor merge 2 different save functions
-	public String saveUploadedFile(MultipartFile file, List<String> extensions, boolean cropAvatar) throws IOException, InterruptedException {
-		
-		String fileName = "";
-        if (file.isEmpty()) {
-	    	return fileName;
-	    }
-        
-        if (!filePassesFilter(file, extensions)) {
-        	System.out.println("File did not pass the filter");
-        	return fileName;
-        }
- 
-        connectToFTP();
-		byte[] bytes = file.getBytes();        
-		fileName = System.currentTimeMillis() + " " + file.getOriginalFilename();
-		OutputStream outputStream = ftpClient.storeFileStream(fileName);
-		
-		if (cropAvatar) {
-			bytes = cropImageSquare(bytes);
-		}
-		
-		outputStream.write(bytes);
-		outputStream.close();
-		busy = false;
-        return fileName;
-    }
 	
 	
 	private byte[] cropImageSquare(byte[] image) throws IOException {        

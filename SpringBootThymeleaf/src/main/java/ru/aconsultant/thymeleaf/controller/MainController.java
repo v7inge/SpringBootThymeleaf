@@ -163,7 +163,7 @@ public class MainController {
 	}
 	
 	
-	@RequestMapping(value = { "/auth" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "/login" }, method = RequestMethod.GET)
 	public String authGet(Model model, Principal principal) {
 		
 		if (principal != null) {
@@ -172,7 +172,7 @@ public class MainController {
 		
 		model.addAttribute("authForm", new AuthForm());
 
-		return "auth";
+		return "login";
 	}
 	
 	
@@ -263,22 +263,6 @@ public class MainController {
 	}
 	
 	
-	// Unused in product, used as testing method
-	@GetMapping("/user-avatar")
-	public @ResponseBody byte[] getUserAvatar() throws IOException, SQLException {
-		
-		return null;
-		//return fileProcessor.getMultipleFilesFromFTP();
-	}
-	
-	
-	// Unused in product, used as testing method
-	@PostMapping("/testload")
-	public void testLoad(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		
-	}
-	
-	
 	@PostMapping("/get-files")
 	public void getImages(HttpServletResponse response, HttpServletRequest request, Principal principal) throws IOException, InterruptedException {
 		
@@ -314,12 +298,11 @@ public class MainController {
 		for (Map.Entry<String, Object> entry : filesFromFTP.entrySet()) {
 			
 			storeFileInCache(entry.getKey(), entry.getValue().toString());
-		}
-		
+		}	
 	}
 	
 	
-	@PostMapping("/profile-picture")
+	@PostMapping("/set-profile-picture")
 	public void profilePictureUpload(HttpServletResponse response, Principal principal, MultipartHttpServletRequest request) throws SQLException, IOException {
 		
 		// Saving uploaded picture

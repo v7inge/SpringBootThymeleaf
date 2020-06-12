@@ -331,7 +331,7 @@ function updateAvatar() {
 		
 		$.ajax({
 	        type: "POST",
-	        url: "/profile-picture",
+	        url: "/set-profile-picture",
 	        data: data,
 	        processData: false,
 	        contentType: false,
