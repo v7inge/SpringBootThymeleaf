@@ -12,6 +12,7 @@ import java.security.Principal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,6 +43,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -78,7 +81,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.util.Base64;
 
 @Controller
-@SessionAttributes({"loginedUser","testUser"})
+//@SessionAttributes("currentContact") //({"loginedUser","testUser"})
 public class MainController {
 	
 	@Autowired
@@ -102,23 +105,34 @@ public class MainController {
 	private HashMap<String, String> fileCache = new HashMap<String, String>();
 	private static int fileCacheSize = 10;
 	
+	/*@ModelAttribute("currentContact")
+	public String setUpcurrentContact() {
+		return null;
+	}*/
+	
+	@Autowired
+	FindByIndexNameSessionRepository<? extends Session> sessions;
+	
 	// How to get principal as a user:
 	//User loginedUser = (User) ((Authentication) principal).getPrincipal();
 	
 	
 	@MessageMapping("/message-flow")
     public void broadcast(@Payload Message message, Principal principal) {
-
+		
+		String sender = principal.getName();
+		String receiver = message.getReceiver();
+		
 		// Send message to the receiver
-        messagingTemplate.convertAndSendToUser(message.getReceiver(), "/queue/reply", message);
+        messagingTemplate.convertAndSendToUser(receiver, "/queue/reply", message);
 		
 		// Notify user himself
         message.setCode(3);
-		String username = principal.getName();
-		messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
+		messagingTemplate.convertAndSendToUser(sender, "/queue/reply", message);
 		
-        // Save massage to database with minor thread priority
+        // Save massage to database with minor thread priority #refactor thread is not needed
 		message.setCode(0);
+		message.setNewOne( !receiverIsFocusedOnTheSender(sender, receiver) );
         MessageSaveThread messageSaveThread = new MessageSaveThread(message, this.databaseAccess);
         messageSaveThread.setPriority(3);
         messageSaveThread.start(); 
@@ -126,8 +140,10 @@ public class MainController {
 	
 	
 	@RequestMapping(value = { "/" }, method = RequestMethod.GET)
-	public String chatGet(Model model, Principal principal) throws SQLException, InvalidResultSetAccessException, IOException {
+	public String chatGet(Model model, Principal principal, HttpServletRequest request) throws SQLException, InvalidResultSetAccessException, IOException {
  		
+		setSessionAttribute(request, "currentContact", null);
+		
 		// Fill contact list
         List<Contact> contactList = databaseAccess.userContactList(principal.getName());
         int indexLast = contactList.size() - 1;
@@ -145,18 +161,21 @@ public class MainController {
 	public void contactClick(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
 		
 		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
-		String contact = (String) requestParameters.get("contact");
+		
+		String currentContact = (String) requestParameters.get("contact");
+		setSessionAttribute(request, "currentContact", currentContact);
+		
 		String userName = principal.getName();
 		
-		List<Message> history = databaseAccess.getHistory(userName, contact);
+		List<Message> history = databaseAccess.getHistory(userName, currentContact);
 		
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("contactHistory", history);
 		httpParamProcessor.translateResponseParameters(response, map);
 		
-		// Reset message counter with minor thread priority
+		// Reset message counter with minor thread priority #refactor we don't need a thread here
         if ((boolean) requestParameters.get("needToResetCounter")) {
-        	CounterResetThread counterResetThread = new CounterResetThread(userName, contact, this.databaseAccess);
+        	CounterResetThread counterResetThread = new CounterResetThread(userName, currentContact, this.databaseAccess);
         	counterResetThread.setPriority(3);
         	counterResetThread.start();
         }
@@ -404,5 +423,26 @@ public class MainController {
 		fileCache.put(filename, base64);
 	}
 	
+	private void setSessionAttribute(HttpServletRequest request, String name, String value) {
+		
+		HttpSession session = request.getSession(true);
+	    session.setAttribute(name, value);
+	}
+	
+	private boolean receiverIsFocusedOnTheSender(String sender, String receiver) {
+		
+		boolean focused = false;
+		
+		Collection<? extends Session> usersSessions = this.sessions.findByPrincipalName(receiver).values();
+		for (Session s : usersSessions) {
+			
+			if (s.getAttribute("currentContact") != null && s.getAttribute("currentContact").equals(sender)) {
+				focused = true;
+				break;
+			}
+		}
+		
+		return focused;
+	}
 	
 }

@@ -8,20 +8,25 @@ let userName;
 let contactName;
 
 class Message {
-
-  constructor(sender, receiver, code, text, fileName) {
+	
+	constructor(sender, receiver, code, text, fileName = null) {
 	  
-	let milliseconds = Date.now();  
-	  
-	this.sender = sender;
-	this.receiver = receiver;
-	this.code = code;
-	this.milliseconds = milliseconds;
-	this.id = "" + sender[0] + receiver[0] + milliseconds;
-	this.text = text;
-	this.fileName = fileName;
-	this.filePath = this.id + " " + fileName;
-  }
+		let milliseconds = Date.now();  
+		  
+		this.sender = sender;
+		this.receiver = receiver;
+		this.code = code;
+		this.milliseconds = milliseconds;
+		this.id = "" + sender[0] + receiver[0] + milliseconds;
+		this.text = text;
+		this.fileName = fileName;
+		
+		if (fileName == null) {
+			this.filePath = null;
+		} else {
+			this.filePath = this.id + " " + fileName;
+		}
+	}
 }
 
 
@@ -93,7 +98,13 @@ function connect() {
 					// File is uploaded
 					
 					updateMessageDate(message);
-				}
+				}	
+			
+			///////////////////////////////////////////////////////////////
+			} else {
+				// Message from an other contact
+				
+				increaseCounter(message.sender);
 			}
 		});
 	});
@@ -282,21 +293,27 @@ function contactClick(contactElement) {
 	
 	contactName = getContactName(contactElement);
 
-	// Changing styles and content
+	// Update contact list
 	resetCounter(contactName);
 	contacts = $(".contact-active");
 	contacts.removeClass();
 	contacts.toggleClass("contact");
 	contactElement.removeClass();
 	contactElement.toggleClass("contact-active");
-	$("#messages").html("");
-
+	
 	// Hide tip table
 	tipTable = $(".tdcenter");
 	tipTable.removeClass();
 	tipTable.html("");
+	
+	// Show messages
+	$("#messages").html("");
+	$("#messages").removeClass("invisible");
 
-	// Filling data
+	// Show bottom panel
+	$(".bottom_wrapper").removeClass("invisible");
+
+	// Fill data
 	let userData = {"contact": contactName, "needToResetCounter": needToResetCounter};
     let url = "/contact-clicked";
     let userJson = JSON.stringify(userData);

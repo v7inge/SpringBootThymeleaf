@@ -24,6 +24,7 @@ public class Message {
 	// 5: File is ready
 	
 	private String id;
+	private boolean newOne;
 	
 	// --- CONSTRUCTORS --- //
 	
@@ -107,6 +108,10 @@ public class Message {
 		return fileName;
 	}
 	
+	public boolean getNewOne() {
+		return newOne;
+	}
+	
 	// --- SET --- //
 	
 	public void setSender(String st) {
@@ -139,6 +144,10 @@ public class Message {
 	
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+	
+	public void setNewOne(boolean newOne) {
+		this.newOne = newOne;
 	}
 	
 	// --- OTHER --- //

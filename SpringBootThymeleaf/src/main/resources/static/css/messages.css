@@ -11,7 +11,7 @@
 	clear: both;
 	/*display: block;*/
   	display: inline-flex;
-	color:#222222;
+	color: var(--dark-text);
 	padding:6px;
 	overflow: auto;
   	margin-bottom: 3px;

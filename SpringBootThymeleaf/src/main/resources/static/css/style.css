@@ -10,6 +10,7 @@
   --dark-text: #222222;
   --deep-blue: #63ADD0;
   --light-blue: #e0ecfe;
+  --dark-text: #222222;
 }
 
 .light-gray {
@@ -48,7 +49,7 @@
 }
 
 .chat_inner_window .tdcenter {
-  height: calc(100% - 70px);
+  height: 100%;
   vertical-align: middle;
   width: 100%;
   text-align: center; 

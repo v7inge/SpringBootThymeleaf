@@ -65,7 +65,7 @@
   box-sizing: border-box;
   width: calc(100% - 40px);
   outline-width: 0;
-  color: gray;
+  color: var(--dark-text);
 }
 
 .bottom-block.block3 {
