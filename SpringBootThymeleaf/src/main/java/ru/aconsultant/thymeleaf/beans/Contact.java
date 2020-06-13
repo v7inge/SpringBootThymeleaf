@@ -3,10 +3,6 @@ package ru.aconsultant.thymeleaf.beans;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
-import ru.aconsultant.thymeleaf.service.FileProcessor;
-
 public class Contact {
 	
 	public String username;

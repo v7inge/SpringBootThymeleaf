@@ -1,48 +1,28 @@
 package ru.aconsultant.thymeleaf.controller;
 
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringReader;
 import java.security.Principal;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.jdbc.InvalidResultSetAccessException;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.Session;
 import org.springframework.stereotype.Controller;
@@ -54,34 +34,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttribute;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.context.support.ServletContextResource;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ru.aconsultant.thymeleaf.form.AuthForm;
 import ru.aconsultant.thymeleaf.beans.UserAccount;
 import ru.aconsultant.thymeleaf.beans.Contact;
 import ru.aconsultant.thymeleaf.beans.Message;
 import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
-import ru.aconsultant.thymeleaf.service.CounterResetThread;
 import ru.aconsultant.thymeleaf.service.HttpParamProcessor;
-import ru.aconsultant.thymeleaf.service.MessageSaveThread;
 import ru.aconsultant.thymeleaf.security.PasswordEncoder;
 import ru.aconsultant.thymeleaf.security.UserDetailsServiceImpl;
 import ru.aconsultant.thymeleaf.service.FileProcessor;
 import ru.aconsultant.thymeleaf.form.UploadForm;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.util.Base64;
 
 @Controller
-//@SessionAttributes("currentContact") //({"loginedUser","testUser"})
 public class MainController {
 	
 	@Autowired
@@ -99,16 +68,8 @@ public class MainController {
 	@Autowired
 	private FileProcessor fileProcessor;
 	
-	@Autowired
-    private ServletContext servletContext;
-	
 	private HashMap<String, String> fileCache = new HashMap<String, String>();
 	private static int fileCacheSize = 10;
-	
-	/*@ModelAttribute("currentContact")
-	public String setUpcurrentContact() {
-		return null;
-	}*/
 	
 	@Autowired
 	FindByIndexNameSessionRepository<? extends Session> sessions;
@@ -116,9 +77,8 @@ public class MainController {
 	// How to get principal as a user:
 	//User loginedUser = (User) ((Authentication) principal).getPrincipal();
 	
-	
 	@MessageMapping("/message-flow")
-    public void broadcast(@Payload Message message, Principal principal) {
+    public void broadcast(@Payload Message message, Principal principal) throws SQLException {
 		
 		String sender = principal.getName();
 		String receiver = message.getReceiver();
@@ -130,12 +90,10 @@ public class MainController {
         message.setCode(3);
 		messagingTemplate.convertAndSendToUser(sender, "/queue/reply", message);
 		
-        // Save massage to database with minor thread priority #refactor thread is not needed
+        // Save massage to database
 		message.setCode(0);
 		message.setNewOne( !receiverIsFocusedOnTheSender(sender, receiver) );
-        MessageSaveThread messageSaveThread = new MessageSaveThread(message, this.databaseAccess);
-        messageSaveThread.setPriority(3);
-        messageSaveThread.start(); 
+		databaseAccess.saveMessage(message);
     }
 	
 	
@@ -173,11 +131,9 @@ public class MainController {
 		map.put("contactHistory", history);
 		httpParamProcessor.translateResponseParameters(response, map);
 		
-		// Reset message counter with minor thread priority #refactor we don't need a thread here
-        if ((boolean) requestParameters.get("needToResetCounter")) {
-        	CounterResetThread counterResetThread = new CounterResetThread(userName, currentContact, this.databaseAccess);
-        	counterResetThread.setPriority(3);
-        	counterResetThread.start();
+		// Reset message counter
+        if ((boolean) requestParameters.get("needToResetCounter")) {	
+        	databaseAccess.resetCounter(userName, currentContact);
         }
 	}
 	
@@ -258,19 +214,6 @@ public class MainController {
         	
         databaseAccess.addContact(userName, input);
         databaseAccess.addContact(input, userName);    
-	}
-	
-	
-	@RequestMapping(value = { "/personal" }, method = RequestMethod.GET)
-	public String personalGet(Model model, Principal principal) {
-        
-		
-		
-		model.addAttribute("imageSource", "https://aconsultant.ru/wp-content/uploads/2017/10/development.desktop-512.png");
-		
-		
-		model.addAttribute("username", principal.getName());
-		return "personal";
 	}
 	
 	
@@ -364,14 +307,12 @@ public class MainController {
 		messagingTemplate.convertAndSendToUser(username, "/queue/reply", message);
 		messagingTemplate.convertAndSendToUser(contact, "/queue/reply", message);
 		
-		// Save uploaded picture // #refactor make a thread
+		// Save uploaded picture
 		fileProcessor.saveFile(file, filePath);
 		
-		// Save massage to database with minor thread priority
+		// Save massage to database
 		message.setCode(code);
-        MessageSaveThread messageSaveThread = new MessageSaveThread(message, this.databaseAccess);
-        messageSaveThread.setPriority(3);
-        messageSaveThread.start();
+		databaseAccess.saveMessage(message);
 	}
 	
 	
@@ -423,11 +364,13 @@ public class MainController {
 		fileCache.put(filename, base64);
 	}
 	
+	
 	private void setSessionAttribute(HttpServletRequest request, String name, String value) {
 		
 		HttpSession session = request.getSession(true);
 	    session.setAttribute(name, value);
 	}
+	
 	
 	private boolean receiverIsFocusedOnTheSender(String sender, String receiver) {
 		
