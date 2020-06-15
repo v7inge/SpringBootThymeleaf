@@ -63,12 +63,22 @@ function createContact(contact = null, contactElement = null, found = false, mak
   let classValue = (found) ? "contact found" : "contact";
   let listId = (found) ? "found_contacts" : "contacts";
 
-  // Create element
+  // Create li element
   let newContact = $("<li>", {"class": classValue});
-	
-  newContact.append( $("<img>", {"class": "contact-img", src: imgSrc}) );
+
+  // Create placeholder or image
+  if (contact.base64 == null) {
+	  let placeHolder = $("<div>", {"class": "contact-placeholder a"});
+	  placeHolder.append( $("<div>", {"class": "letter", text: "a"}) );  
+	  newContact.append( placeHolder );
+  } else {
+	  newContact.append( $("<img>", {"class": "contact-img", src: imgSrc}) );
+  }
+  
+  // Create contact name
   newContact.append( $("<div>", {"class": "contact-name", text: name}) );
   
+  // Create counter
   if (!found) {
 	  newContact.append( $("<div>", {"class": "counter invisible"}) );
   }

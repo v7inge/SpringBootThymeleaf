@@ -84,8 +84,8 @@ function updateMessageImages() {
 	        			setMessageDateText($(this));
 	        		}
 	        	});
+	        	scrollDown();
 	    	}	
 	    });
     }
-    scrollDown();
 }
