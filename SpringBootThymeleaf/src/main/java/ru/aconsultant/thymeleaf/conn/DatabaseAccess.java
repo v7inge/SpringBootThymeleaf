@@ -173,10 +173,10 @@ public class DatabaseAccess extends JdbcDaoSupport {
     }
     
     
-    public ArrayList<String> searchForUsers(String input, String username) throws SQLException {
+    public ArrayList<Contact> searchForUsers(String input, String username) throws SQLException {
         
     	String sql = 
-				"SELECT u.USER_NAME FROM APP_USER u \n" +
+				"SELECT u.USER_NAME, u.BASE64IMAGE FROM APP_USER u \n" +
 				"WHERE u.USER_NAME LIKE CONCAT(?, \"%\") \n" +
 				"AND u.USER_NAME NOT IN \n" +
 				"(SELECT chats.Contact FROM PERSONAL_CHATS chats \n" +
@@ -187,9 +187,12 @@ public class DatabaseAccess extends JdbcDaoSupport {
 		
 		try {
 			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
-			ArrayList<String> list = new ArrayList<String>();
+			ArrayList<Contact> list = new ArrayList<Contact>();
 		    while (rs.next()) {
-		        list.add(rs.getString("USER_NAME"));
+		    	Contact contact = new Contact();
+		    	contact.setUsername(rs.getString("USER_NAME"));
+		    	contact.setBase64Image(rs.getString("BASE64IMAGE"));
+		        list.add(contact);
 		    }
 		    return list;
 			
@@ -251,6 +254,24 @@ public class DatabaseAccess extends JdbcDaoSupport {
     public void fillAvatarPath(Contact contact) throws SQLException {
     	String avatarPath = getUserAvatarPath(contact.getUsername());
     	contact.setAvatarPath(avatarPath);
+    }
+    
+    
+    public String getUserBase64Image(String username) {
+    	
+    	String sql = "SELECT BASE64IMAGE FROM APP_USER WHERE USER_NAME = ?";
+		
+		Object[] args = new Object[] { username };
+		int[] argTypes = new int[] { Types.VARCHAR };
+		
+		try {
+			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
+		    if (rs.next()) {
+		        return rs.getString("BASE64IMAGE");
+		    }
+			
+        } catch (EmptyResultDataAccessException e) { }
+		return null;
     }
 
     

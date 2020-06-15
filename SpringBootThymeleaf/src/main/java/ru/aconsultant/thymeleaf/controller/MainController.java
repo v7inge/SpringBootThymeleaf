@@ -197,7 +197,7 @@ public class MainController {
 		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
 		String input = (String) requestParameters.get("input");
 		String userName = principal.getName();
-		List<String> users = databaseAccess.searchForUsers(input, userName);
+		List<Contact> users = databaseAccess.searchForUsers(input, userName);
 		
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("users", users);
@@ -209,11 +209,20 @@ public class MainController {
 	public void contactAdd(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
 		
 		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
-		String input = (String) requestParameters.get("input");
+		String addedContact = (String) requestParameters.get("input");
         String userName = principal.getName();
-        	
-        databaseAccess.addContact(userName, input);
-        databaseAccess.addContact(input, userName);    
+        
+        // Add dialogues to the database
+        databaseAccess.addContact(userName, addedContact);
+        databaseAccess.addContact(addedContact, userName);
+        
+        // Notify the user he was added
+        Message message = new Message();
+        message.setSender(userName);
+        message.setText(databaseAccess.getUserBase64Image(userName));
+        message.setReceiver(addedContact);
+        message.setCode(6);
+        messagingTemplate.convertAndSendToUser(addedContact, "/queue/reply", message);
 	}
 	
 	

@@ -22,6 +22,7 @@ public class Message {
 	// 3: Plain text is successfully sent
 	// 4: File uploading
 	// 5: File is ready
+	// 6: User added as a contact
 	
 	private String id;
 	private boolean newOne;

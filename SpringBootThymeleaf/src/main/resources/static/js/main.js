@@ -7,6 +7,7 @@ let downloadingPlaceholderText = "Downloading...";
 let userName;
 let contactName;
 
+
 class Message {
 	
 	constructor(sender, receiver, code, text, fileName = null) {
@@ -26,6 +27,16 @@ class Message {
 		} else {
 			this.filePath = this.id + " " + fileName;
 		}
+	}
+}
+
+
+class Contact {
+	
+	constructor(name, base64) {
+	  
+		this.name = name;
+		this.base64 = base64;
 	}
 }
 
@@ -55,7 +66,15 @@ function connect() {
 			// Broadcast incoming message
 			
 			///////////////////////////////////////////////////////////////
-			if (message.sender == contactName) {
+			if (message.code == 6) {
+				// User was added as a contact
+				
+				let contact = new Contact(message.sender, message.text);
+				createContact(contact, null, false, false);
+				showPopUp("" + message.sender + " added you as a contact.");
+				
+			///////////////////////////////////////////////////////////////
+			} else if (message.sender == contactName) {
 				// Message from an active contact
 				
 				if (message.code == 2) {
@@ -340,7 +359,7 @@ function updateAvatar() {
 	let ext = file.name.split(".").pop().toLowerCase();
 	
 	if(jQuery.inArray(ext, ["png","jpg","jpeg"]) == -1) {
-		console.log("Sorry, only .jpg and .png files are accepted.");
+		showPopUp("Sorry, only .jpg and .png files are accepted.");
 	} else {
 		
 		let data = new FormData();
@@ -381,12 +400,14 @@ $(document).ready(function() {
 
 	// Click on contact
 	$("body").on("click", ".contact", function () {
-		contactClick($(this));
+		if (!$(this).hasClass("found")) {
+			contactClick($(this));
+		}
 	});
 
 	// Click on found contact
 	$("body").on("click", ".found", function () {
-		moveContactToTheList($(this).text());
+		moveContactToTheList($(this));
 	});
 	
 	// Click on profile
