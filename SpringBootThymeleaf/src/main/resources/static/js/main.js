@@ -70,7 +70,7 @@ function connect() {
 			if (message.code == 6) {
 				// User was added as a contact
 				
-				let contact = new Contact(message.sender, message.text);
+				let contact = new Contact(message.sender, message.text, message.filePath);
 				createContact(contact, null, false, false);
 				showPopUp("" + message.sender + " added you as a contact.");
 				

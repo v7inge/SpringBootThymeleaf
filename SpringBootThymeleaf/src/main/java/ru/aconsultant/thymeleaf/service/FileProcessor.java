@@ -138,24 +138,6 @@ public class FileProcessor {
 	}
 	
 	
-	public void fillContactsBase64Images(List<Contact> contacts) throws SocketException, IOException, InterruptedException {
-		
-		if(ftpClient==null || !ftpClient.isConnected()) {
-        	connectToFTP();
-        }
-		
-		for (Contact contact : contacts) {
-			byte[] img = getBytesWhenConnected(contact.getAvatarPath());
-			if (img == null) {
-				contact.setBase64Image(null);
-			} else {
-				contact.setBase64Image(Base64.encodeBase64String(img));
-			}
-		}
-		busy = false;
-	}
-	
-	
 	public static boolean filePassesFilter(MultipartFile file, List<String> extensions) {
 		
 		if (extensions == null || extensions.size() == 0) {

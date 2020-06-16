@@ -7,8 +7,6 @@ public class Contact {
 	
 	public String username;
 	public Integer unreadCount;
-	public byte[] avatar;
-	public String avatarPath;
 	public boolean current;
 	public String base64Image;
 	public String letter;
@@ -23,17 +21,15 @@ public class Contact {
 	}
 	
 	
-	public Contact(String username, Integer unreadCount, byte[] avatar) {
+	public Contact(String username, Integer unreadCount) {
 		this.username = username;
 		this.unreadCount = unreadCount;
-		this.avatar = avatar;
 	}
 	
 	
-	public Contact(String username, Integer unreadCount, String avatarPath, boolean current, String base64Image, String letter) throws SQLException, IOException {
+	public Contact(String username, Integer unreadCount, boolean current, String base64Image, String letter) throws SQLException, IOException {
 		this.username = username;
 		this.unreadCount = unreadCount;
-		this.avatarPath = avatarPath;
 		this.current = current;
 		this.base64Image = base64Image;
 		this.letter = letter;
@@ -46,14 +42,6 @@ public class Contact {
 	
 	public void setUnreadCount(Integer unreadCount) {
 		this.unreadCount = unreadCount;
-	}
-	
-	public void setAvatar(byte[] avatar) {
-		this.avatar = avatar;
-	}
-	
-	public void setAvatarPath(String avatarPath) {
-		this.avatarPath = avatarPath;
 	}
 	
 	public void setBase64Image(String base64Image) {
@@ -74,14 +62,6 @@ public class Contact {
 	
 	public Integer getUnreadCount() {
 		return unreadCount;
-	}
-	
-	public byte[] getAvatar() {
-		return avatar;
-	}
-	
-	public String getAvatarPath() {
-		return avatarPath;
 	}
 	
 	public boolean getCurrent() {

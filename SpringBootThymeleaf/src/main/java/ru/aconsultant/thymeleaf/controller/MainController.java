@@ -217,10 +217,12 @@ public class MainController {
         databaseAccess.addContact(userName, addedContact);
         databaseAccess.addContact(addedContact, userName);
         
-        // Notify the user he was added
+        // Notify the user he was added. We use "text" and "filePath" fields to store data of the user who added a contact.
         Message message = new Message();
+        Contact user = databaseAccess.getContact(userName);
         message.setSender(userName);
-        message.setText(databaseAccess.getUserBase64Image(userName));
+        message.setText(user.getBase64Image());
+        message.setFilePath(user.getLetter());
         message.setReceiver(addedContact);
         message.setCode(6);
         messagingTemplate.convertAndSendToUser(addedContact, "/queue/reply", message);
