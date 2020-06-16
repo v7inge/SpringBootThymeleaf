@@ -111,8 +111,9 @@ public class FileProcessor {
         }
 		
 		// Crop it
-		byte[] bytes = file.getBytes();        
-		bytes = cropImageSquare(bytes);
+		byte[] bytes = file.getBytes();
+		String ext = FilenameUtils.getExtension(file.getOriginalFilename());
+		bytes = cropImageSquare(bytes, ext);
 		
 		String base63image = Base64.encodeBase64String(bytes);
 		user.setBase64Image(base63image);
@@ -253,7 +254,8 @@ public class FileProcessor {
 			OutputStream outputStream = ftpClient.storeFileStream(filename);
 			
 			if (cropAvatar) {
-				bytes = cropImageSquare(bytes);
+				String ext = FilenameUtils.getExtension(file.getOriginalFilename());
+				bytes = cropImageSquare(bytes, ext);
 			}
 			
 			outputStream.write(bytes);
@@ -272,7 +274,7 @@ public class FileProcessor {
 	}
 	
 	
-	private byte[] cropImageSquare(byte[] image) throws IOException {        
+	private byte[] cropImageSquare(byte[] image, String ext) throws IOException {        
         
 		// Convert from byte array to buffered image
 		InputStream in = new ByteArrayInputStream(image);
@@ -297,7 +299,7 @@ public class FileProcessor {
 
         // Convert from buffered image to byte array
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(croppedImage, "jpg", baos);
+        ImageIO.write(croppedImage, ext, baos);
         byte[] bytes = baos.toByteArray();
 
         return bytes;

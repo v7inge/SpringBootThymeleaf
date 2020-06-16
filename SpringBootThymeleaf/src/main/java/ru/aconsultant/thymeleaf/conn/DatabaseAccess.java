@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.aconsultant.thymeleaf.beans.*;
+import ru.aconsultant.thymeleaf.mapper.ContactMapper;
 import ru.aconsultant.thymeleaf.mapper.MessageMapper;
 import ru.aconsultant.thymeleaf.mapper.UserAccountMapper;
 
@@ -33,55 +34,6 @@ public class DatabaseAccess extends JdbcDaoSupport {
     @Autowired
     public DatabaseAccess(DataSource dataSource) {
         this.setDataSource(dataSource);
-    }
- 
-    
-    public UserAccount findUser(String login, String password) {
-    	
-    	String sql = "Select a.USER_NAME, a.PASSWORD from USER_ACCOUNT a where a.USER_NAME = ? and a.PASSWORD = ?";
-        Object[] args = new Object[] { login, password };
-        UserAccountMapper mapper = new UserAccountMapper();
-        try {
-        	UserAccount userInfo = this.getJdbcTemplate().queryForObject(sql, args, mapper);
-            return userInfo;
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    }
-    
-    
-    public UserAccount findUser(String login) {
-    	
-    	String sql = "Select a.USER_NAME, a.PASSWORD from USER_ACCOUNT a where a.USER_NAME = ?";
-        Object[] args = new Object[] { login };
-        UserAccountMapper mapper = new UserAccountMapper();
-        try {
-        	UserAccount userInfo = this.getJdbcTemplate().queryForObject(sql, args, mapper);
-            return userInfo;
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    }
-    
-    
-    public ArrayList<String> contactNameList(String excludeName) throws SQLException {
-        
-		String sql = "Select a.USER_NAME from USER_ACCOUNT a WHERE a.USER_NAME <> ?";
-		Object[] args = new Object[] { excludeName };
-		int[] argTypes = new int[] { Types.VARCHAR };
-		
-		try {
-			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
-			
-			ArrayList<String> list = new ArrayList<String>();
-		    while (rs.next()) {
-		        list.add(rs.getString("USER_NAME"));
-		    }
-		    return list;
-			
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
     }
     
     
@@ -173,29 +125,21 @@ public class DatabaseAccess extends JdbcDaoSupport {
     }
     
     
-    public ArrayList<Contact> searchForUsers(String input, String username) throws SQLException {
+    public List<Contact> searchForUsers(String input, String username) throws SQLException {
         
     	String sql = 
-				"SELECT u.USER_NAME, u.BASE64IMAGE FROM APP_USER u \n" +
+				"SELECT u.USER_NAME, u.BASE64IMAGE, u.LETTER FROM APP_USER u \n" +
 				"WHERE u.USER_NAME LIKE CONCAT(?, \"%\") \n" +
 				"AND u.USER_NAME NOT IN \n" +
 				"(SELECT chats.Contact FROM PERSONAL_CHATS chats \n" +
 				"WHERE chats.User = ?)";
     	
 		Object[] args = new Object[] { input, username };
-		int[] argTypes = new int[] { Types.VARCHAR, Types.VARCHAR };
-		
+		ContactMapper mapper = new ContactMapper();
+    	
 		try {
-			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
-			ArrayList<Contact> list = new ArrayList<Contact>();
-		    while (rs.next()) {
-		    	Contact contact = new Contact();
-		    	contact.setUsername(rs.getString("USER_NAME"));
-		    	contact.setBase64Image(rs.getString("BASE64IMAGE"));
-		        list.add(contact);
-		    }
-		    return list;
-			
+			List<Contact> users = this.getJdbcTemplate().query(sql, args, mapper);
+            return users;
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -221,39 +165,9 @@ public class DatabaseAccess extends JdbcDaoSupport {
     }
     
     
-    public void setUserAvatar(String username, String avatar) throws SQLException {
-        String sql = "UPDATE APP_USER SET AVATAR=? WHERE USER_NAME=?";
-        this.getJdbcTemplate().update(sql, avatar, username);
-    }
-    
-    
     public void saveUserBase64Image(String username, String base63image) throws SQLException {
         String sql = "UPDATE APP_USER SET BASE64IMAGE=? WHERE USER_NAME=?";
         this.getJdbcTemplate().update(sql, base63image, username);
-    }
-    
-    
-    public String getUserAvatarPath(String username) throws SQLException {
-        
-		String sql = "SELECT AVATAR FROM APP_USER WHERE USER_NAME = ?";
-				
-		Object[] args = new Object[] { username };
-		int[] argTypes = new int[] { Types.VARCHAR };
-		
-		try {
-			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
-		    if (rs.next()) {
-		        return rs.getString("AVATAR");
-		    }
-			
-        } catch (EmptyResultDataAccessException e) { }
-		return null;
-    }
-    
-    
-    public void fillAvatarPath(Contact contact) throws SQLException {
-    	String avatarPath = getUserAvatarPath(contact.getUsername());
-    	contact.setAvatarPath(avatarPath);
     }
     
     
@@ -273,6 +187,11 @@ public class DatabaseAccess extends JdbcDaoSupport {
         } catch (EmptyResultDataAccessException e) { }
 		return null;
     }
+    
+    
+    /*public Contact getContact(String name) {
+    	
+    }*/
 
     
 }

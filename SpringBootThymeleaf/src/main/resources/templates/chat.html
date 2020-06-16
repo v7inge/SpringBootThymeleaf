@@ -52,16 +52,16 @@
 		
 			<!-- PROFILE -->
 			<div id="profile" class="profile">	
-				<img id="contact-profile-img" class="contact-img" th:unless="${user.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${user.base64Image}}" />
-				<div class="contact-placeholder" th:classappend="${user.letter}" th:if="${user.base64Image == null}"><div class="letter" th:utext="${user.username[0]}"></div></div>
+				<img id="contact-profile-img" class="contact-img" th:classappend="${user.base64Image == null} ? invisible : userclass" th:src="@{'data:image/jpeg;base64,'+${user.base64Image}}" />
+				<div id="contact-profile-placeholder" class="contact-placeholder" th:classappend="${(user.base64Image != null ? 'invisible' : '') + (' ' + user.letter)}"><div class="letter" th:utext="${user.username[0]}"></div></div>
 				<div class="contact-name" th:utext="${user.username}"></div>
 			</div>
 
 			<!-- MENU -->
 			<div class="menu">
 				<div class="shadowRound" th:classappend="${user.letter}">
-					<img id="menu-profile-img" th:unless="${user.base64Image == null}" th:src="@{'data:image/jpeg;base64,'+${user.base64Image}}" />
-					<div class="letter" th:if="${user.base64Image == null}" th:utext="${user.username[0]}"></div>
+					<img id="menu-profile-img"  th:classappend="${user.base64Image == null} ? invisible : userclass" th:src="@{'data:image/jpeg;base64,'+${user.base64Image}}" />
+					<div id="menu-profile-letter" class="letter" th:classappend="${user.base64Image} != null ? invisible : userclass" th:utext="${user.username[0]}"></div>
 				</div>
 				<div class="username" th:utext="${user.username}"></div>
 				<div class="text"><a th:href="@{/logout}">Sign out</a></div>

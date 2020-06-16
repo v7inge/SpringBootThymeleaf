@@ -1,5 +1,5 @@
 let checkDelay = 1000;
-let hideDelay = 3000;
+let hideDelay = 5000;
 let popUpActive = false;
 
 function showPopUp(text) {

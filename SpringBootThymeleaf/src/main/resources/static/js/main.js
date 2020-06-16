@@ -33,10 +33,11 @@ class Message {
 
 class Contact {
 	
-	constructor(name, base64) {
+	constructor(name, base64, classLetter) {
 	  
 		this.name = name;
 		this.base64 = base64;
+		this.classLetter = classLetter;
 	}
 }
 
@@ -362,6 +363,7 @@ function updateAvatar() {
 		showPopUp("Sorry, only .jpg and .png files are accepted.");
 	} else {
 		
+		showPopUp("Got it, your picture will be updated soon!");
 		let data = new FormData();
 		data.append("file", file);
 		
@@ -375,6 +377,12 @@ function updateAvatar() {
 	        dataType: "json",
 	        timeout: 1000000,
 	        success: function(response) {
+	        	
+	        	$("#menu-profile-img").removeClass("invisible");
+	        	$("#contact-profile-img").removeClass("invisible");
+	        	$("#menu-profile-letter").addClass("invisible");
+	        	$("#contact-profile-placeholder").addClass("invisible");
+	        	
 	        	$("#menu-profile-img").attr("src", "data:image/png;base64," + response.base64String);
 	        	$("#contact-profile-img").attr("src", "data:image/png;base64," + response.base64String);
 	        }

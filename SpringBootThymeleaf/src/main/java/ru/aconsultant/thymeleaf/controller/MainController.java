@@ -77,6 +77,7 @@ public class MainController {
 	// How to get principal as a user:
 	//User loginedUser = (User) ((Authentication) principal).getPrincipal();
 	
+	
 	@MessageMapping("/message-flow")
     public void broadcast(@Payload Message message, Principal principal) throws SQLException {
 		
