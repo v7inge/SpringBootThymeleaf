@@ -161,12 +161,6 @@
 		    <groupId>javax.servlet</groupId>
 		    <artifactId>jstl</artifactId>
 		</dependency>
-
-		<!--<dependency>
-		    <groupId>javax.servlet.jsp.jstl</groupId>
-		    <artifactId>jstl-api</artifactId>
-		    <version>1.2</version>
-		</dependency>-->	
 		
 		<!-- file processing -->
 		<dependency>
@@ -189,7 +183,6 @@
 			<plugin>
 			    <groupId>org.apache.maven.plugins</groupId>
 			    <artifactId>maven-compiler-plugin</artifactId>
-			    <version>3.8.0</version>
 			    <configuration>
 			        <release>14</release>
 			    </configuration>

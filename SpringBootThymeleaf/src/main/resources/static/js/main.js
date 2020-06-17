@@ -1,6 +1,6 @@
 
-let imagePlaceholderSource = "http://aconsultant.ru/wp-content/uploads/2020/06/img_148071.png";
-let fileIconSource = "http://aconsultant.ru/wp-content/uploads/2020/06/attach-file.png";
+let imagePlaceholderSource = "https://aconsultant.ru/wp-content/uploads/2020/06/img_148071.png";
+let fileIconSource = "https://aconsultant.ru/wp-content/uploads/2020/06/attach-file.png";
 let uploadingPlaceholderText = "Uploading...";
 let downloadingPlaceholderText = "Downloading...";
 
