@@ -16,7 +16,7 @@
 	<description>Spring Boot and Thymeleaf</description>
 
 	<properties>
-		<maven.compiler.release>14</maven.compiler.release>
+		<java.version>14</java.version>
 		<spring-security.version>5.3.2.RELEASE</spring-security.version>
     	<spring.version>5.0.6.RELEASE</spring.version>
 	</properties>
@@ -162,11 +162,11 @@
 		    <artifactId>jstl</artifactId>
 		</dependency>
 
-		<dependency>
+		<!--<dependency>
 		    <groupId>javax.servlet.jsp.jstl</groupId>
 		    <artifactId>jstl-api</artifactId>
 		    <version>1.2</version>
-		</dependency>	
+		</dependency>-->	
 		
 		<!-- file processing -->
 		<dependency>
@@ -185,6 +185,15 @@
 
 	<build>
 		<plugins>
+			
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-compiler-plugin</artifactId>
+			    <version>3.8.0</version>
+			    <configuration>
+			        <release>14</release>
+			    </configuration>
+			</plugin>
 			
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
