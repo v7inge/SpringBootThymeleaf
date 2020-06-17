@@ -21,6 +21,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.util.Base64;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -170,7 +171,7 @@ public class FileProcessor {
 	        for (String filename : filenames) {
 		    	InputStream inputStream = ftpClient.retrieveFileStream(filename);
 		    	byte[] bytes = inputStream.readAllBytes();
-		       	result.put(filename, getBase64String(bytes));
+	        	result.put(filename, getBase64String(bytes));
 		       	ftpClient.completePendingCommand();
 	        }
         } catch (IOException e) {
