@@ -121,8 +121,8 @@ function connect() {
 				}	
 			
 			///////////////////////////////////////////////////////////////
-			} else {
-				// Message from an other contact
+			} else if (message.code != 1 && message.code != 4) {
+				// Message from an other contact. It's not about something is uploading.
 				
 				increaseCounter(message.sender);
 			}
