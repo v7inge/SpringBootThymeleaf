@@ -185,7 +185,7 @@ function drawMessage(message, datePlaceholder = null) {
 	}
 	
 	// Add message text
-	if (message.code == 0 || message.code == null) {
+	if (message.code == 0 || message.code == 3 || message.code == null) {
 		messageBox.appendChild(document.createTextNode(message.text));
 	} else if (message.code == 4) {
 		let filenameContainer = document.createElement("div");
