@@ -393,6 +393,26 @@ function updateAvatar() {
 }
 
 
+function test() {
+	sendTestQuery();
+}
+
+
+function sendTestQuery() {
+	
+	$.ajax({
+        type: "POST",
+        url: "/test",
+        //data: data,
+        processData: false,
+        contentType: false,
+        cache: false,
+        //dataType: "json",
+        timeout: 1000000
+    });		
+}
+
+
 $(document).ready(function() {
 	
 	$(document).keypress(function (e) {

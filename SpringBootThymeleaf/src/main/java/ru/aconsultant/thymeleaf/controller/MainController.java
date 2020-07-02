@@ -1,7 +1,11 @@
 package ru.aconsultant.thymeleaf.controller;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.net.SocketException;
 import java.security.Principal;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -233,7 +237,8 @@ public class MainController {
 	@GetMapping("/picture/{path}")
 	public @ResponseBody byte[] getPicture(@PathVariable String path) throws IOException, SQLException, InterruptedException {
 		
-		return fileProcessor.getBytesFromFTP(path);
+		return null;
+		//return fileProcessor.getBytesFromFTP(path);
 	}
 	
 	
@@ -341,13 +346,13 @@ public class MainController {
 	@RequestMapping(value = { "/test" }, method = RequestMethod.POST)
 	public void test(HttpServletResponse response, Principal principal, HttpServletRequest request) throws SQLException, IOException, InterruptedException {
         
-		Object fileBase64 = fileProcessor.getFileBase64("id1111111 text text file.txt");
 		
-		HashMap<String, Object> responseParameters = new HashMap<String, Object>();
-		responseParameters.put("id1111111 text text file.txt", fileBase64);
-				
-		// Response
-		httpParamProcessor.translateResponseParameters(response, responseParameters);
+		/*long currentMillis = System.currentTimeMillis();
+		String filename = "Test file created at" + currentMillis + ".txt";
+		
+		byte[] bytes = FileTest.createNewFile(filename);
+		fileProcessor.saveBytes(bytes, filename, false);
+		fileProcessor.deleteFile(filename);*/
 	}
 	
 	

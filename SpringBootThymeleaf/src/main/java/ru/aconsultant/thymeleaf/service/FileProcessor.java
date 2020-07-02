@@ -4,6 +4,8 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,7 +23,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.util.Base64;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,11 +48,18 @@ public class FileProcessor {
 	
 	public boolean busy;
 	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// ---------------------------------- CONNECTION ---------------------------------- //
+	
+	
 	private void connectToFTP() throws SocketException, IOException, InterruptedException {
 		
 		// If FTP is busy we wait
 		int i = 0;
 		while (busy) {
+			
+			System.out.println("FTP is busy, waiting...");
 			
 			if (i >= attempts) {
 				System.out.println("Error connecting to FTP: it's busy for a long time.");
@@ -67,7 +75,6 @@ public class FileProcessor {
 		// Connect if necessary
 		if(ftpClient == null || !ftpClient.isConnected()) {
 			try {
-				//System.out.println("Connecting to FTP at " + System.currentTimeMillis());
 				ftpClient = new FTPClient();
 		        ftpClient.setControlEncoding("UTF-8");
 		        ftpClient.connect(server, port);
@@ -97,7 +104,64 @@ public class FileProcessor {
 	}
 	
 	
-	public void saveUserBase64Image(Contact user, MultipartFile file) throws IOException, SQLException {
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// ---------------------------------- DOWNLOADING ---------------------------------- //
+	
+	
+	private synchronized byte[] getBytesWhenConnected(String filename) throws IOException {
+		
+		if (filename == null || filename == "") { return null; }
+		
+		InputStream inputStream = ftpClient.retrieveFileStream(filename);
+		byte[] bytes = inputStream.readAllBytes();
+		
+		return bytes;
+	}
+	
+	
+	public synchronized HashMap<String, Object> getMultipleFilesBase64(Set<String> filenames) throws IOException, InterruptedException {
+		
+        connectToFTP();
+        HashMap<String, Object> result = new HashMap<String, Object>();
+        
+        for (String filename : filenames) {
+        	try {
+		    	byte[] bytes = getBytesWhenConnected(filename);
+	        	result.put(filename, getBase64String(bytes));
+		       	ftpClient.completePendingCommand();
+        	} catch (IOException e) {
+        		System.out.println("Could not connect to FTP server");
+        	} catch (NullPointerException n) {
+        		String exceptionMsg = "No file \"" + filename + "\" found on FTP server";
+        		System.err.println(exceptionMsg);
+        	}
+        }
+        
+        busy = false;
+        return result;
+	}
+	
+	
+	public Object getFileBase64(String filename) throws IOException, InterruptedException {
+		
+		Set<String> filenames = new HashSet<String>();
+		filenames.add(filename);
+		return getMultipleFilesBase64(filenames).get(filename);
+	}
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// ---------------------------------- UPLOADING ---------------------------------- //
+	
+	
+	public void saveUserBase64Image(Contact user, MultipartFile[] files) throws IOException, SQLException {
+		
+		MultipartFile file = files[0];
+		saveUserBase64Image(user, file);
+	}
+	
+	
+	public synchronized void saveUserBase64Image(Contact user, MultipartFile file) throws IOException, SQLException {
 		
 		// Check if file is empty
 		if (file.isEmpty()) {
@@ -122,122 +186,44 @@ public class FileProcessor {
 	}
 	
 	
-	public List<String> imageExtensions() {
-		return Arrays.asList("jpg", "jpeg", "png");
-	}
-	
-	
-	public String getBase64String(byte[] bytes) {
-		return Base64.encodeBase64String(bytes);
-	}
-	
-	
-	public void saveUserBase64Image(Contact user, MultipartFile[] files) throws IOException, SQLException {
-		
-		MultipartFile file = files[0];
-		saveUserBase64Image(user, file);
-	}
-	
-	
-	public static boolean filePassesFilter(MultipartFile file, List<String> extensions) {
-		
-		if (extensions == null || extensions.size() == 0) {
-			return true;
-		}
-		
-		String fileEx = FilenameUtils.getExtension(file.getOriginalFilename());
-		
-		return extensions.contains(fileEx);
-	}
-	
-	
-	private byte[] getBytesWhenConnected(String filename) throws IOException {
-		
-		if (filename == null || filename == "") { return null; }
-		
-		InputStream inputStream = ftpClient.retrieveFileStream(filename);
-		byte[] bytes = inputStream.readAllBytes();
-		
-		return bytes;
-	}
-	
-	
-	public HashMap<String, Object> getMultipleFilesBase64(Set<String> filenames) throws IOException, InterruptedException {
-		
-        connectToFTP();
-        HashMap<String, Object> result = new HashMap<String, Object>();
-        
-        try {
-	        for (String filename : filenames) {
-		    	InputStream inputStream = ftpClient.retrieveFileStream(filename);
-		    	byte[] bytes = inputStream.readAllBytes();
-	        	result.put(filename, getBase64String(bytes));
-		       	ftpClient.completePendingCommand();
-	        }
-        } catch (IOException e) {
-        	System.out.println(e);
-        	disconnectFromFTP();
-        }
-        busy = false;
-        return result;
-	}
-	
-	
-	public Object getFileBase64(String filename) throws IOException, InterruptedException {
-		
-		Set<String> filenames = new HashSet<String>();
-		filenames.add(filename);
-		return getMultipleFilesBase64(filenames).get(filename);
-	}
-	
-	
-	public byte[] getBytesFromFTP(String filename) throws IOException, InterruptedException {
-		
-		if (filename == null || filename == "") { return null; }
-		
-		if(ftpClient == null || !ftpClient.isConnected()) {
-        	connectToFTP();
-        }
-		InputStream inputStream = ftpClient.retrieveFileStream(filename);
-		byte[] bytes = inputStream.readAllBytes();
-		busy = false;
-		return bytes;
-	}
-	
-	
 	public boolean saveFile(MultipartFile file, String filename) throws IOException, InterruptedException {
 		
-        return saveFile(file, filename, null, false);
+		return saveBytes(fileToBytes(file), filename, false);
+	}
+	
+	
+	public boolean saveFile(File file, String filename) throws IOException, InterruptedException {
+		
+		return saveBytes(fileToBytes(file), filename, false);
 	}
 	
 	
 	public boolean saveFile(MultipartFile file, String filename, List<String> extensions) throws IOException, InterruptedException {
 		
-        return saveFile(file, filename, extensions, false);
-	}
-	
-	
-	public boolean saveFile(MultipartFile file, String filename, List<String> extensions, boolean cropAvatar) throws IOException, InterruptedException {
-		
-		boolean complete = false;
-		
-        if (file.isEmpty()) {
-	    	return false;
-	    }
-        
-        if (!filePassesFilter(file, extensions)) {
+		if (!filePassesFilter(file, extensions)) {
         	System.out.println("File did not pass the filter");
         	return false;
         }
+		
+		return saveBytes(fileToBytes(file), filename, false);
+	}
+	
+	
+	public synchronized boolean saveBytes(byte[] bytes, String filename, boolean cropAvatar) throws IOException, InterruptedException {
+		
+		boolean complete = false;
+		
+        if (bytes.length == 0) {
+	    	return false;
+	    }
         
         connectToFTP();
-		byte[] bytes = file.getBytes();
 		
 		try {
 			OutputStream outputStream = ftpClient.storeFileStream(filename);
 			
 			if (cropAvatar) {
-				String ext = FilenameUtils.getExtension(file.getOriginalFilename());
+				String ext = FilenameUtils.getExtension(filename);
 				bytes = cropImageSquare(bytes, ext);
 			}
 			
@@ -255,6 +241,32 @@ public class FileProcessor {
 		busy = false;
 		return complete;
 	}
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// ---------------------------------- DELETING ---------------------------------- //
+	
+	
+	public synchronized boolean deleteFile(String filename) throws SocketException, IOException, InterruptedException {
+		
+		boolean complete;
+		connectToFTP();
+		
+		try {
+			ftpClient.deleteFile(filename);
+			complete = true;
+		} catch (SocketException e) {
+			System.out.println("Error deleting file: " + filename + ". Root error: " + e.getMessage());
+			complete = false;
+		}
+		
+		busy = false;
+		return complete;
+	}
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// ---------------------------------- GRAPHICS ---------------------------------- //
 	
 	
 	private byte[] cropImageSquare(byte[] image, String ext) throws IOException {        
@@ -298,6 +310,50 @@ public class FileProcessor {
 		g.drawImage(originalImage, 0, 0, avaWidth, avaHeight, null);
 		g.dispose();
 		return resizedImage;
+	}
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// ---------------------------------- SERVICE ---------------------------------- //
+	
+	
+	private byte[] fileToBytes(File file) throws IOException {
+		
+		byte[] bytes = new byte[(int) file.length()];
+
+		FileInputStream fis = new FileInputStream(file);
+		fis.read(bytes);
+		fis.close();
+		return bytes;
+	}
+	
+	
+	private byte[] fileToBytes(MultipartFile file) throws IOException {
+		
+		byte[] bytes = file.getBytes();
+		return bytes;
+	}
+	
+	
+	public String getBase64String(byte[] bytes) {
+		return Base64.encodeBase64String(bytes);
+	}
+	
+	
+	public static boolean filePassesFilter(MultipartFile file, List<String> extensions) {
+		
+		if (extensions == null || extensions.size() == 0) {
+			return true;
+		}
+		
+		String fileEx = FilenameUtils.getExtension(file.getOriginalFilename());
+		
+		return extensions.contains(fileEx);
+	}
+	
+	
+	public List<String> imageExtensions() {
+		return Arrays.asList("jpg", "jpeg", "png");
 	}
 	
 	
