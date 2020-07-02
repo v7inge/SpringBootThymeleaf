@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import com.anarsoft.vmlens.concurrent.junit.ConcurrentTestRunner;
 
 @RunWith(ConcurrentTestRunner.class)
-public class FileDownloadingMultithreadTest {
+public class FileDeletingMultithreadTest {
 
 	
 	private static FileProcessor fileProcessor;
@@ -21,7 +21,7 @@ public class FileDownloadingMultithreadTest {
 	
 	@BeforeAll
     public static void beforeAll() {
-        System.out.println("Concurrent file downloading test started...");
+        System.out.println("Concurrent file deleting test started...");
         fileProcessor = new FileProcessor();
     }
 	
@@ -30,7 +30,7 @@ public class FileDownloadingMultithreadTest {
 	@Execution(ExecutionMode.CONCURRENT)
 	public void thread1() throws InterruptedException, SocketException, IOException {
 		
-		fileProcessor.getFileBase64("Junit file 1.txt");
+		fileProcessor.deleteFile("Junit file 1.txt");
 	}
 	
 	
@@ -38,7 +38,7 @@ public class FileDownloadingMultithreadTest {
 	@Execution(ExecutionMode.CONCURRENT)
 	public void thread2() throws InterruptedException, SocketException, IOException {
 		
-		fileProcessor.getFileBase64("Junit file 2.txt");
+		fileProcessor.deleteFile("Junit file 2.txt");
 	}
 	
 	
@@ -46,12 +46,12 @@ public class FileDownloadingMultithreadTest {
 	@Execution(ExecutionMode.CONCURRENT)
 	public void thread3() throws InterruptedException, SocketException, IOException {
 		
-		fileProcessor.getFileBase64("Junit file 3.txt");
+		fileProcessor.deleteFile("Junit file 3.txt");
 	}
 	
 	
 	@AfterAll
     public static void afterAll() {
-        System.out.println("Concurrent file downloading test finished.");
+        System.out.println("Concurrent file deleting test finished.");
     }
 }

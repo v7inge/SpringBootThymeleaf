@@ -42,11 +42,8 @@ public class FileProcessor {
 	private static final String pass = "hgy7fD531cvZ";
 	private static int avaWidth = 150;
 	private static int avaHeight = 150;
-	private static int attempts = 20;
 	
 	private FTPClient ftpClient;
-	
-	public boolean busy;
 	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,23 +51,6 @@ public class FileProcessor {
 	
 	
 	private void connectToFTP() throws SocketException, IOException, InterruptedException {
-		
-		// If FTP is busy we wait
-		int i = 0;
-		while (busy) {
-			
-			System.out.println("FTP is busy, waiting...");
-			
-			if (i >= attempts) {
-				System.out.println("Error connecting to FTP: it's busy for a long time.");
-				disconnectFromFTP();
-				break;
-			}
-			
-			Thread.sleep(500);
-			i++;
-		}
-		busy = true;
 		
 		// Connect if necessary
 		if(ftpClient == null || !ftpClient.isConnected()) {
@@ -98,8 +78,6 @@ public class FileProcessor {
 	        }
 	    } catch (IOException ex) {
 	        ex.printStackTrace();
-	    } finally {
-	    	busy = false;
 	    }
 	}
 	
@@ -137,7 +115,6 @@ public class FileProcessor {
         	}
         }
         
-        busy = false;
         return result;
 	}
 	
@@ -238,7 +215,6 @@ public class FileProcessor {
         	complete = false;
 		}
 		
-		busy = false;
 		return complete;
 	}
 	
@@ -260,7 +236,6 @@ public class FileProcessor {
 			complete = false;
 		}
 		
-		busy = false;
 		return complete;
 	}
 	

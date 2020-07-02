@@ -52,54 +52,10 @@ public class FileUploadingMultithreadTest {
 	}
 	
 	
-	private void createUpload(String filename) {
+	private void createUpload(String filename) throws IOException, InterruptedException {
 		
 		byte[] bytes = createNewFile(filename);
-		saveBytesCommenting(bytes, filename);
-	}
-	
-	
-	private void uploadDelete(int threadNumber) throws SocketException, IOException, InterruptedException {
-		
-		long currentMillis = System.currentTimeMillis();
-		System.out.println("thread" + threadNumber + " started at " + currentMillis);
-		String filename = "" + currentMillis + " junit test file " + threadNumber + ".txt";
-		byte[] bytes = createNewFile(filename);
-		saveBytesCommenting(bytes, filename);
-		deleteFileCommenting(filename);
-	}
-	
-	
-	private void saveBytesCommenting(byte[] bytes, String filename) {
-		
-		System.out.println("Start uploading file \"" + filename + "\"");
-		
-		try {
-			
-			boolean result = fileProcessor.saveBytes(bytes, filename, false);
-			if (result) {
-				System.out.println("File \"" + filename + "\" successfully uploaded.");
-			} else {
-				System.out.println("Error uploading file \""+ filename + "\".");
-			}
-		
-		} catch (IOException | InterruptedException e) {
-			System.out.println("Error uploading file \""+ filename + "\":");
-			e.printStackTrace();
-		}
-	}
-	
-	
-	private void deleteFileCommenting(String filename) throws SocketException, IOException, InterruptedException {
-		
-		System.out.println("Start deleting file \"" + filename + "\"");
-		
-		boolean result = fileProcessor.deleteFile(filename);
-		if (result) {
-			System.out.println("File \""+ filename + "\" successfully deleted.");
-		} else {
-			System.out.println("Error deleting file \""+ filename + "\".");
-		}
+		fileProcessor.saveBytes(bytes, filename, false);
 	}
 	
 	
@@ -116,7 +72,9 @@ public class FileUploadingMultithreadTest {
             writer.write(filename + " test data");
             writer.close();
             
-            return fileToBytes(file);
+            byte[] bytes = fileToBytes(file);
+            file.delete();
+            return bytes;
             
         } catch (IOException e) {
             e.printStackTrace();
