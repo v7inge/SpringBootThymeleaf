@@ -101,7 +101,7 @@
 			</table>
 			
 			<!-- MESSAGES -->
-			<ul class="messages invisible" id="messages">
+			<ul class="messages invisible" th:each="contact : ${contactList}" th:id="'messages-' + ${contact.username}">
 			</ul>
 			
 			<!-- BOTTOM BAR -->

@@ -63,79 +63,111 @@ function connect() {
 		stompClient.subscribe("/user/queue/reply", function (data) {
 			
 			var message = JSON.parse(data.body);
-			
-			// Broadcast incoming message
-			
-			///////////////////////////////////////////////////////////////
-			if (message.code == 6) {
-				// User was added as a contact
-				
-				let contact = new Contact(message.sender, message.text, message.filePath);
-				createContact(contact, null, false, false);
-				showPopUp("" + message.sender + " added you as a contact.");
-				
-			///////////////////////////////////////////////////////////////
-			} else if (message.sender == contactName) {
-				// Message from an active contact
-				
-				if (message.code == 2) {
-					updateMessageImages();
-				} else if (message.code == 5) {
-					updateMessageDate(message);
-				} else {
-					drawMessage(message);
-				}
-				
-			///////////////////////////////////////////////////////////////
-			} else if (message.sender == userName && message.receiver == contactName) {
-				// Message from user himself
-				
-				if (message.code == 3) {
-					// Plain text is delivered
-					
-					let messageContainer = $("#" + message.id);
-					if (messageContainer.prop("id") == null) {
-						drawMessage(message);
-					} else {
-						updateMessageDate(message);
-					}
-						
-				} else if (message.code == 2) {
-					// Image is uploaded
-					
-					updateMessageImages(); // Needed only in case there's no file reader in the browser
-					updateMessageDate(message);
-				
-				} else if (message.code == 1 || message.code == 4) {
-					// Check if we need to draw a message placeholder
-					
-					let messageContainer = $("#" + message.id);
-					if (messageContainer.prop("id") == null) {
-						drawMessage(message, uploadingPlaceholderText);
-					}
-				
-				} else if (message.code == 5) {
-					// File is uploaded
-					
-					updateMessageDate(message);
-				}	
-			
-			///////////////////////////////////////////////////////////////
-			} else if (message.code != 1 && message.code != 4) {
-				// Message from an other contact. It's not about something is uploading.
-				
-				increaseCounter(message.sender);
-			}
+			broadcastMessage(message);
 		});
 	});
 }
 
 
+function broadcastMessage(message) {
+
+	let blockName;
+	if (message.sender == userName) {
+		blockName = message.receiver;
+	} else {
+		blockName = message.sender;
+	}
+	
+	if (messagesBlockIsEmpty(blockName)) {
+		loadMessageHistory(blockName, false, message);
+	} else {
+		broadcastMessageToExistingBlock(message);
+	}
+}
+
+
+function broadcastMessageToExistingBlock(message) {
+	
+///////////////////////////////////////////////////////////////
+	// Broadcast
+	
+	if (message.code == 0 || message.code == null) {
+		// We got some plain text
+		
+		if (message.sender != userName) {
+			drawMessage(message);
+		}
+	
+	} else if (message.code == 2) {
+		// Image is ready
+
+		updateMessageImages();
+
+		if (message.sender == userName) {
+			updateMessageDate(message);
+		}
+
+	} else if (message.code == 6) {
+		// User was added as a contact
+				
+		let contact = new Contact(message.sender, message.text, message.filePath);
+		createContact(contact, null, false, false);
+		showPopUp("" + message.sender + " added you as a contact.");
+				
+	} else if (message.code == 5) {
+		// File is ready
+
+		updateMessageDate(message);
+
+	} else if (message.code == 3) {
+		// Plain text is delivered
+					
+		let messageContainer = $("#" + message.id);
+		if (messageContainer.prop("id") == null) {
+			drawMessage(message);
+		} else {
+			updateMessageDate(message);
+		}
+
+	} else if (message.code == 1 || message.code == 4) {
+		// Check if we need to draw a message placeholder
+					
+		let messageContainer = $("#" + message.id);
+		if (messageContainer.prop("id") == null) {
+			drawMessage(message, uploadingPlaceholderText);
+		}
+	}
+
+	///////////////////////////////////////////////////////////////
+	// Check if we need to increase counter
+	
+	if (message.sender != contactName && message.code != 1 && message.code != 4) {
+
+		increaseCounter(message.sender);
+	}
+}
+
+
 function drawMessage(message, datePlaceholder = null) {
+	
+	/////// Check if plain text message already exists
 	
 	let side = getMessageSide(message);
 	
-	let messages = document.getElementById("messages");
+	// Define messages block
+	let messagesBlockName;
+	if (message.sender == userName) {
+		messagesBlockName = message.receiver;
+	} else {
+		messagesBlockName = message.sender;
+	}
+	let messages = document.getElementById("messages-" + messagesBlockName);
+	
+	// #refactor
+	// If there is no messages block, we don't draw it. Maybe this check is not needed.
+	if (messages == null) {
+		return;
+	}
 	
 	// Create message container
 	let messageContainer = document.createElement("li");
@@ -326,31 +358,86 @@ function contactClick(contactElement) {
 	tipTable.removeClass();
 	tipTable.html("");
 	
+	// Hide current message list
+	let elems = $(".contact");
+    let elemsTotal = elems.length;
+    for (let i = 0; i < elemsTotal; ++i) {
+		let cName = getContactName(elems[i]);
+		$("#messages-"+cName).addClass("invisible");
+	}
+
 	// Show messages
-	$("#messages").html("");
-	$("#messages").removeClass("invisible");
+    let currentMessagesBlock = $("#messages-" + contactName);
+    currentMessagesBlock.removeClass("invisible");
 
 	// Show bottom panel
 	$(".bottom_wrapper").removeClass("invisible");
+////////// DELETE EXTRA VAR
+	// Check if we need to send a query
+	let needToLoadMessages = messagesBlockIsEmpty(contactName);//(currentMessagesBlock.children("li").length == 0);
+	console.log("needToLoadMessages: " + needToLoadMessages);
+	
+	// Load message history
+	loadMessageHistory(contactName, needToResetCounter);
+	/*if (needToLoadMessages || needToResetCounter) {
+		
+		let userData = {"contact": contactName, "needToResetCounter": needToResetCounter, "needToLoadMessages": needToLoadMessages};
+	    let url = "/contact-clicked";
+	    let userJson = JSON.stringify(userData);
+		
+		$.ajax
+	    ({
+	        type: "POST",
+	        data: userJson,
+	        url: url,
+	        contentType: "application/json; charset=utf-8",
+	        success: function(data)
+	    	{
+	        	if (needToLoadMessages) {
+	        		outputMessageHistory(data);
+	        	}
+	    	}
+	    });
+	}*/
+	
+	
+}
 
-	// Fill data
-	let userData = {"contact": contactName, "needToResetCounter": needToResetCounter};
-    let url = "/contact-clicked";
-    let userJson = JSON.stringify(userData);
+
+function loadMessageHistory(contact, needToResetCounter, messageToBroadcast = null) {
 	
-	$.ajax
-    ({
-        type: "POST",
-        data: userJson,
-        url: url,
-        contentType: "application/json; charset=utf-8",
-        success: function(data)
-    	{
-        	outputMessageHistory(data);
-    	}
-    });
+	needToLoadMessages = messagesBlockIsEmpty(contact);
 	
-	scrollDown();
+	if (needToLoadMessages || needToResetCounter) {
+		
+		let userData = {"contact": contact, "needToResetCounter": needToResetCounter, "needToLoadMessages": needToLoadMessages};
+	    let url = "/contact-clicked";
+	    let userJson = JSON.stringify(userData);
+		
+		$.ajax
+	    ({
+	        type: "POST",
+	        data: userJson,
+	        url: url,
+	        contentType: "application/json; charset=utf-8",
+	        success: function(data)
+	    	{
+	        	if (needToLoadMessages) {
+	        		outputMessageHistory(data);
+	        	}
+	        		
+	        	if (messageToBroadcast) {
+	        		
+	        		// Broadcast message if it doesn't exist
+	        		if ($("#" + messageToBroadcast.id) == null) { 
+	        			broadcastMessageToExistingBlock(messageToBroadcast);
+	        		}
+	        	}
+	        		
+	        	scrollDown();	
+	    	}
+	    });
+	}
 }
 
 

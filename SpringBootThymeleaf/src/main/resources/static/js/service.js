@@ -105,7 +105,9 @@ function increaseCounter(str, num = 1) {
 
 
 function scrollDown() {
-	$("#messages").scrollTop($("#messages")[0].scrollHeight);
+	if ($("#messages-"+contactName).length != 0) {
+		$("#messages-"+contactName).scrollTop($("#messages-"+contactName)[0].scrollHeight);
+	}
 }
 
 
@@ -137,4 +139,11 @@ function getText(el) {
 		  return this.nodeType == Node.TEXT_NODE;
 		}).text();
 	return text;
+}
+
+
+function messagesBlockIsEmpty(contact) {
+	
+	let messagesBlock = $("#messages-" + contact);
+	return (messagesBlock.children("li").length == 0);
 }

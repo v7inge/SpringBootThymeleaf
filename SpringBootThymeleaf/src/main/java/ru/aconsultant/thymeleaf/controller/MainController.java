@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.security.Principal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -130,8 +131,10 @@ public class MainController {
 		
 		String userName = principal.getName();
 		
-		List<Message> history = databaseAccess.getHistory(userName, currentContact);
-		
+		List<Message> history = new ArrayList<Message>();
+		if ((boolean) requestParameters.get("needToLoadMessages")) {
+			history = databaseAccess.getHistory(userName, currentContact);
+		}
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("contactHistory", history);
 		httpParamProcessor.translateResponseParameters(response, map);

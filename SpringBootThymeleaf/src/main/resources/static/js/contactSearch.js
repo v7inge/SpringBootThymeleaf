@@ -97,6 +97,10 @@ function createContact(contact = null, contactElement = null, found = false, mak
   
   $("#" + listId).append(newContact);
   
+  //Create a messages block
+  let newBlock = $("<ul>", {"class": "messages", "id": "messages-"+name});
+  $(".chat_inner_window").append(newBlock);
+  
   if (makeAClick) {
 	newContact.click();
   }
