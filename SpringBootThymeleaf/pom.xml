@@ -191,10 +191,10 @@
             <scope>test</scope>
         </dependency>
         
-        <dependency>
+        <!--<dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-        </dependency>
+        </dependency>-->
         
         <dependency>
 		    <groupId>com.github.stefanbirkner</groupId>
