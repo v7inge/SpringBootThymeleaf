@@ -79,7 +79,11 @@ function broadcastMessage(message) {
 	}
 	
 	if (messagesBlockIsEmpty(blockName)) {
-		loadMessageHistory(blockName, false, message);
+		
+		if (message.code != 1 && message.code != 4) {
+			loadMessageHistory(blockName, message);
+		}
+		
 	} else {
 		broadcastMessageToExistingBlock(message);
 	}
@@ -87,9 +91,6 @@ function broadcastMessage(message) {
 
 
 function broadcastMessageToExistingBlock(message) {
-	
-///////////////////////////////////////////////////////////////
-	// Broadcast
 	
 	if (message.code == 0 || message.code == null) {
 		// We got some plain text
@@ -333,14 +334,13 @@ function outputMessageHistory(data) {
 
 function contactClick(contactElement) {
 
-	// Counter
 	let contactCounter = getContactCounter(contactElement);
-	let needToResetCounter = (contactCounter != 0);
-	
 	contactName = getContactName(contactElement);
 
 	// Update contact list
-	resetCounter(contactName);
+	if (contactCounter != 0) {
+		resetCounter(contactName);
+	}
 	contacts = $(".contact-active");
 	contacts.removeClass();
 	contacts.toggleClass("contact");
@@ -367,18 +367,16 @@ function contactClick(contactElement) {
 	$(".bottom_wrapper").removeClass("invisible");
 
 	// Load message history
-	loadMessageHistory(contactName, needToResetCounter);
+	loadMessageHistory(contactName);
 }
 
 
-function loadMessageHistory(contact, needToResetCounter, messageToBroadcast = null) {
+function loadMessageHistory(contact, messageToBroadcast = null) {
 	
-	needToLoadMessages = messagesBlockIsEmpty(contact);
-	
-	if (needToLoadMessages || needToResetCounter) {
+	if (messagesBlockIsEmpty(contact)) {
 		
-		let userData = {"contact": contact, "needToResetCounter": needToResetCounter, "needToLoadMessages": needToLoadMessages};
-	    let url = "/contact-clicked";
+		let userData = {"contact": contact};
+	    let url = "/get-history";
 	    let userJson = JSON.stringify(userData);
 		
 		$.ajax
@@ -389,10 +387,8 @@ function loadMessageHistory(contact, needToResetCounter, messageToBroadcast = nu
 	        contentType: "application/json; charset=utf-8",
 	        success: function(data)
 	    	{
-	        	if (needToLoadMessages) {
-	        		outputMessageHistory(data);
-	        	}
-	        		
+	        	outputMessageHistory(data);
+	        	
 	        	if (messageToBroadcast) {
 	        		
 	        		// We don't know if the new message was already loaded. It depends on the connection speed. 
@@ -466,7 +462,7 @@ function sendTestQuery() {
         cache: false,
         //dataType: "json",
         timeout: 1000000
-    });		
+    });
 }
 
 

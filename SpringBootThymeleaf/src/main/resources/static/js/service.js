@@ -40,9 +40,9 @@ function formatDate(date) {
 }
 
 
-function resetCounter(str) {
+function resetCounter(contact) {
 
-	let el = findContact(str);
+	let el = findContact(contact);
 	if (el != null) {
 	
 		let counterElement = $(el).children(".counter");
@@ -52,6 +52,20 @@ function resetCounter(str) {
 		}
 
 		counterElement.text("");
+		
+		// Notify the server
+		let userData = {"contact": contact};
+	    let url = "/reset-counter";
+	    let userJson = JSON.stringify(userData);
+		
+		$.ajax
+	    ({
+	        type: "POST",
+	        data: userJson,
+	        url: url,
+	        contentType: "application/json; charset=utf-8",
+	        success: function(data) { }
+	    });
 
 	};
 }

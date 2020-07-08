@@ -121,7 +121,7 @@ public class MainController {
 	}
 	
 	
-	@RequestMapping(value = { "/contact-clicked" }, method = RequestMethod.POST)
+	/*@RequestMapping(value = { "/contact-clicked" }, method = RequestMethod.POST)
 	public void contactClick(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
 		
 		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
@@ -143,6 +143,34 @@ public class MainController {
         if ((boolean) requestParameters.get("needToResetCounter")) {	
         	databaseAccess.resetCounter(userName, currentContact);
         }
+	}*/
+	
+	
+	@PostMapping("/get-history")
+	public void getHistory(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
+		
+		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
+		
+		String currentContact = (String) requestParameters.get("contact");
+		setSessionAttribute(request, "currentContact", currentContact);
+		
+		String userName = principal.getName();
+		
+		List<Message> history = databaseAccess.getHistory(userName, currentContact);
+		
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("contactHistory", history);
+		httpParamProcessor.translateResponseParameters(response, map);
+	}
+	
+	
+	@PostMapping("/reset-counter")
+	public void resetCounter(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
+		
+		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
+		String currentContact = (String) requestParameters.get("contact");
+		String userName = principal.getName();
+		databaseAccess.resetCounter(userName, currentContact);
 	}
 	
 	
@@ -332,6 +360,7 @@ public class MainController {
 		
 		// Save massage to database
 		message.setCode(code);
+		message.setNewOne( !receiverIsFocusedOnTheSender(username, contact) );
 		databaseAccess.saveMessage(message);
 	}
 	
