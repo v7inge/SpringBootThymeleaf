@@ -3,8 +3,9 @@ package ru.aconsultant.thymeleaf.mapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import ru.aconsultant.thymeleaf.beans.UserAccount;
 import org.springframework.jdbc.core.RowMapper;
+
+import ru.aconsultant.thymeleaf.model.UserAccount;
 
 public class UserAccountMapper implements RowMapper<UserAccount> {
 	

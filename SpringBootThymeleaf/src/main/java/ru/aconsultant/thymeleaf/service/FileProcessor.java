@@ -27,8 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import ru.aconsultant.thymeleaf.beans.Contact;
 import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
+import ru.aconsultant.thymeleaf.model.Contact;
 
 @Component
 public class FileProcessor {
@@ -44,6 +44,11 @@ public class FileProcessor {
 	private static int avaHeight = 150;
 	
 	private FTPClient ftpClient;
+	
+	// This method is not used as we use FileProcessor as Autowired. But we need it if create it manually (to put into static variable).
+	public void setDatabaseAccess(DatabaseAccess databaseAccess) {
+		this.databaseAccess = databaseAccess;
+	}
 	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -237,6 +242,19 @@ public class FileProcessor {
 		}
 		
 		return complete;
+	}
+	
+	
+	public void clearAllConversationContents(String user1, String user2) throws SocketException, IOException, InterruptedException {
+		
+		// Delete files
+		List<String> filePaths = databaseAccess.getFilePaths(user1, user2);
+		for (String filePath : filePaths) {
+			deleteFile(filePath);
+		}
+		
+		// Clear message history
+		databaseAccess.clearMessageHistory(user1, user2);
 	}
 	
 	

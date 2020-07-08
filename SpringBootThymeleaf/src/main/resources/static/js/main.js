@@ -140,17 +140,11 @@ function broadcastMessageToExistingBlock(message) {
 
 	///////////////////////////////////////////////////////////////
 	// Check if we need to increase counter
-	
-	if (message.sender != contactName && message.code != 1 && message.code != 4) {
-
-		increaseCounter(message.sender);
-	}
+	increaseCounterIfNecessary(message);
 }
 
 
 function drawMessage(message, datePlaceholder = null) {
-	
-	/////// Check if plain text message already exists
 	
 	let side = getMessageSide(message);
 	
@@ -165,9 +159,9 @@ function drawMessage(message, datePlaceholder = null) {
 	
 	// #refactor
 	// If there is no messages block, we don't draw it. Maybe this check is not needed.
-	if (messages == null) {
+	/*if (messages == null) {
 		return;
-	}
+	}*/
 	
 	// Create message container
 	let messageContainer = document.createElement("li");
@@ -367,40 +361,13 @@ function contactClick(contactElement) {
 	}
 
 	// Show messages
-    let currentMessagesBlock = $("#messages-" + contactName);
-    currentMessagesBlock.removeClass("invisible");
+    $("#messages-" + contactName).removeClass("invisible");
 
 	// Show bottom panel
 	$(".bottom_wrapper").removeClass("invisible");
-////////// DELETE EXTRA VAR
-	// Check if we need to send a query
-	let needToLoadMessages = messagesBlockIsEmpty(contactName);//(currentMessagesBlock.children("li").length == 0);
-	console.log("needToLoadMessages: " + needToLoadMessages);
-	
+
 	// Load message history
 	loadMessageHistory(contactName, needToResetCounter);
-	/*if (needToLoadMessages || needToResetCounter) {
-		
-		let userData = {"contact": contactName, "needToResetCounter": needToResetCounter, "needToLoadMessages": needToLoadMessages};
-	    let url = "/contact-clicked";
-	    let userJson = JSON.stringify(userData);
-		
-		$.ajax
-	    ({
-	        type: "POST",
-	        data: userJson,
-	        url: url,
-	        contentType: "application/json; charset=utf-8",
-	        success: function(data)
-	    	{
-	        	if (needToLoadMessages) {
-	        		outputMessageHistory(data);
-	        	}
-	    	}
-	    });
-	}*/
-	
-	
 }
 
 
@@ -428,9 +395,12 @@ function loadMessageHistory(contact, needToResetCounter, messageToBroadcast = nu
 	        		
 	        	if (messageToBroadcast) {
 	        		
-	        		// Broadcast message if it doesn't exist
+	        		// We don't know if the new message was already loaded. It depends on the connection speed. 
+	        		// If it wasn't, we broadcast it. Else we just increase the counter. 
 	        		if ($("#" + messageToBroadcast.id) == null) { 
 	        			broadcastMessageToExistingBlock(messageToBroadcast);
+	        		} else {
+	        			increaseCounterIfNecessary(messageToBroadcast);
 	        		}
 	        	}
 	        		

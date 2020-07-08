@@ -3,9 +3,9 @@ package ru.aconsultant.thymeleaf.mapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import ru.aconsultant.thymeleaf.beans.Contact;
-
 import org.springframework.jdbc.core.RowMapper;
+
+import ru.aconsultant.thymeleaf.model.Contact;
 
 public class ContactMapper implements RowMapper<Contact> {
 

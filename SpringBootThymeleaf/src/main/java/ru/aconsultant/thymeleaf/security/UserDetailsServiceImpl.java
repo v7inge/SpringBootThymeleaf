@@ -12,8 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import ru.aconsultant.thymeleaf.beans.UserAccount;
 import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
+import ru.aconsultant.thymeleaf.model.UserAccount;
  
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

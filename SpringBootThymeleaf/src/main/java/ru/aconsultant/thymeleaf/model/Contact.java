@@ -1,4 +1,4 @@
-package ru.aconsultant.thymeleaf.beans;
+package ru.aconsultant.thymeleaf.model;
 
 import java.io.IOException;
 import java.sql.SQLException;

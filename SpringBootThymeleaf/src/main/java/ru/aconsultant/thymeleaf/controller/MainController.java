@@ -43,15 +43,15 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import ru.aconsultant.thymeleaf.form.AuthForm;
-import ru.aconsultant.thymeleaf.beans.UserAccount;
-import ru.aconsultant.thymeleaf.beans.Contact;
-import ru.aconsultant.thymeleaf.beans.Message;
 import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
 import ru.aconsultant.thymeleaf.service.HttpParamProcessor;
 import ru.aconsultant.thymeleaf.security.PasswordEncoder;
 import ru.aconsultant.thymeleaf.security.UserDetailsServiceImpl;
 import ru.aconsultant.thymeleaf.service.FileProcessor;
 import ru.aconsultant.thymeleaf.form.UploadForm;
+import ru.aconsultant.thymeleaf.model.Contact;
+import ru.aconsultant.thymeleaf.model.Message;
+import ru.aconsultant.thymeleaf.model.UserAccount;
 
 import org.apache.commons.net.util.Base64;
 
@@ -349,6 +349,9 @@ public class MainController {
 	@RequestMapping(value = { "/test" }, method = RequestMethod.POST)
 	public void test(HttpServletResponse response, Principal principal, HttpServletRequest request) throws SQLException, IOException, InterruptedException {
         
+		
+		fileProcessor.clearAllConversationContents("victor", "jerry");
+		System.out.println("Content cleared");
 		
 		/*long currentMillis = System.currentTimeMillis();
 		String filename = "Test file created at" + currentMillis + ".txt";

@@ -147,3 +147,12 @@ function messagesBlockIsEmpty(contact) {
 	let messagesBlock = $("#messages-" + contact);
 	return (messagesBlock.children("li").length == 0);
 }
+
+
+function increaseCounterIfNecessary(message) {
+	
+	if (message.sender != contactName && message.code != 1 && message.code != 4) {
+
+		increaseCounter(message.sender);
+	}
+}

@@ -16,10 +16,10 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import ru.aconsultant.thymeleaf.beans.*;
 import ru.aconsultant.thymeleaf.mapper.ContactMapper;
 import ru.aconsultant.thymeleaf.mapper.MessageMapper;
 import ru.aconsultant.thymeleaf.mapper.UserAccountMapper;
+import ru.aconsultant.thymeleaf.model.*;
 
 @Repository
 @Transactional
@@ -206,6 +206,35 @@ public class DatabaseAccess extends JdbcDaoSupport {
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+    }
+    
+    
+    public List<String> getFilePaths(String user1, String user2) {
+    	
+    	String sql = "SELECT m.FilePath FROM MESSAGES m \r\n" + 
+    			"WHERE (m.Sender = ? AND m.Receiver = ? OR m.Sender = ? AND m.Receiver = ?) \r\n" + 
+    			"AND m.FilePath IS NOT NULL";
+    	
+    	Object[] args = new Object[] { user1, user2, user2, user1 };
+    	int[] argTypes = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR };
+    	List<String> filePaths = new ArrayList<String>();
+    	
+		try {
+			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
+			while (rs.next()) {
+				filePaths.add(rs.getString("FilePath"));
+			}
+            return filePaths;
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    
+    public void clearMessageHistory(String user1, String user2) {
+    	
+    	String sql = "DELETE FROM MESSAGES WHERE Sender = ? AND Receiver = ? OR Sender = ? AND Receiver = ?";
+        this.getJdbcTemplate().update(sql, user1, user2, user2, user1);
     }
 
     

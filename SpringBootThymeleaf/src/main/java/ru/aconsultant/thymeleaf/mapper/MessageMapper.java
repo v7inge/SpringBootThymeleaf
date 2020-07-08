@@ -4,8 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
 
-import ru.aconsultant.thymeleaf.beans.Message;
 import org.springframework.jdbc.core.RowMapper;
+
+import ru.aconsultant.thymeleaf.model.Message;
 
 public class MessageMapper implements RowMapper<Message> {
 

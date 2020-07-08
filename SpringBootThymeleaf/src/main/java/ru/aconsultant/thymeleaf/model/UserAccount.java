@@ -1,4 +1,4 @@
-package ru.aconsultant.thymeleaf.beans;
+package ru.aconsultant.thymeleaf.model;
 import java.io.Serializable;
 import java.util.Random;
 
