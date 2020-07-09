@@ -84,7 +84,6 @@ function updateMessageImages() {
 	        			setMessageDateText($(this));
 	        		}
 	        	});
-	        	scrollDown();
 	    	}	
 	    });
     }

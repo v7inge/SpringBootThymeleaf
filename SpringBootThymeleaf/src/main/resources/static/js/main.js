@@ -348,7 +348,7 @@ function contactClick(contactElement) {
 	contactElement.toggleClass("contact-active");
 	
 	// Hide tip table
-	tipTable = $(".tdcenter");
+	tipTable = $(".starting-tip");
 	tipTable.removeClass();
 	tipTable.html("");
 	
@@ -375,6 +375,8 @@ function loadMessageHistory(contact, messageToBroadcast = null) {
 	
 	if (messagesBlockIsEmpty(contact)) {
 		
+		$(".chat-tip").removeClass("invisible");
+		
 		let userData = {"contact": contact};
 	    let url = "/get-history";
 	    let userJson = JSON.stringify(userData);
@@ -399,8 +401,9 @@ function loadMessageHistory(contact, messageToBroadcast = null) {
 	        			increaseCounterIfNecessary(messageToBroadcast);
 	        		}
 	        	}
-	        		
-	        	scrollDown();	
+	        	
+	        	scrollDown();
+	        	$(".chat-tip").addClass("invisible");
 	    	}
 	    });
 	}
@@ -456,11 +459,9 @@ function sendTestQuery() {
 	$.ajax({
         type: "POST",
         url: "/test",
-        //data: data,
         processData: false,
         contentType: false,
         cache: false,
-        //dataType: "json",
         timeout: 1000000
     });
 }

@@ -30,7 +30,7 @@
 
 <body onload="onLoad()">
 	
-	<button onclick="test()">Test</button>
+	<!--<button onclick="test()">Test</button>-->
 	
 	<input type="file" class="invisible" id="avatar_input" name="avatar_input" />
 	<input type="file" class="invisible" id="file-input" name="file-input" />​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
@@ -92,10 +92,19 @@
 		<div class="chat_inner_window">
 		
 			<!-- STARTING TIP -->
-			<table class = "tdcenter">
+			<table class="starting-tip">
 				<tr>
 					<td>
 						<p>Select a contact to start messaging...</p>
+					</td>
+				</tr>
+			</table>
+			
+			<!-- CHAT TIP -->
+			<table class="chat-tip invisible">
+				<tr>
+					<td>
+						<p>Loading messages...</p>
 					</td>
 				</tr>
 			</table>

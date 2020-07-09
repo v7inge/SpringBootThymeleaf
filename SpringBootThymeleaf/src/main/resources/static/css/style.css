@@ -48,8 +48,16 @@
   position: relative;
 }
 
-.chat_inner_window .tdcenter {
+.chat_inner_window .starting-tip {
   height: 100%;
+  vertical-align: middle;
+  width: 100%;
+  text-align: center; 
+  color: gray;
+}
+
+.chat_inner_window .chat-tip {
+  height: calc(100% - 70px);
   vertical-align: middle;
   width: 100%;
   text-align: center; 
