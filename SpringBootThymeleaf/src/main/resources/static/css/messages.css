@@ -9,7 +9,6 @@
 
 .message-box {
 	clear: both;
-	/*display: block;*/
   	display: inline-flex;
 	color: var(--dark-text);
 	padding:6px;

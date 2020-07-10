@@ -545,4 +545,17 @@ $(document).ready(function() {
 		sendFile();		
 	});
 	
+	// Click on message image
+	$(document).on("click", ".image-message img", function() {
+		
+		showLightbox($(this));
+	});
+	
+	// Click to hide a lightbox
+	$(document).on("click", "#overlay", function() {
+
+		event.preventDefault();
+		hideLightbox();
+	});
+	
 });
