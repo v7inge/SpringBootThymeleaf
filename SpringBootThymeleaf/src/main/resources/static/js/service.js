@@ -165,7 +165,7 @@ function messagesBlockIsEmpty(contact) {
 
 function increaseCounterIfNecessary(message) {
 	
-	if (message.sender != contactName && message.code != 1 && message.code != 4) {
+	if (message.sender != contactName && message.code != 1 && message.code != 4 && message.code != 6) {
 
 		increaseCounter(message.sender);
 	}

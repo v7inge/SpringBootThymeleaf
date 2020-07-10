@@ -395,7 +395,7 @@ function loadMessageHistory(contact, messageToBroadcast = null) {
 	        		
 	        		// We don't know if the new message was already loaded. It depends on the connection speed. 
 	        		// If it wasn't, we broadcast it. Else we just increase the counter. 
-	        		if ($("#" + messageToBroadcast.id) == null) { 
+	        		if ($("#" + messageToBroadcast.id).length == 0) { 
 	        			broadcastMessageToExistingBlock(messageToBroadcast);
 	        		} else {
 	        			increaseCounterIfNecessary(messageToBroadcast);

@@ -42,15 +42,15 @@ public class DatabaseAccess extends JdbcDaoSupport {
     	String sql =
     			"SELECT AppUser.USER_NAME AS Username, SUM(m.New) AS UnreadCount, AppUser.BASE64IMAGE AS Base64Image, AppUser.LETTER AS Letter, 0 AS Current FROM\r\n" + 
     			"(SELECT chats.User, chats.Contact FROM PERSONAL_CHATS chats WHERE chats.User = ?) AS UserChats\r\n" + 
-    			"LEFT JOIN MESSAGES m ON UserChats.Contact = m.Sender AND m.New = 1\r\n" + 
+    			"LEFT JOIN MESSAGES m ON UserChats.Contact = m.Sender AND m.Receiver = ? AND m.New = 1\r\n" + 
     			"LEFT JOIN APP_USER AppUser ON UserChats.Contact = AppUser.USER_NAME\r\n" + 
     			"GROUP BY UserChats.Contact\r\n" + 
     			"UNION\r\n" + 
     			"SELECT AppUser.USER_NAME, 0, AppUser.BASE64IMAGE, AppUser.LETTER, 1 FROM\r\n" + 
     			"APP_USER AppUser WHERE AppUser.USER_NAME = ?";
     	
-    	Object[] args = new Object[] { username, username };
-		int[] argTypes = new int[] { Types.VARCHAR, Types.VARCHAR };
+    	Object[] args = new Object[] { username, username, username };
+		int[] argTypes = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR };
 		
 		try {
 			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);

@@ -45,11 +45,6 @@ public class FileProcessor {
 	
 	private FTPClient ftpClient;
 	
-	// This method is not used as we use FileProcessor as Autowired. But we need it if create it manually (to put into static variable).
-	public void setDatabaseAccess(DatabaseAccess databaseAccess) {
-		this.databaseAccess = databaseAccess;
-	}
-	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	// ---------------------------------- CONNECTION ---------------------------------- //
@@ -113,7 +108,17 @@ public class FileProcessor {
 	        	result.put(filename, getBase64String(bytes));
 		       	ftpClient.completePendingCommand();
         	} catch (IOException e) {
-        		System.out.println("Could not connect to FTP server");
+        		System.err.println("FTP connection lost during downloading a file: " + filename);
+        		e.printStackTrace();
+        		/*connectToFTP();
+        		try {
+	        		byte[] bytes = getBytesWhenConnected(filename);
+		        	result.put(filename, getBase64String(bytes));
+			       	ftpClient.completePendingCommand();
+        		} catch (IOException e2) {
+        			System.err.println("FTP connection lost again during downloading a file: " + filename + ". We give it up.");
+        			connectToFTP();
+        		}*/
         	} catch (NullPointerException n) {
         		String exceptionMsg = "No file \"" + filename + "\" found on FTP server";
         		System.err.println(exceptionMsg);
