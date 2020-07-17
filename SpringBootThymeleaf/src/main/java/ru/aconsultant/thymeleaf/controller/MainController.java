@@ -103,6 +103,15 @@ public class MainController {
     }
 	
 	
+	// For android developing
+	@MessageMapping("/echo")
+    public void echo(@Payload Message message) {
+		
+		message.setText("Server returns: " + message.getText());
+		messagingTemplate.convertAndSend("/queue/echo-reply", message);
+    }
+	
+	
 	@RequestMapping(value = { "/" }, method = RequestMethod.GET)
 	public String chatGet(Model model, Principal principal, HttpServletRequest request) throws SQLException, InvalidResultSetAccessException, IOException {
  		
