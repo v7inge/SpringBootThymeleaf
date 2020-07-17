@@ -91,7 +91,7 @@ public class FileProcessor {
 		if (filename == null || filename == "") { return null; }
 		
 		InputStream inputStream = ftpClient.retrieveFileStream(filename);
-		byte[] bytes = inputStream.readAllBytes();
+		byte[] bytes = readAllBytes(inputStream); //inputStream.readAllBytes();
 		
 		return bytes;
 	}
@@ -352,6 +352,21 @@ public class FileProcessor {
 	
 	public List<String> imageExtensions() {
 		return Arrays.asList("jpg", "jpeg", "png");
+	}
+	
+	
+	public byte[] readAllBytes(InputStream inputStream) throws IOException {
+		
+		int nRead;	
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+		byte[] data = new byte[16384];
+
+		while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+			buffer.write(data, 0, nRead);
+		}
+
+		return buffer.toByteArray();
 	}
 	
 	
