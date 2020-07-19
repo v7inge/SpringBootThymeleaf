@@ -96,7 +96,7 @@ public class MainController {
         message.setCode(3);
 		messagingTemplate.convertAndSendToUser(sender, "/queue/reply", message);
 		
-        // Save massage to database
+        // Save message to database
 		message.setCode(0);
 		message.setNewOne( !receiverIsFocusedOnTheSender(sender, receiver) );
 		databaseAccess.saveMessage(message);
@@ -105,9 +105,9 @@ public class MainController {
 	
 	// For android developing
 	@MessageMapping("/echo")
-    public void echo(@Payload Message message) {
+    public void echo(@Payload String message) {
 		
-		message.setText("Server returns: " + message.getText());
+		message = "Server returns: " + message;
 		messagingTemplate.convertAndSend("/queue/echo-reply", message);
     }
 	

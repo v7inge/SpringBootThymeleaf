@@ -69,7 +69,7 @@ function connect() {
 		stompClient.subscribe("/queue/echo-reply", function (data) {
 			
 			console.log("we got some message");
-			var message = JSON.parse(data.body);
+			var message = data.body;
 		});
 	});
 }
@@ -461,7 +461,7 @@ function test() {
 	// Testing echo
 	let message = new Message("test sender", "test receiver", 0, "test text");
 	let userJson = JSON.stringify(message);
-	stompClient.send("/app/echo", {}, userJson);
+	stompClient.send("/app/echo", {}, "test text");
 }
 
 
