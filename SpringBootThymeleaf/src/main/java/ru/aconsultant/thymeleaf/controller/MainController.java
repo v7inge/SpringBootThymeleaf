@@ -96,7 +96,7 @@ public class MainController {
         message.setCode(3);
 		messagingTemplate.convertAndSendToUser(sender, "/queue/reply", message);
 		
-        // Save massage to database
+        // Save message to database
 		message.setCode(0);
 		message.setNewOne( !receiverIsFocusedOnTheSender(sender, receiver) );
 		databaseAccess.saveMessage(message);
