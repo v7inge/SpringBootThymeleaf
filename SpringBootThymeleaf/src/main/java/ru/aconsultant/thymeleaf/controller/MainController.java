@@ -105,9 +105,9 @@ public class MainController {
 	
 	// For android developing
 	@MessageMapping("/echo")
-    public void echo(@Payload Message message) {
+    public void echo(@Payload String message) {
 		
-		message.setText("Server returns: " + message.getText());
+		message = "Server returns: " + message;
 		messagingTemplate.convertAndSend("/queue/echo-reply", message);
     }
 	
