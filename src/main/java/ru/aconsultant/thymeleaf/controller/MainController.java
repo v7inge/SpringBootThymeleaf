@@ -169,7 +169,7 @@ public class MainController {
 		
 		String userName = principal.getName();
 		
-		List<Message> history = databaseAccess.getHistory(userName, currentContact);
+		List<Message> history = messageService.getHistory(userName, currentContact);
 		
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("contactHistory", history);

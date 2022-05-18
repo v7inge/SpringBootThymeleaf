@@ -14,6 +14,6 @@ public class MessageService {
     private MessageRepositoryInterface messageRepositoryInterface;
 
     public List<Message> getHistory(String sender, String receiver) {
-        return Util.getAsList(messageRepositoryInterface.findBySenderAndReceiver(sender, receiver));
+        return Util.getAsList(messageRepositoryInterface.getHistory(sender, receiver));
     }
 }
