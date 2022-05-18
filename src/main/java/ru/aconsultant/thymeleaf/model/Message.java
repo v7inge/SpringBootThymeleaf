@@ -1,5 +1,7 @@
 package ru.aconsultant.thymeleaf.model;
 
+import ru.aconsultant.thymeleaf.service.DateConverter;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -21,7 +23,8 @@ public class Message {
 	@Column(name = "FilePath")
 	private String filePath;
 
-	@Transient
+	@Column(name = "DateTime")
+	@Convert(converter = DateConverter.class)
 	private long milliseconds;
 
 	@Column(name = "FileName")
