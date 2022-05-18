@@ -42,7 +42,7 @@ public class DatabaseAccess extends JdbcDaoSupport {
     	String sql =
     			"SELECT AppUser.USER_NAME AS Username, SUM(m.New) AS UnreadCount, AppUser.BASE64IMAGE AS Base64Image, AppUser.LETTER AS Letter, 0 AS Current FROM\r\n" + 
     			"(SELECT chats.User, chats.Contact FROM PERSONAL_CHATS chats WHERE chats.User = ?) AS UserChats\r\n" + 
-    			"LEFT JOIN MESSAGES m ON UserChats.Contact = m.Sender AND m.Receiver = ? AND m.New = 1\r\n" + 
+    			"LEFT JOIN message m ON UserChats.Contact = m.Sender AND m.Receiver = ? AND m.New = 1\r\n" +
     			"LEFT JOIN APP_USER AppUser ON UserChats.Contact = AppUser.USER_NAME\r\n" + 
     			"GROUP BY UserChats.Contact\r\n" + 
     			"UNION\r\n" + 
@@ -71,7 +71,7 @@ public class DatabaseAccess extends JdbcDaoSupport {
     
     public List<Message> getHistory(String sender, String receiver) throws SQLException {
     	
-    	String sql = "Select * from MESSAGES m where m.Sender = ? and m.Receiver = ? or m.Sender = ? and m.Receiver = ?";
+    	String sql = "Select * from message m where m.Sender = ? and m.Receiver = ? or m.Sender = ? and m.Receiver = ?";
     	Object[] args = new Object[] { sender, receiver, receiver, sender };
 		MessageMapper mapper = new MessageMapper();
     	
@@ -86,14 +86,14 @@ public class DatabaseAccess extends JdbcDaoSupport {
     
     public void saveMessage(Message message) throws SQLException {
     	
-        String sql = "INSERT INTO MESSAGES (Sender, Receiver, DateTime, Text, FilePath, Code, ID, FileName, New) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO message (Sender, Receiver, DateTime, Text, FilePath, Code, ID, FileName, New) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         this.getJdbcTemplate().update(sql, message.getSender(), message.getReceiver(), message.getDateTime(), message.getText(), 
         		message.getFilePath(), message.getCode(), message.getId(), message.getFileName(), message.getNewOne());
     }
     
     
     public void resetCounter(String userName, String contactName) throws SQLException {
-        String sql = "UPDATE MESSAGES SET New=0 WHERE Sender=? AND Receiver=?";
+        String sql = "UPDATE message SET New=0 WHERE Sender=? AND Receiver=?";
         this.getJdbcTemplate().update(sql, contactName, userName);
     }
     
@@ -211,7 +211,7 @@ public class DatabaseAccess extends JdbcDaoSupport {
     
     public List<String> getFilePaths(String user1, String user2) {
     	
-    	String sql = "SELECT m.FilePath FROM MESSAGES m \r\n" + 
+    	String sql = "SELECT m.FilePath FROM message m \r\n" +
     			"WHERE (m.Sender = ? AND m.Receiver = ? OR m.Sender = ? AND m.Receiver = ?) \r\n" + 
     			"AND m.FilePath IS NOT NULL";
     	
@@ -233,7 +233,7 @@ public class DatabaseAccess extends JdbcDaoSupport {
     
     public void clearMessageHistory(String user1, String user2) {
     	
-    	String sql = "DELETE FROM MESSAGES WHERE Sender = ? AND Receiver = ? OR Sender = ? AND Receiver = ?";
+    	String sql = "DELETE FROM message WHERE Sender = ? AND Receiver = ? OR Sender = ? AND Receiver = ?";
         this.getJdbcTemplate().update(sql, user1, user2, user2, user1);
     }
 

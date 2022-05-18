@@ -3,18 +3,31 @@ package ru.aconsultant.thymeleaf.model;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.springframework.stereotype.Component;
+import javax.persistence.*;
 
-@Component
+@Entity
+@Table(name = "message")
 public class Message {
 
+	@Column(name = "Sender")
 	private String sender;
+
+	@Column(name = "Receiver")
 	private String receiver;
+
+	@Column(name = "Text")
 	private String text;
+
+	@Column(name = "FilePath")
 	private String filePath;
+
+	@Transient
 	private long milliseconds;
+
+	@Column(name = "FileName")
 	private String fileName;
-	
+
+	@Column(name = "Code")
 	private int code;
 	// null or 0: Plain text message
 	// 1: Image uploading
@@ -23,8 +36,11 @@ public class Message {
 	// 4: File uploading
 	// 5: File is ready
 	// 6: User added as a contact
-	
+
+	@Id
 	private String id;
+
+	@Column(name = "New")
 	private boolean newOne;
 	
 	// --- CONSTRUCTORS --- //

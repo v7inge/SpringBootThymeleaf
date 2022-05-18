@@ -54,6 +54,7 @@ import ru.aconsultant.thymeleaf.model.Message;
 import ru.aconsultant.thymeleaf.model.UserAccount;
 
 import org.apache.commons.net.util.Base64;
+import ru.aconsultant.thymeleaf.service.MessageService;
 
 @Controller
 public class MainController {
@@ -72,6 +73,9 @@ public class MainController {
 	
 	@Autowired
 	private FileProcessor fileProcessor;
+
+	@Autowired
+	private MessageService messageService;
 	
 	private HashMap<String, String> fileCache = new HashMap<String, String>();
 	private static int fileCacheSize = 10;
@@ -386,17 +390,11 @@ public class MainController {
 	// Service method for debugging
 	@RequestMapping(value = { "/test" }, method = RequestMethod.POST)
 	public void test(HttpServletResponse response, Principal principal, HttpServletRequest request) throws SQLException, IOException, InterruptedException {
-        
+
+		List<Message> messages = messageService.getHistory("friend", "test");
 		
-		fileProcessor.clearAllConversationContents("victor", "jerry");
-		System.out.println("Content cleared");
-		
-		/*long currentMillis = System.currentTimeMillis();
-		String filename = "Test file created at" + currentMillis + ".txt";
-		
-		byte[] bytes = FileTest.createNewFile(filename);
-		fileProcessor.saveBytes(bytes, filename, false);
-		fileProcessor.deleteFile(filename);*/
+		/*fileProcessor.clearAllConversationContents("victor", "jerry");
+		System.out.println("Content cleared");*/
 	}
 	
 	

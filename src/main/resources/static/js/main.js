@@ -61,7 +61,9 @@ function connect() {
 	stompClient.connect({}, function (frame) {
 		
 		stompClient.subscribe("/user/queue/reply", function (data) {
-			
+
+			console.log("received a message:\n" + data.body)
+
 			var message = JSON.parse(data.body);
 			broadcastMessage(message);
 		});
@@ -456,12 +458,13 @@ function updateAvatar() {
 
 
 function test() {
-	//sendTestQuery();
+
+	sendTestQuery();
 	
 	// Testing echo
-	let message = new Message("test sender", "test receiver", 0, "test text");
+	/*let message = new Message("test sender", "test receiver", 0, "test text");
 	let userJson = JSON.stringify(message);
-	stompClient.send("/app/echo", {}, "test text");
+	stompClient.send("/app/echo", {}, "test text");*/
 }
 
 
