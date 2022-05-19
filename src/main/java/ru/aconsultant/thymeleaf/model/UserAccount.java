@@ -1,9 +1,9 @@
 package ru.aconsultant.thymeleaf.model;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.springframework.data.repository.cdi.Eager;
+
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Random;
 
 @Entity
@@ -21,7 +21,16 @@ public class UserAccount implements Serializable {
 
 	@Column(name = "LETTER")
 	private String letter;
-	
+
+	@ElementCollection
+	@Column(name = "Contact")
+	@CollectionTable(name = "PERSONAL_CHATS", joinColumns = @JoinColumn(name = "User"))
+	private List<String> contactNames;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "PERSONAL_CHATS", joinColumns = @JoinColumn(name = "User"), inverseJoinColumns = @JoinColumn(name = "Contact"))
+	private List<UserAccount> companions;
+
 	public UserAccount() { }
 	
 	public UserAccount(String userName, String encryptedPassword) {
@@ -53,7 +62,23 @@ public class UserAccount implements Serializable {
 	public String getLetter() {
 		return letter;
 	}
-	
+
+	public List<String> getContactNames() {
+		return contactNames;
+	}
+
+	public void setContactNames(List<String> contactNames) {
+		this.contactNames = contactNames;
+	}
+
+	public List<UserAccount> getCompanions() {
+		return companions;
+	}
+
+	public void setCompanions(List<UserAccount> companions) {
+		this.companions = companions;
+	}
+
 	@Override
     public String toString() {
         return this.userName + "/" + this.encryptedPassword;

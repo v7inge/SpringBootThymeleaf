@@ -1,6 +1,9 @@
 package ru.aconsultant.thymeleaf.model;
 
+import javax.persistence.Entity;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.SQLException;
 
 public class Contact {
@@ -27,12 +30,23 @@ public class Contact {
 	}
 	
 	
-	public Contact(String username, Integer unreadCount, boolean current, String base64Image, String letter) throws SQLException, IOException {
+	public Contact(String username, Integer unreadCount, boolean current, String base64Image, String letter) {
 		this.username = username;
 		this.unreadCount = unreadCount;
 		this.current = current;
 		this.base64Image = base64Image;
 		this.letter = letter;
+	}
+
+
+	public Contact(Object[] object) {
+		this(
+				(String) object[0],
+				(object[1] == null ? 0 : ((BigDecimal) object[1]).intValue()),
+				(object[4] != null && ((BigInteger) object[4]).intValue() == 1),
+				(String) object[2],
+				((Character) object[3]).toString()
+		);
 	}
 	
 
