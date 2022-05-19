@@ -14,25 +14,24 @@ import org.springframework.stereotype.Service;
 
 import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
 import ru.aconsultant.thymeleaf.model.UserAccount;
- 
+import ru.aconsultant.thymeleaf.service.UserAccountService;
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
- 
+
     @Autowired
-    private DatabaseAccess databaseAccess;
+    private UserAccountService userAccountService;
     
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        UserAccount appUser = this.databaseAccess.findUserAccount(userName);
+        UserAccount appUser = userAccountService.findUserAccount(userName);
  
         if (appUser == null) {
             System.out.println("User not found! " + userName);
             throw new UsernameNotFoundException("User " + userName + " was not found in the database");
         }
- 
-        UserDetails userDetails = (UserDetails) new User(appUser.getUserName(), appUser.getEncryptedPassword(), createAuthorityList("ROLE_USER"));
- 
-        return userDetails;
+
+        return new User(appUser.getUserName(), appUser.getEncryptedPassword(), createAuthorityList("ROLE_USER"));
     }
     
     public List<GrantedAuthority> createAuthorityList(String role) {

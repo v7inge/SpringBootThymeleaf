@@ -59,18 +59,20 @@ function connect() {
 	var socket = new SockJS("/chat-messaging");
 	stompClient = Stomp.over(socket);
 	stompClient.connect({}, function (frame) {
-		
+
+		stompClient.subscribe("/news", function (data) {
+			console.log("received news!")
+		});
+
 		stompClient.subscribe("/user/queue/reply", function (data) {
 
-			console.log("received a message:\n" + data.body)
+			console.log("received a message!")
 
 			var message = JSON.parse(data.body);
 			broadcastMessage(message);
 		});
 		
 		stompClient.subscribe("/queue/echo-reply", function (data) {
-			
-			console.log("we got some message");
 			var message = data.body;
 		});
 	});

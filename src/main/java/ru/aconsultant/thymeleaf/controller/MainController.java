@@ -55,6 +55,7 @@ import ru.aconsultant.thymeleaf.model.UserAccount;
 
 import org.apache.commons.net.util.Base64;
 import ru.aconsultant.thymeleaf.service.MessageService;
+import ru.aconsultant.thymeleaf.service.UserAccountService;
 
 @Controller
 public class MainController {
@@ -76,6 +77,9 @@ public class MainController {
 
 	@Autowired
 	private MessageService messageService;
+
+	@Autowired
+	private UserAccountService userAccountService;
 	
 	private HashMap<String, String> fileCache = new HashMap<String, String>();
 	private static int fileCacheSize = 10;
@@ -92,7 +96,10 @@ public class MainController {
 		
 		String sender = principal.getName();
 		String receiver = message.getReceiver();
-		
+
+		// Send to everyone
+		messagingTemplate.convertAndSend("/news", message);
+
 		// Send message to the receiver
         messagingTemplate.convertAndSendToUser(receiver, "/queue/reply", message);
 		
@@ -215,16 +222,14 @@ public class MainController {
         String encryptedPassword = PasswordEncoder.encryptPassword(password);
         UserAccount user = new UserAccount(username, encryptedPassword);
         
-        String errorString = databaseAccess.addUserAccount(user);
-        if (errorString == "") {
-        	
-        	Authentication authentication = new UsernamePasswordAuthenticationToken(userService.loadUserByUsername(username), null, userService.createAuthorityList("ROLE_USER"));
-        	SecurityContextHolder.getContext().setAuthentication(authentication);
-        	return "redirect:/";
-        	
-        } else {
-        	return "redirect:/auth?regerror";
-        }
+        UserAccount userAccount = userAccountService.save(user);
+        if (userAccount == null) {
+			return "redirect:/auth?regerror";
+		} else {
+			Authentication authentication = new UsernamePasswordAuthenticationToken(userService.loadUserByUsername(username), null, userService.createAuthorityList("ROLE_USER"));
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			return "redirect:/";
+		}
     }
 	
 	
@@ -235,7 +240,7 @@ public class MainController {
 		String username = (String) requestParameters.get("username");
 		
 		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("free", databaseAccess.findUserAccount(username) == null);
+		map.put("free", userAccountService.findUserAccount(username) == null);
 		httpParamProcessor.translateResponseParameters(response, map);
 	}
 	

@@ -26,9 +26,9 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer  {
 	
 	public void configureMessageBroker(MessageBrokerRegistry confi) {
-		confi.enableSimpleBroker("/queue", "/user");
+		confi.enableSimpleBroker("/queue", "/user", "/news");
 		confi.setApplicationDestinationPrefixes("/app");
-		confi.setUserDestinationPrefix("/user"); 
+		confi.setUserDestinationPrefix("/user");
 	}
 
 	public void registerStompEndpoints(StompEndpointRegistry registry) {

@@ -69,21 +69,6 @@ public class DatabaseAccess extends JdbcDaoSupport {
     }
     
     
-    public List<Message> getHistory(String sender, String receiver) throws SQLException {
-    	
-    	String sql = "Select * from message m where m.Sender = ? and m.Receiver = ? or m.Sender = ? and m.Receiver = ?";
-    	Object[] args = new Object[] { sender, receiver, receiver, sender };
-		MessageMapper mapper = new MessageMapper();
-    	
-		try {
-			List<Message> history = this.getJdbcTemplate().query(sql, args, mapper);
-            return history;
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    }
-    
-    
     public void saveMessage(Message message) throws SQLException {
     	
         String sql = "INSERT INTO message (Sender, Receiver, DateTime, Text, FilePath, Code, ID, FileName, New) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -95,33 +80,6 @@ public class DatabaseAccess extends JdbcDaoSupport {
     public void resetCounter(String userName, String contactName) throws SQLException {
         String sql = "UPDATE message SET New=0 WHERE Sender=? AND Receiver=?";
         this.getJdbcTemplate().update(sql, contactName, userName);
-    }
-    
-    
-    public UserAccount findUserAccount(String userName) {
-
-        String sql = "SELECT u.USER_NAME, u.ENCRYPTED_PASSWORD From APP_USER u WHERE u.USER_NAME = ? ";
- 
-        Object[] params = new Object[] { userName };
-        UserAccountMapper mapper = new UserAccountMapper();
-        try {
-        	UserAccount userInfo = this.getJdbcTemplate().queryForObject(sql, params, mapper);
-            return userInfo;
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    }
-    
-    
-    public String addUserAccount(UserAccount user) throws SQLException {
-    	
-    	if (findUserAccount(user.getUserName()) != null) {
-    		return "error";
-    	}
-    	
-		String sql = "INSERT INTO APP_USER (USER_NAME, ENCRYPTED_PASSWORD, ENABLED, LETTER) VALUES (?, ?, 1, ?)";
-        this.getJdbcTemplate().update(sql, user.getUserName(), user.getEncryptedPassword(), user.getLetter());
-        return "";
     }
     
     

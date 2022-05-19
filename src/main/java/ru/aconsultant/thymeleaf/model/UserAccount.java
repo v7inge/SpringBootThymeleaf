@@ -1,25 +1,34 @@
 package ru.aconsultant.thymeleaf.model;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Random;
 
+@Entity
+@Table(name = "APP_USER")
 public class UserAccount implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	@Id
+	@Column(name = "USER_NAME")
 	private String userName;
+
+	@Column(name = "ENCRYPTED_PASSWORD")
 	private String encryptedPassword;
+
+	@Column(name = "LETTER")
 	private String letter;
 	
-	public UserAccount() {
-	
-	}
+	public UserAccount() { }
 	
 	public UserAccount(String userName, String encryptedPassword) {
 		this.userName = userName;
 		this.encryptedPassword = encryptedPassword;
 		setRandomLetter();
 	}
-	
-	
 	
 	public void setUserName(String userName) {
 		this.userName = userName;
