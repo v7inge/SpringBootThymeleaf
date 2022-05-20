@@ -16,11 +16,7 @@ public class UserAccountService {
     UserAccountRepositoryInterface userAccountRepositoryInterface;
 
     public UserAccount save(UserAccount userAccount) {
-        if (userAccount.getUsername() != null && findUserAccount(userAccount.getUsername()) == null) {
-            return userAccountRepositoryInterface.save(userAccount);
-        } else {
-            return null;
-        }
+        return userAccountRepositoryInterface.save(userAccount);
     }
 
     public UserAccount findUserAccount(String username) {

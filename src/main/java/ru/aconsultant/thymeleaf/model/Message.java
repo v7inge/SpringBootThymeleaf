@@ -8,7 +8,7 @@ import java.util.Date;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "message")
+@Table(name = "MESSAGES")
 public class Message {
 
 	@Column(name = "Sender")

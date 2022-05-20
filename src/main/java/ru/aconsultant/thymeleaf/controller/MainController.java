@@ -268,22 +268,28 @@ public class MainController {
 	public void contactAdd(Model model, HttpServletRequest request, HttpServletResponse response, Principal principal) throws SQLException, IOException {
 		
 		HashMap<String, Object> requestParameters = httpParamProcessor.getRequestParameters(request);
-		String addedContact = (String) requestParameters.get("input");
-        String userName = principal.getName();
-        
-        // Add dialogues to the database
-        databaseAccess.addContact(userName, addedContact);
-        databaseAccess.addContact(addedContact, userName);
-        
+		String addedName = (String) requestParameters.get("input");
+        String currentName = principal.getName();
+
+        UserAccount currentUser = userAccountService.findUserAccount(currentName);
+        UserAccount addedUser = userAccountService.findUserAccount(addedName);
+
+		// Add dialogues to the database
+        currentUser.getContactNames().add(addedName);
+        addedUser.getContactNames().add(currentName);
+
+        userAccountService.save(currentUser);
+        userAccountService.save(addedUser);
+
         // Notify the user he was added. We use "text" and "filePath" fields to store data of the user who added a contact.
         Message message = new Message();
-        Contact user = databaseAccess.getContact(userName);
-        message.setSender(userName);
+        UserAccount user = userAccountService.findUserAccount(currentName);
+        message.setSender(currentName);
         message.setText(user.getBase64Image());
         message.setFilePath(user.getLetter());
-        message.setReceiver(addedContact);
+        message.setReceiver(addedName);
         message.setCode(6);
-        messagingTemplate.convertAndSendToUser(addedContact, "/queue/reply", message);
+        messagingTemplate.convertAndSendToUser(addedName, "/queue/reply", message);
 	}
 	
 	
@@ -401,10 +407,10 @@ public class MainController {
 	@RequestMapping(value = { "/test" }, method = RequestMethod.POST)
 	public void test(HttpServletResponse response, Principal principal, HttpServletRequest request) throws SQLException, IOException, InterruptedException {
 
-		List<Message> messages = messageService.getHistory("friend", "test");
+		//List<Message> messages = messageService.getHistory("friend", "test");
 		
-		/*fileProcessor.clearAllConversationContents("victor", "jerry");
-		System.out.println("Content cleared");*/
+		fileProcessor.clearAllConversationContents("test", "friend");
+		System.out.println("Content cleared");
 	}
 	
 	

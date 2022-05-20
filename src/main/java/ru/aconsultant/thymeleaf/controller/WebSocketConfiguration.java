@@ -32,7 +32,9 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 	}
 
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		
+
+		registry.addEndpoint("/public").withSockJS();
+
 		registry
 		.addEndpoint("/chat-messaging")
 		.setHandshakeHandler(new DefaultHandshakeHandler() {

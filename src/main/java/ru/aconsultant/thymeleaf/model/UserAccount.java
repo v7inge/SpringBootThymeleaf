@@ -2,8 +2,9 @@ package ru.aconsultant.thymeleaf.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 @Entity
 @Table(name = "APP_USER")
@@ -24,11 +25,11 @@ public class UserAccount implements Serializable {
 	@ElementCollection
 	@Column(name = "Contact")
 	@CollectionTable(name = "PERSONAL_CHATS", joinColumns = @JoinColumn(name = "User"))
-	private List<String> contactNames;
+	private Set<String> contactNames = new HashSet<>();
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "PERSONAL_CHATS", joinColumns = @JoinColumn(name = "User"), inverseJoinColumns = @JoinColumn(name = "Contact"))
-	private List<UserAccount> companions;
+	private Set<UserAccount> companions;
 
 	@Transient
 	private Integer unreadCount;
@@ -78,19 +79,19 @@ public class UserAccount implements Serializable {
 		return letter;
 	}
 
-	public List<String> getContactNames() {
+	public Set<String> getContactNames() {
 		return contactNames;
 	}
 
-	public void setContactNames(List<String> contactNames) {
+	public void setContactNames(Set<String> contactNames) {
 		this.contactNames = contactNames;
 	}
 
-	public List<UserAccount> getCompanions() {
+	public Set<UserAccount> getCompanions() {
 		return companions;
 	}
 
-	public void setCompanions(List<UserAccount> companions) {
+	public void setCompanions(Set<UserAccount> companions) {
 		this.companions = companions;
 	}
 

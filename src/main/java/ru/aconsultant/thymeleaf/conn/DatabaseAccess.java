@@ -1,6 +1,5 @@
 package ru.aconsultant.thymeleaf.conn;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -10,15 +9,12 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.InvalidResultSetAccessException;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.aconsultant.thymeleaf.mapper.ContactMapper;
-import ru.aconsultant.thymeleaf.mapper.MessageMapper;
-import ru.aconsultant.thymeleaf.mapper.UserAccountMapper;
 import ru.aconsultant.thymeleaf.model.*;
 
 @Repository
@@ -39,14 +35,14 @@ public class DatabaseAccess extends JdbcDaoSupport {
     
     public void saveMessage(Message message) throws SQLException {
     	
-        String sql = "INSERT INTO message (Sender, Receiver, DateTime, Text, FilePath, Code, ID, FileName, New) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO MESSAGES (Sender, Receiver, DateTime, Text, FilePath, Code, ID, FileName, New) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         this.getJdbcTemplate().update(sql, message.getSender(), message.getReceiver(), message.getDateTime(), message.getText(), 
         		message.getFilePath(), message.getCode(), message.getId(), message.getFileName(), message.getNewOne());
     }
     
     
     public void resetCounter(String userName, String contactName) throws SQLException {
-        String sql = "UPDATE message SET New=0 WHERE Sender=? AND Receiver=?";
+        String sql = "UPDATE MESSAGES SET New=0 WHERE Sender=? AND Receiver=?";
         this.getJdbcTemplate().update(sql, contactName, userName);
     }
     
@@ -69,25 +65,6 @@ public class DatabaseAccess extends JdbcDaoSupport {
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
-    }
-    
-    
-    public void addContact(String username, String contact) throws SQLException {
-    	
-    	String sql = "SELECT ch.User, ch.Contact FROM PERSONAL_CHATS ch \n" + 
-    			"WHERE ch.User = ? AND ch.Contact = ?";
-    	
-    	Object[] args = new Object[] { username, contact };
-		int[] argTypes = new int[] { Types.VARCHAR, Types.VARCHAR };
-    	
-		try {
-			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
-		    if (rs.next()) { } else {
-		    	sql = "INSERT INTO PERSONAL_CHATS (User, Contact, New) VALUES (?, ?, NULL)";
-		    	this.getJdbcTemplate().update(sql, username, contact);
-		    }
-			
-        } catch (EmptyResultDataAccessException e) { }    
     }
     
     
@@ -115,29 +92,9 @@ public class DatabaseAccess extends JdbcDaoSupport {
     }
     
     
-    public Contact getContact(String name) {
-    
-    	String sql = "SELECT USER_NAME, BASE64IMAGE, LETTER FROM APP_USER WHERE USER_NAME=? LIMIT 1";
-
-		Object[] args = new Object[] { name };
-		ContactMapper mapper = new ContactMapper();
-    	
-		try {
-			List<Contact> users = this.getJdbcTemplate().query(sql, args, mapper);
-			if (users.size() > 0) {
-		        return users.get(0);
-		    } else {
-		    	return null;
-		    }
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    }
-    
-    
     public List<String> getFilePaths(String user1, String user2) {
     	
-    	String sql = "SELECT m.FilePath FROM message m \r\n" +
+    	String sql = "SELECT m.FilePath FROM MESSAGES m \r\n" +
     			"WHERE (m.Sender = ? AND m.Receiver = ? OR m.Sender = ? AND m.Receiver = ?) \r\n" + 
     			"AND m.FilePath IS NOT NULL";
     	
@@ -159,7 +116,7 @@ public class DatabaseAccess extends JdbcDaoSupport {
     
     public void clearMessageHistory(String user1, String user2) {
     	
-    	String sql = "DELETE FROM message WHERE Sender = ? AND Receiver = ? OR Sender = ? AND Receiver = ?";
+    	String sql = "DELETE FROM MESSAGES WHERE Sender = ? AND Receiver = ? OR Sender = ? AND Receiver = ?";
         this.getJdbcTemplate().update(sql, user1, user2, user2, user1);
     }
 
