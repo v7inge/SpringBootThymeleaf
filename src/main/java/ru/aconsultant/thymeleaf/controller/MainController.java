@@ -127,14 +127,19 @@ public class MainController {
 	public String chatGet(Model model, Principal principal, HttpServletRequest request) throws SQLException, InvalidResultSetAccessException, IOException {
  		
 		setSessionAttribute(request, "currentContact", null);
-		
+
+		UserAccount user = userAccountService.findUserAccount(principal.getName());
+		List<UserAccount> contacts = userAccountService.getContactAccounts(user);
+		model.addAttribute("contactList", contacts);
+
 		// Fill contact list
-        List<Contact> contactList = databaseAccess.userContactList(principal.getName());
+        /*List<Contact> contactList = userAccountService.userContactList(principal.getName());
         int indexLast = contactList.size() - 1;
         Contact user = contactList.get(indexLast);
         contactList.remove(indexLast);
         
-		model.addAttribute("contactList", contactList);
+		model.addAttribute("contactList", contactList);*/
+
 		model.addAttribute("user", user);
 
 		return "chat";

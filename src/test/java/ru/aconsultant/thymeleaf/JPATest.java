@@ -23,8 +23,9 @@ public class JPATest {
     @Test
     @Transactional
     public void findUserAccountTest() {
-        //UserAccount userAccount = userAccountService.findUserAccount("victor");
+        UserAccount userAccount = userAccountService.findUserAccount("friend");
         //Hibernate.initialize(userAccount.getContactNames());
-        List<Contact> contacts = userAccountService.userContactList("friend");
+        //List<Contact> contacts = userAccountService.userContactList("friend");
+        List<UserAccount> accounts = userAccountService.getCompanions(userAccount);
     }
 }

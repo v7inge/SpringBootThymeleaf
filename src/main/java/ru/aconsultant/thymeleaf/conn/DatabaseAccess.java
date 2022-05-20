@@ -37,38 +37,6 @@ public class DatabaseAccess extends JdbcDaoSupport {
     }
     
     
-    public List<Contact> userContactList(String username) throws InvalidResultSetAccessException, SQLException, IOException {
-    	
-    	String sql =
-    			"SELECT AppUser.USER_NAME AS Username, SUM(m.New) AS UnreadCount, AppUser.BASE64IMAGE AS Base64Image, AppUser.LETTER AS Letter, 0 AS Current FROM\r\n" + 
-    			"(SELECT chats.User, chats.Contact FROM PERSONAL_CHATS chats WHERE chats.User = ?) AS UserChats\r\n" + 
-    			"LEFT JOIN message m ON UserChats.Contact = m.Sender AND m.Receiver = ? AND m.New = 1\r\n" +
-    			"LEFT JOIN APP_USER AppUser ON UserChats.Contact = AppUser.USER_NAME\r\n" + 
-    			"GROUP BY UserChats.Contact\r\n" + 
-    			"UNION\r\n" + 
-    			"SELECT AppUser.USER_NAME, 0, AppUser.BASE64IMAGE, AppUser.LETTER, 1 FROM\r\n" + 
-    			"APP_USER AppUser WHERE AppUser.USER_NAME = ?";
-    	
-    	Object[] args = new Object[] { username, username, username };
-		int[] argTypes = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR };
-		
-		try {
-			SqlRowSet rs = this.getJdbcTemplate().queryForRowSet(sql, args, argTypes);
-			
-			ArrayList<Contact> list = new ArrayList<Contact>();
-		    while (rs.next()) {   	
-		    	Contact contact = new Contact(rs.getString("Username"), rs.getInt("UnreadCount"), rs.getInt("Current")==1, rs.getString("Base64Image"), rs.getString("Letter"));
-		    	list.add(contact);
-		    }
-		    return list;
-			
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    	
-    }
-    
-    
     public void saveMessage(Message message) throws SQLException {
     	
         String sql = "INSERT INTO message (Sender, Receiver, DateTime, Text, FilePath, Code, ID, FileName, New) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";

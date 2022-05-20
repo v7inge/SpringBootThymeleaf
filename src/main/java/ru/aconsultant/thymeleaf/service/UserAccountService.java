@@ -16,7 +16,7 @@ public class UserAccountService {
     UserAccountRepositoryInterface userAccountRepositoryInterface;
 
     public UserAccount save(UserAccount userAccount) {
-        if (userAccount.getUserName() != null && findUserAccount(userAccount.getUserName()) == null) {
+        if (userAccount.getUsername() != null && findUserAccount(userAccount.getUsername()) == null) {
             return userAccountRepositoryInterface.save(userAccount);
         } else {
             return null;
@@ -24,7 +24,7 @@ public class UserAccountService {
     }
 
     public UserAccount findUserAccount(String username) {
-        return userAccountRepositoryInterface.findByUserName(username);
+        return userAccountRepositoryInterface.findByUsername(username);
     }
 
     public List<Contact> userContactList(String username) {
@@ -40,5 +40,14 @@ public class UserAccountService {
             }
         }
         return contacts;
+    }
+
+    public List<UserAccount> getCompanions(UserAccount userAccount) {
+        return Util.getAsList(userAccountRepositoryInterface.getContactz(userAccount.getUsername()));
+        //return Util.getAsList(userAccountRepositoryInterface.getContactAccounts(userAccount.getUserName(), userAccount.getContactNames()));
+    }
+
+    public List<UserAccount> getContactAccounts(UserAccount userAccount) {
+        return Util.getAsList(userAccountRepositoryInterface.getContactAccounts(userAccount.getUsername(), userAccount.getContactNames()));
     }
 }

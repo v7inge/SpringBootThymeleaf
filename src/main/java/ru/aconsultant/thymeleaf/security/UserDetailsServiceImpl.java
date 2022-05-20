@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import ru.aconsultant.thymeleaf.conn.DatabaseAccess;
 import ru.aconsultant.thymeleaf.model.UserAccount;
 import ru.aconsultant.thymeleaf.service.UserAccountService;
 
@@ -31,7 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("User " + userName + " was not found in the database");
         }
 
-        return new User(appUser.getUserName(), appUser.getEncryptedPassword(), createAuthorityList("ROLE_USER"));
+        return new User(appUser.getUsername(), appUser.getEncryptedPassword(), createAuthorityList("ROLE_USER"));
     }
     
     public List<GrantedAuthority> createAuthorityList(String role) {

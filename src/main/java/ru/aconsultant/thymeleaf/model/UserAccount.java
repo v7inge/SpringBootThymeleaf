@@ -1,5 +1,4 @@
 package ru.aconsultant.thymeleaf.model;
-import org.springframework.data.repository.cdi.Eager;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -14,7 +13,7 @@ public class UserAccount implements Serializable {
 
 	@Id
 	@Column(name = "USER_NAME")
-	private String userName;
+	private String username;
 
 	@Column(name = "ENCRYPTED_PASSWORD")
 	private String encryptedPassword;
@@ -31,16 +30,32 @@ public class UserAccount implements Serializable {
 	@JoinTable(name = "PERSONAL_CHATS", joinColumns = @JoinColumn(name = "User"), inverseJoinColumns = @JoinColumn(name = "Contact"))
 	private List<UserAccount> companions;
 
+	@Transient
+	private Integer unreadCount;
+
+	@Column(name = "BASE64IMAGE")
+	private String base64Image;
+
+	@Transient
+	private boolean current;
+
 	public UserAccount() { }
 	
-	public UserAccount(String userName, String encryptedPassword) {
-		this.userName = userName;
+	public UserAccount(String username, String encryptedPassword) {
+		this.username = username;
 		this.encryptedPassword = encryptedPassword;
 		setRandomLetter();
 	}
-	
-	public void setUserName(String userName) {
-		this.userName = userName;
+
+	public UserAccount(String username, String letter, Long unreadCount, String base64Image) {
+		this.username = username;
+		this.letter = letter;
+		this.unreadCount = unreadCount == null ? 0 : unreadCount.intValue();
+		this.base64Image = base64Image;
+	}
+
+	public void setUsername(String userName) {
+		this.username = userName;
 	}
 	
 	public void setEncryptedPassword(String encryptedPassword) {
@@ -51,8 +66,8 @@ public class UserAccount implements Serializable {
 		this.letter = letter;
 	}
 	
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 	
 	public String getEncryptedPassword() {
@@ -79,9 +94,33 @@ public class UserAccount implements Serializable {
 		this.companions = companions;
 	}
 
+	public Integer getUnreadCount() {
+		return unreadCount;
+	}
+
+	public void setUnreadCount(Integer unreadCount) {
+		this.unreadCount = unreadCount;
+	}
+
+	public String getBase64Image() {
+		return base64Image;
+	}
+
+	public void setBase64Image(String base64Image) {
+		this.base64Image = base64Image;
+	}
+
+	public boolean isCurrent() {
+		return current;
+	}
+
+	public void setCurrent(boolean current) {
+		this.current = current;
+	}
+
 	@Override
     public String toString() {
-        return this.userName + "/" + this.encryptedPassword;
+        return this.username + "/" + this.encryptedPassword;
     }
 	
 	private void setRandomLetter() {
